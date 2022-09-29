@@ -4,16 +4,18 @@ import { lazy, Suspense, useContext } from "react";
 import Settings from "src/pages/Settings";
 import { Loader } from "src/components/Loader";
 import { AuthContext } from "src/utils/contexts/AuthContext";
+import Page404 from "src/pages/Page404/Page404";
 
 const Home = lazy(() => import('src/pages/Home'));
 const Manga = lazy(() => import('src/pages/Manga'));
 const MangaCatalog = lazy(() => import('src/pages/MangaCatalog'));
 const Reader = lazy(() => import('src/pages/Reader'));
-const Register = lazy(() => import('src/pages/Register/Register'));
+const SignUp = lazy(() => import('src/pages/SignUp/SignUp'));
 const Login = lazy(() => import('src/pages/Login/Login'));
 const Dashboard = lazy(() => import('src/pages/Dashboard/Dashboard'));
 const AddManga = lazy(() => import('src/pages/Dashboard/AddManga/AddManga'));
 const MangaEdit = lazy(() => import('src/pages/Dashboard/AddChapter/AddChapter'));
+
 
 const WithSuspense = (props: any) => {
     return (
@@ -24,7 +26,6 @@ const WithSuspense = (props: any) => {
 }
 
 export const AppRoutes = () => {
-
     const { data } = useContext(AuthContext);
 
     return (
@@ -41,7 +42,7 @@ export const AppRoutes = () => {
                         <WithSuspense children={<Manga />} />
                     } />
                     <Route path={':id/ch/'} element={
-                        <Navigate to=':id' />
+                        <Navigate to='1'replace={true} />
                     } />
                     <Route path={':id/ch/:id/'} element={
                         <WithSuspense children={<Reader />} />
@@ -70,14 +71,16 @@ export const AppRoutes = () => {
                 <Route path={'/settings'} element={<Settings />} />
 
                 {/*auth page routes*/}
-                <Route path={'/registration'} element={
-                    <WithSuspense children={<Register />} />
+                <Route path={'/signup'} element={
+                     data?.auth?.id ? <Navigate to='/' />
+                     :  <WithSuspense children={<SignUp />} />
                 } />
                 <Route path={'/login'} element={
                     data?.auth?.id ? <Navigate to='/' />
-                        : <Suspense fallback={<Loader />}>
-                            <Login />
-                        </Suspense>
+                        :  <WithSuspense children={<Login />} />
+                } />
+                <Route path={'*'} element={
+                    <Page404 />
                 } />
             </Route>
         </Routes>

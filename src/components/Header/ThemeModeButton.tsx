@@ -4,7 +4,6 @@ import { IconButton, useTheme } from '@mui/material';
 import { ThemeContext} from "src/utils/hooks/useNewTheme";
 
 import {lightTheme, darkTheme} from 'src/configs/theme'
-// type Props = {user: any };
 
 export const ThemeModeButton = ()=>{
     const theme = useTheme();

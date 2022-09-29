@@ -44,10 +44,10 @@ const MangaDeleteDialog = ({manga, handleClose}:Props) => {
         <Box component='form' noValidate onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
           <DialogContentText>
-                Это действие нельзя отменить. Это навсегда удалит мангу <Typography component={'span'} sx={{fontWeight: 700}}>{manga?.title}</Typography>, а также относящиеся к ней комментарии и главы.  
+                Это действие нельзя отменить. Это навсегда удалит <Typography component={'span'} sx={{fontWeight: 700}}>{manga?.title}</Typography>, а также относящиеся к ней комментарии и главы.  
                 <br/>
                 <br/>
-                Введите <Typography component={'span'} sx={{fontWeight: 700}}>{manga?.title}</Typography> для подтверждения.
+                Введите ( <Typography component={'span'} sx={{fontWeight: 700}}>{manga?.title}</Typography> ) для подтверждения.
           </DialogContentText>
           <TextField
             autoFocus

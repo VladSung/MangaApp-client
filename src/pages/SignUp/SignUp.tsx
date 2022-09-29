@@ -22,22 +22,14 @@ const REGISTER_USER = gql`
     }
 `
 
-export default function SignUp() {
+const SignUp =  ()=> {
     const { register, handleSubmit, formState: { errors } } = useForm<FormInput>({mode: 'onBlur'});
 
     const [registerUser, {loading, error}] = useMutation(REGISTER_USER, {
-      update(cache, { data: { registerUser } }) {
-        cache.modify({
-          fields: {
-            auth(){
-              const auth = cache.writeQuery({
-                query: AUTH,
-                data: registerUser});
-              return auth;
-            }
-          }
-        });
-      }
+      refetchQueries: [
+        {query: AUTH},
+        'auth'
+      ],
     });
 
     const onSubmit: SubmitHandler<FormInput> = data =>{
@@ -139,3 +131,5 @@ export default function SignUp() {
       </Container>
   );
 }
+
+export default SignUp

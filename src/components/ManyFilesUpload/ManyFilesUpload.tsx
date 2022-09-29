@@ -2,9 +2,8 @@
 import { ChangeEventHandler, useCallback} from "react";
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import { Typography, Card, CardActionArea, CardContent, CardMedia, CardProps, ImageList, ImageListItem} from "@mui/material";
+import { Typography, Card, CardActionArea, CardContent, CardProps, ImageList, ImageListItem} from "@mui/material";
 import {css} from '@emotion/react'
-import { forEach } from "lodash-es";
 
 const cssCard = css`
     position: relative;

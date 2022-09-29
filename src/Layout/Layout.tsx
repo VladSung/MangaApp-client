@@ -21,7 +21,7 @@ const Layout = ()=>{
                     <Outlet/>
                 </Box>
                 {
-                    location.pathname?.split('/')[3]?.indexOf('ch') > -1
+                    location.pathname.match(/manga\/[A-Za-z0-9]+\/ch/gi)
                     ? <ReaderNavigation/>
                 :
                     <Navigation/>}
