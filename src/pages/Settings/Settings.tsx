@@ -36,13 +36,13 @@ export const Settings = ()=>{
 
     const handleChangeTheme = () => {
         setTheme(theme.palette.mode === 'dark' ? lightTheme : darkTheme)
-      }
+    }
 
     const [logout, {error}]  = useMutation(LOGOUT, {
         refetchQueries: [
             {query: AUTH},
             'auth'
-          ],
+        ],
     });
 
     const handleClick =()=>{
@@ -101,7 +101,6 @@ export const Settings = ()=>{
                 onClick={handleClick}
                 sx={{margin: '32px 0'}}
                 fullWidth={true}
-
                 variant={'outlined'}>Выйти</Button>
             }
             </ListItem>

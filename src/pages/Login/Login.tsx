@@ -109,7 +109,7 @@ const Login = () =>  {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item marginBottom={4}>
-                <MuiLink component={Link} to="/registration" variant="body2">
+                <MuiLink component={Link} to="/signup" variant="body2">
                 Нет аккаунта? Зарегистрироваться
                 </MuiLink>
               </Grid>

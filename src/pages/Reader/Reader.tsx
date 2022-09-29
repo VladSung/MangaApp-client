@@ -2,7 +2,7 @@ import {useLocation} from "react-router-dom";
 import {ImageList, Box, ImageListItem, Skeleton, Typography} from "@mui/material";
 import { gql, useQuery } from "@apollo/client";
 import { Loader } from "src/components/Loader";
-import useWindowDimensions from "src/utils/hooks/useWindowDimensions";
+import Page404 from "../Page404/Page404";
 
 const GET_MANGA_BY_ID = gql`
 query getManga($id: GraphQLObjectId!){
@@ -23,6 +23,8 @@ export const Reader = ()=>{
 
     const {data, loading} = useQuery(GET_MANGA_BY_ID, {variables:{id: mangaId}})
 
+    if(!data?.manga) return <Page404/>
+
     const Chapter = ()=>{
         if(loading) (
             <ImageListItem>
@@ -32,7 +34,6 @@ export const Reader = ()=>{
         )
 
         // есть ли глава
-
         if(!data?.manga?.chapters?.[+chapterId -1 ]?.parts) (
             <ImageListItem>
                 <Box height='80vh' sx={{bgcolor: '#ff10100d'}}>

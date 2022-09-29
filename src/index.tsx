@@ -4,7 +4,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import {GlobalStyles, StyledEngineProvider} from '@mui/material';
+import { GlobalStyles, StyledEngineProvider } from '@mui/material';
 
 import { ApolloProvider } from '@apollo/client/react';
 import { ApolloClient, InMemoryCache, from } from '@apollo/client';
@@ -21,26 +21,25 @@ const client = () => {
     return new ApolloClient({
         cache: new InMemoryCache(),
         credentials: 'same-origin',
-        link: from([removeTypenameFromMutationLink, createUploadLink({uri:`${window.location.origin}/api/`})]),
+        link: from([removeTypenameFromMutationLink, createUploadLink({ uri: process.env.REACT_APP_API_SERVER })]),
     });
 };
-
 root.render(
     <React.StrictMode>
-            <ApolloProvider client={client()}>
-                <DndProvider backend={HTML5Backend}>
-                    <BrowserRouter>
+        <ApolloProvider client={client()}>
+            <DndProvider backend={HTML5Backend}>
+                <BrowserRouter>
                     <StyledEngineProvider injectFirst>
                         <GlobalStyles styles={'default'} />
-                                <App /> 
-                </StyledEngineProvider>
+                        <App />
+                    </StyledEngineProvider>
                 </BrowserRouter>
-                </DndProvider>
-            </ApolloProvider>
+            </DndProvider>
+        </ApolloProvider>
     </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals(console.log);

@@ -5,12 +5,12 @@ import {light, dark} from "@mui/material/styles/createPalette";
 
 declare module '@mui/material/styles' {
     interface Theme {
-      extPalette:{
-        background: {
-            primary: string
-            over: string
+        extPalette:{
+            background: {
+                primary: string
+                over: string
+            }
         }
-      }
     }
     // allow configuration using `createTheme`
     interface ThemeOptions {
@@ -19,9 +19,9 @@ declare module '@mui/material/styles' {
                 primary?: string
                 over?: string
             }
-          };
+        };
     }
-  }
+}
 
 const typography = {
     h1: {
@@ -57,7 +57,7 @@ const typography = {
 }
 const palette = {
     primary:{
-        main: '#0074ab',
+        main: '#e9546b',
     },
     secondary:{
         main: '#c13e53'
@@ -86,7 +86,7 @@ export  const darkTheme = createTheme({
 let theme = createTheme(lightTheme, {
     extPalette:{
         background: {
-            primary:'#0074ab15',
+            primary:'#e9546b15',
             over: alpha((grey[50]), 0.6)
         }
     },
