@@ -1,0 +1,10 @@
+{
+    "sidebar": {
+        "overview": "Обзор",
+        "stats": "Статистика",
+        "notifications": "Уведомления",
+        "projects": "Проекты",
+        "teams": "Команды",
+        "chats": "Чаты"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "sidebar": {
+        "overview": "Overview",
+        "stats": "Stats",
+        "notifications": "Notifications",
+        "projects": "Projects",
+        "teams": "Teams",
+        "chats": "Chats"
+    }
+}
