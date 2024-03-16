@@ -20,7 +20,7 @@
             }
         ],
         "paths": {
-            "@/*": ["./*"]
+            "@/app/*": ["./app/*"]
         }
     },
     "include": [
@@ -28,7 +28,8 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "app/api/auth/[auth0]/route.ts"
+        "app/api/auth/[auth0]/route.ts",
+        "tailwind.config.js"
     ],
     "exclude": ["node_modules"]
 }

@@ -1,16 +1,20 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
     images: {
-        domains: ['res.cloudinary.com'],
-    },
-    i18n: {
-        defaultLocale: 'default',
-        locales: ['ru', 'en', 'default'],
-        localeDetection: true,
-    },
-    experimental: {
-        serverActions: true,
-        appDir: true,
+        remotePatterns: [
+            {
+                hostname: 'res.cloudinary.com',
+                protocol: 'https',
+                pathname: '/dd5xzevrq/image/upload/**',
+            },
+            {
+                hostname: 'localhost',
+                port: '9000',
+                protocol: 'http',
+                pathname: '/alopex/**',
+            },
+        ],
     },
 };
 

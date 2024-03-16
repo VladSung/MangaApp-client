@@ -1,17 +1,20 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-    schema: 'http://localhost:5000/api/graphql',
+    schema: 'http://localhost:5000/graphql',
+    debug: true,
     documents: [
-        '_src/**/*.tsx',
-        '_src/widgets/**/*.tsx',
-        '_src/features/**/*.tsx',
-        '_src/pages/**/*.tsx',
+        'app/**/*.{ts,tsx}',
+        // 'app/features/**/*.{ts,tsx}',
+        // 'app/(pages)/**/*.{ts,tsx}',
     ],
     ignoreNoDocuments: true, // for better experience with the watcher
     generates: {
-        './_src/shared/api/graphql/': {
+        './app/shared/api/graphql/generated/': {
             preset: 'client',
+            config: {
+                avoidOptionals: true,
+            },
         },
     },
 };

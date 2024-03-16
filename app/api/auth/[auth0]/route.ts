@@ -1,5 +1,5 @@
-import { getAccessToken, handleAuth, handleLogin } from '@auth0/nextjs-auth0';
-
+import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export const GET = handleAuth({
     login: handleLogin({
         authorizationParams: {
@@ -7,9 +7,5 @@ export const GET = handleAuth({
             scope: 'openid profile email offline_access',
         },
     }),
-    // getAccessToken: async (req, res)=>{
-    //     const token = await getAccessToken();
-
-    //     return res.send(token);
-    // }
-});
+}) as (...args: any) => any;
+/* eslint-enable  */

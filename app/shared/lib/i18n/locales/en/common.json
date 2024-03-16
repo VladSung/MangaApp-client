@@ -1,0 +1,10 @@
+{
+    "art-by": "Art by",
+    "go-back": "Go back",
+    "error": {
+        "404": {
+            "title": "404",
+            "description": "Page not found! Maybe page was deleted or "
+        }
+    }
+}

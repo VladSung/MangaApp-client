@@ -10,7 +10,6 @@ module.exports = {
         'plugin:boundaries/recommended',
         'plugin:unicorn/recommended',
         'plugin:import/recommended',
-        'plugin:prettier/recommended',
         'plugin:import/errors',
         'plugin:import/typescript',
     ],
@@ -26,11 +25,10 @@ module.exports = {
         'react-hooks',
         'import',
         'boundaries',
-        'prettier',
         'unicorn',
         'simple-import-sort',
     ],
-    ignorePatterns: ['**/node_modules', '**/public', '**/build', '/src/shared/api'],
+    ignorePatterns: ['**/node_modules', '**/public', '**/build', '/app/shared/api'],
 
     overrides: [
         {
@@ -52,7 +50,7 @@ module.exports = {
             typescript: true,
             node: {
                 extensions: ['.js', '.jsx', 'mjs', 'cjs', '.ts', '.tsx', '.native.js'],
-                paths: ['src'],
+                paths: ['app'],
             },
         },
         'boundaries/elements': [
@@ -65,27 +63,27 @@ module.exports = {
             {
                 type: 'pages',
                 mode: 'folder',
-                pattern: 'src/pages/*',
+                pattern: 'app/[lng]/*',
             },
             {
                 type: 'widgets',
                 mode: 'folder',
-                pattern: 'widgets/*',
+                pattern: 'app/widgets/*',
             },
             {
                 type: 'features',
                 mode: 'folder',
-                pattern: 'features/',
+                pattern: 'app/features/',
             },
             {
                 type: 'entities',
                 mode: 'folder',
-                pattern: 'entities/*',
+                pattern: 'app/entities/*',
             },
             {
                 type: 'shared',
                 mode: 'folder',
-                pattern: 'shared/*',
+                pattern: 'app/shared/*',
             },
         ],
     },
@@ -96,13 +94,7 @@ module.exports = {
 
         '@typescript-eslint/no-floating-promises': ['warn'],
 
-        '@typescript-eslint/no-misused-promises': [
-            'error',
-            {
-                checksVoidReturn: false,
-                ignoreIIFE: true,
-            },
-        ],
+        '@typescript-eslint/no-misused-promises': ['warn'],
 
         'linebreak-style': [2, process.platform === 'win32' ? 'windows' : 'unix'],
 
@@ -182,7 +174,9 @@ module.exports = {
         'import/newline-after-import': 'error',
         'import/no-duplicates': 'error',
 
-        'react-hooks/rules-of-hooks': 'error',
+        'react/display-name': 'warn',
+
+        'react-hooks/rules-of-hooks': 'warn',
         'react-hooks/exhaustive-deps': 'warn',
 
         'unicorn/no-abusive-eslint-disable': 2,
@@ -208,13 +202,15 @@ module.exports = {
             {
                 cases: {
                     camelCase: true,
+                    kebabCase: true,
                 },
             },
         ],
+        'unicorn/no-null': ['warn'],
         'unicorn/prevent-abbreviations': [
-            'error',
+            'off',
             {
-                ignore: ['env', 'Props', 'ImportMetaEnv'],
+                ignore: ['env', 'Props'],
             },
         ],
     },

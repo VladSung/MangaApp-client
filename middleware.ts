@@ -1,12 +1,12 @@
 import { NextResponse, NextRequest } from 'next/server';
 import acceptLanguage from 'accept-language';
-import { fallbackLng, languages } from './_src/shared/lib/i18n/settings';
+import { fallbackLng, languages } from './app/shared/lib/i18n/settings';
 
 acceptLanguage.languages(languages);
 
 export const config = {
     // matcher: '/:lng*',
-    matcher: ['/:lng', '/((?!api|_next/static|_error|_next/image|assets|favicon.ico|sw.js).*)'],
+    matcher: ['/((?!api|_next/static|_error|_next/image|assets|favicon.ico|sw.js).*)'],
 };
 
 const cookieName = 'i18next';
@@ -19,11 +19,14 @@ export function middleware(req: NextRequest) {
     if (!lng) lng = fallbackLng;
 
     // Redirect if lng in path is not supported
+
     if (
         !languages.some((loc) => req.url.includes(`/${loc}`)) &&
         !req.nextUrl.pathname.startsWith('/_next')
     ) {
-        return NextResponse.redirect(new URL(`/${lng}${req.nextUrl.pathname}`, req.url));
+        return NextResponse.redirect(
+            new URL(`/${lng}${req.nextUrl.pathname}${req.nextUrl?.search}`, req.url)
+        );
     }
 
     if (req.headers.has('referer')) {
@@ -33,5 +36,6 @@ export function middleware(req: NextRequest) {
         if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
         return response;
     }
+
     return NextResponse.next();
 }
