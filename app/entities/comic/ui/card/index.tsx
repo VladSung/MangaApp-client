@@ -56,11 +56,9 @@ export const Card = ({ data }: Props) => {
             <Box className='card-content' w={cardWidth}>
                 <Title order={5}
                     lineClamp={2}
-                    component={Link}
-                    href={`/comic/${data?.id}`}
                     size='h6'
                 >
-                    {data?.title}
+                    <Link href={`/comic/${data?.id}`}>{data?.title}</Link>
                 </Title>
             </Box>
         </Box>

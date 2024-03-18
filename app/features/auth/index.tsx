@@ -34,8 +34,6 @@ export const LoginButtonOrAvatar = async () => {
             },
         });
 
-        console.log(data, errors)
-
         if (errors?.filter(err => (err.extensions.code === 'TOKEN_EXPIRED'))[0]) {
             // if (session?.accessTokenExpiresAt && session?.accessTokenExpiresAt * 1000 < new Date().getTime()) {
             redirect('/api/auth/authorize')

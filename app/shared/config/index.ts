@@ -1,8 +1,6 @@
-import { default as path } from './path';
-
 export const config = {
     apollo: {
-        uri: process.env.APP_API_SERVER,
-        wsUri: process.env.VITE_API_WS_SERVER,
+        uri: process.env.NEXT_PUBLIC_SERVER_API!,
+        wsUri: process.env.NEXT_PUBLIC_SERVER_API_WS!,
     },
 };

@@ -13,11 +13,12 @@ import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 import { PropsWithChildren } from 'react';
 import { apolloLinks } from '../shared/lib/apollo/links';
+import { config } from '@/app/shared/config';
 
 const wsLink = () =>
     new GraphQLWsLink(
         createClient({
-            url: 'ws://localhost:5000/graphql/ws',
+            url: config.apollo.wsUri,
         })
     );
 
@@ -40,7 +41,7 @@ const makeClient = (token?: string) => () => {
     });
 
     const httpLink = new HttpLink({
-        uri: 'http://localhost:5000/graphql',
+        uri: config.apollo.uri,
     });
 
     const splitLink = () =>
@@ -66,9 +67,9 @@ const makeClient = (token?: string) => () => {
                         stripDefer: true,
                     }) as ApolloLink,
                     authLink, formatDateLink,
-                    httpLink, ...apolloLinks
+                    ...apolloLinks, httpLink
                 ]
-                : [formatDateLink, authLink, splitLink(), ...apolloLinks]
+                : [formatDateLink, authLink, ...apolloLinks, splitLink()]
         ),
     });
 };

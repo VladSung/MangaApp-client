@@ -27,7 +27,7 @@ export const OneUpload = ({ initialImage, height, width, resolution = '(960 x 14
                 maxFiles={1}
                 h='100%'
                 style={{ cursor: 'pointer' }}
-                onDrop={(files: FileWithPath[]) => form.setFieldValue('cover', files[0])}
+                onDrop={(files) => form.setFieldValue('cover', (files as unknown as FileWithPath[])[0])}
                 align='center'
                 justify='center'>
                 <Text ta="center">Drop image here</Text>

@@ -1,7 +1,7 @@
 import { MantineSize } from "@mantine/core"
 import Image, { ImageProps } from "next/image"
 
-type Props = Omit<ImageProps, 'src' | 'height' | 'width'> & {
+type Props = Omit<ImageProps, 'src' | 'alt' | 'height' | 'width'> & {
     src?: string | null
     alt?: string | null
     size?: MantineSize | number
@@ -34,7 +34,7 @@ export const Avatar = (props: Props) => {
             src={src || '/assets/avatar.png'}
             height={gettedSize}
             width={gettedSize}
-            alt={alt}
+            alt={alt || ''}
         />
     </div>
 }

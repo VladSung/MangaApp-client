@@ -1,77 +1,11 @@
 import Image from 'next/image';
-
-import { graphql } from '@/app/shared/api/graphql';
 import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';
 
 import { ComicContent } from './comic-content';
 import Link from 'next/link';
-import { Box, Button, Card, Title, Text, Flex, CardSection, AppShellMain, Group, Container, Stack } from '@mantine/core';
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { IconBookmark, IconBookmarksFilled, IconEye, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
-
-type Props = {
-    params: {
-        id: string;
-        lng: string;
-    };
-};
-
-const getComicQuery = graphql(`
-    query getComicPage($id: ID!) {
-        comic(id: $id) {
-            title
-            alternativeTitles
-            cover
-            description
-            status
-            genres {
-                id
-                title
-            }
-            tags {
-                id
-                title
-            }
-            chapters {
-                id
-                createdAt
-                number
-                volume
-                title
-                
-            }
-            team {
-                members {
-                    user {
-                        id
-                        avatar
-                        username
-                    }
-                }
-            }
-        }
-    }
-`);
-
-const getComicQueryMeta = graphql(`
-    query getComicMeta($id: ID!) {
-        comic(id: $id) {
-            title
-            description
-        }
-    }
-`);
-
-
-export async function generateMetadata({ params }: Props) {
-    const {
-        data
-    } = useQuery(getComicQuery, { variables: { id: params.id } });
-
-    const comic = data?.comic
-
-    return { title: comic?.title, description: comic?.description };
-}
+import { Box, Button, Card, Title, Text, CardSection, AppShellMain, Group, Container } from '@mantine/core';
+import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
+import { ComicPageProps } from './types';
 
 const Statistics = () => {
     return (
@@ -94,12 +28,7 @@ const Statistics = () => {
 
 
 
-export default function ComicDesktopPage({ params }: Props) {
-    const {
-        data
-    } = useQuery(getComicQuery, { variables: { id: params.id } });
-
-    const comic = data?.comic
+export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicPageProps) {
     if (!comic) {
         return <p>dd</p>;
     }
@@ -131,14 +60,15 @@ export default function ComicDesktopPage({ params }: Props) {
                         component={Link}
                         href={`/comic/${params.id}/ch/1/1`}
                         size="sm"
+                        disabled={!comic.chapters?.length}
                         variant="contained"
                         fullWidth
                         style={{ marginBottom: 2 * 8 }}
                     >
-                        Начать читать
+                        {t('start-reading')}
                     </Button>
                     <Button style={{ marginBottom: 2 * 8 }} size="xs" leftSection={<IconBookmark size={20} />} variant="default" fullWidth>
-                        Добавить в закладки
+                        {t('add-bookmark')}
                     </Button>
                     <Button
                         style={{ marginBottom: 2 * 8 }}
@@ -149,7 +79,7 @@ export default function ComicDesktopPage({ params }: Props) {
                         fullWidth
                         color="primary"
                     >
-                        Редактировать
+                        {t('edit')}
                     </Button>
                 </Box>
                 <Box style={{ width: '100%', maxWidth: 600 }}>
@@ -165,7 +95,7 @@ export default function ComicDesktopPage({ params }: Props) {
                             <Text fw={700} size='h4' component={'span'}>9.2</Text>
                         </Group>
                     </Group>
-                    <ComicContent comicId={params.id} comic={comic} />
+                    <ComicContent t={t} comic={comic} />
 
                 </Box>
                 <Box style={{ width: '100%', maxWidth: 256 }}>

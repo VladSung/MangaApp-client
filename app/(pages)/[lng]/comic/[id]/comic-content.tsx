@@ -1,39 +1,13 @@
-import { Box, Button, Tabs, List, Text, Title, Group, TextInput, Stack, ActionIcon } from '@mantine/core';
+import { Box, Button, Tabs, Text, Title, Group } from '@mantine/core';
 import { IconEye, IconSortAscendingNumbers } from '@tabler/icons-react';
 import Link from 'next/link';
-import { Comment } from '@/app/entities/comment';
-import { graphql } from '@/app/shared/api/graphql';
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { Avatar } from '@/app/shared/ui/Avatar';
 import { dayjsRelativeTime } from '@/app/shared/api/dayjs';
+import { CommentList } from '@/app/widgets/comment';
 
-const getCommentsQuery = graphql(`
-    query CommentsByComic($comicId:ID!){
-        commentsByComic(comicId:$comicId){
-            count
-            comments{
-                createdAt
-                content
-                id
-                _count{
-                    replies
-                }
-                author{
-                    id
-                    avatar
-                    username
-                }
-            }
-        }
-    }
-`)
-
-export const ComicContent = ({
-    comic,
-    comicId,
-}: {
-    comicId: string;
+type ComicContentProps = {
+    t: (key: string | string[]) => string
     comic: {
+        id: string;
         description: string | null;
         genres: { id: number; title: string }[] | null;
         tags: { id: number; title: string }[] | null;
@@ -47,8 +21,9 @@ export const ComicContent = ({
         }[]
         | null;
     };
-}) => {
-    const { data: commentsData } = useQuery(getCommentsQuery, { variables: { comicId } })
+};
+
+export const ComicContent = ({ comic, t }: ComicContentProps) => {
     return (
         <Tabs defaultValue='chapters' style={{ width: '100%' }}>
             <Text component='pre' style={{ textWrap: 'balance', marginBottom: 2 * 8, whiteSpace: 'pre-wrap', fontFamily: 'var(--mantine-font-family)' }}>{comic.description}</Text>
@@ -82,19 +57,21 @@ export const ComicContent = ({
                     style={{ fontSize: '14px', fontWeight: 700 }}
                     value='chapters'
                 >
-                    Список глав
+                    {t('chapter-list')}
                 </Tabs.Tab>
                 <Tabs.Tab
                     style={{ fontSize: '14px', fontWeight: 700 }}
                     value='comments'
-                >Комментарии</Tabs.Tab>
+                >
+                    {t('comments')}
+                </Tabs.Tab>
 
             </Tabs.List>
             <Tabs.Panel value='chapters' py={24}>
                 <Group mb={16} align='center'>
-                    <Title order={3}>Главы</Title>
-                    <Button ml='auto' variant='transparent' rightSection={<IconSortAscendingNumbers size={18} />} size='sm' radius='sm' aria-label='по возрастанию'>
-                        По возрастанию
+                    <Title order={3}>{t('chapters')}</Title>
+                    <Button ml='auto' variant='transparent' rightSection={<IconSortAscendingNumbers size={18} />} size='sm' radius='sm'>
+                        {t('chapter-sort.ascending')}
                     </Button>
                 </Group>
                 {comic.chapters?.map((ch) => (
@@ -106,9 +83,9 @@ export const ComicContent = ({
                             justify='flex-start'
                             component={Link}
                             fullWidth
-                            href={`${comicId}/ch/${ch.volume}/${ch.number}`}
+                            href={`${comic.id}/ch/${ch.volume}/${ch.number}`}
                             leftSection={<IconEye size={18} />}
-                            rightSection={<span>{ch.createdAt && dayjsRelativeTime().to(ch.createdAt)}</span>}
+                            rightSection={<span style={{ marginLeft: 'auto' }}>{ch.createdAt && dayjsRelativeTime().to(ch.createdAt)}</span>}
                         >
                             <Text>
                                 <span style={{ marginRight: '8px' }}>
@@ -120,20 +97,10 @@ export const ComicContent = ({
                         </Button>
                     </Box>
                 ))}
-                {!comic.chapters && <Text>Публикация начнется</Text>}
+                {!comic.chapters?.length && <Text>{t('publish-not-started')}</Text>}
             </Tabs.Panel>
             <Tabs.Panel value='comments'>
-                <Title order={2} mt={24} mb={8} size='h4'>{commentsData?.commentsByComic?.count} comments</Title>
-                <Stack gap={16}>
-                    <Group align='flex-start'>
-                        {/* ! Fix this */}
-                        <Avatar src='' size='md' alt='' style={{ alignSelf: 'flex-start' }} />
-                        <Stack style={{ flexGrow: 1 }}>
-                            <TextInput placeholder='Введите комментарий' />
-                        </Stack>
-                    </Group>
-                    {commentsData?.commentsByComic?.comments?.map(c => (<Comment depth={0} key={c.id} comment={c} />))}
-                </Stack>
+                <CommentList comicId={comic.id} />
             </Tabs.Panel>
         </Tabs >
     );

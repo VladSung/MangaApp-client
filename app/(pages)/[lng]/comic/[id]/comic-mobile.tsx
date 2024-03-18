@@ -1,74 +1,11 @@
 import Image from 'next/image';
 
-import { graphql } from '@/app/shared/api/graphql';
-
 import { ComicContent } from './comic-content';
 import Link from 'next/link';
 import { Box, Button, Card, Container, Title, Stack, Text, Flex, AppShellMain } from '@mantine/core';
 import { IconBookmark } from '@tabler/icons-react';
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
+import { ComicPageProps } from './types';
 
-type Props = {
-    params: {
-        id: string;
-        lng: string;
-    };
-};
-
-const getComicQuery = graphql(`
-    query getComic($id: ID!) {
-        comic(id: $id) {
-            title
-            alternativeTitles
-            cover
-            status
-            description
-            genres {
-                id
-                title
-            }
-            tags {
-                id
-                title
-            }
-            chapters {
-                id
-                number
-                volume
-                title
-            }
-            team {
-                members {
-                    user {
-                        id
-                        avatar
-                        username
-                    }
-                }
-            }
-        }
-    }
-`);
-
-const getComicQueryMeta = graphql(`
-    query getComicMeta($id: ID!) {
-        comic(id: $id) {
-            title
-            description
-        }
-    }
-`);
-
-
-export async function generateMetadata({ params }: Props) {
-    const {
-        data
-    } = useQuery(getComicQuery, { variables: { id: params.id } });
-
-    const comic = data?.comic
-
-    return { title: comic?.title, description: comic?.description };
-}
 
 const Statistics = () => {
     return (
@@ -89,13 +26,7 @@ const Statistics = () => {
     );
 };
 
-export default function ComicPage({ params }: Props) {
-    const {
-        data
-    } = useQuery(getComicQuery, { variables: { id: params.id } });
-
-    const comic = data?.comic
-
+export default function ComicPage({ t, comic: { comic }, params }: ComicPageProps) {
     if (!comic) {
         return <p>dd</p>;
     }
@@ -138,7 +69,7 @@ export default function ComicPage({ params }: Props) {
                     fullWidth
                     style={{ marginBottom: 8 * 2 }}
                 >
-                    Начать читать
+                    {t('start-reading')}
                 </Button>
                 <Button
                     variant='default'
@@ -147,7 +78,7 @@ export default function ComicPage({ params }: Props) {
                     fullWidth
                     style={{ marginBottom: 8 }}
                 >
-                    Добавить в закладки
+                    {t('add-bookmark')}
                 </Button>
                 <Button
                     variant='default'
@@ -156,8 +87,8 @@ export default function ComicPage({ params }: Props) {
                     style={{ marginBottom: 4 * 8 }}
                     component={Link}
                     href={`/comic/${params.id}/ch/1/1`}
-                >Редактировать</Button>
-                <ComicContent comicId={params.id} comic={comic} />
+                >{t('edit')}</Button>
+                <ComicContent t={t} comic={comic} />
             </Container>
             <Box style={{ width: '100%', maxWidth: 256 }}>
                 <Title order={5} style={{ marginBottom: 2 * 8 }}>

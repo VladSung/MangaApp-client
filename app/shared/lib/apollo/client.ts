@@ -7,6 +7,7 @@ import {
 } from '@apollo/experimental-nextjs-app-support/ssr';
 import { getAccessToken } from '@auth0/nextjs-auth0';
 
+import { config } from '@/app/shared/config';
 import { apolloLinks } from './links';
 
 const authLink = setContext(async (_, { headers }) => {
@@ -35,7 +36,7 @@ const authLink = setContext(async (_, { headers }) => {
 
 export const { getClient } = registerApolloClient(() => {
     const httpLink = new HttpLink({
-        uri: process.env.APP_API_SERVER!,
+        uri: config.apollo.uri,
     });
 
     return new NextSSRApolloClient({

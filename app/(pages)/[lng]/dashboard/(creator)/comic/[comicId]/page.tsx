@@ -21,7 +21,6 @@ const getChaptersQuery = graphql(`
 
 const AddComic = async ({ params: { comicId } }: { params: { comicId: string } }) => {
     const chapters = await getClient().query({ query: getChaptersQuery, variables: { id: comicId } })
-    console.log(getClient().cache)
     return (
         <Flex gap='lg'>
             <AppShellSection grow><UpdateComicWidget comicId={comicId} /></AppShellSection>

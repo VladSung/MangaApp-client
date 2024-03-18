@@ -1,0 +1,13 @@
+{
+    "chapter-list": "Chapter list",
+    "comments": "Comments",
+    "chapters": "Chapters",
+    "chapter-sort":{
+        "ascending": "Ascending",
+        "descending": "Descending"
+    },
+    "publish-not-started": "Publication has not yet started",
+    "start-reading": "Start reading",
+    "add-bookmark": "Add to bookmarks",
+    "edit":"Edit"
+}

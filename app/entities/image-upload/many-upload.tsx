@@ -27,7 +27,7 @@ export const ManyUpload = ({ initialImages, height, width, resolution = '(800 x 
                         h='100%'
                         // c='blue'
                         style={{ cursor: 'pointer', overflow: 'auto', padding: 16 }}
-                        onDrop={(newFiles: FileWithPath[]) => { form.setFieldValue('images', [...files, ...newFiles]) }}
+                        onDrop={(newFiles) => { form.setFieldValue('images', [...files, ...(newFiles as unknown as FileWithPath[])]) }}
                         justify='center'
                         align='center'
                     >

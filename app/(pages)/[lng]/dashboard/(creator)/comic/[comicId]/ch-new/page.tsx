@@ -113,7 +113,7 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
             </Breadcrumbs>
             <FormProvider form={form}>
 
-                <form style={{ position: 'relative' }} onReset={form.reset} onSubmit={form.onSubmit((values) => { onSubmit(values); console.log(values) })}>
+                <form style={{ position: 'relative' }} onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>
                     {loading && <Overlay
                         zIndex={201}
                         radius='sm'

@@ -6,7 +6,7 @@ import { PageProps } from '@/app/shared/types';
 import { Avatar } from '@/app/shared/ui/Avatar';
 import { NotFoundError } from '@/app/widgets/not-found';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { Box, Button, Container, Flex, Text, Modal, Table, Tabs, Title, rem, ActionIcon, Link as MantineLink, Fieldset, Stack, Group, TextInput, Textarea, Select } from '@mantine/core';
+import { Box, Button, Container, Flex, Text, Modal, Table, Tabs, Title, rem, ActionIcon, Anchor, Fieldset, Stack, Group, TextInput, Textarea, Select } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconTrash, IconUser } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -85,7 +85,7 @@ export default function TeamList({ params }: Props) {
                     <Table.Tbody>
                         {data?.team?.members?.map((m) => (
                             <Table.Tr key={m?.user?.username}>
-                                <Group component={Table.Td} gap='sm' wrap='no-wrap'>
+                                <Group component={Table.Td} gap='sm' wrap='nowrap'>
                                     <Avatar size='sm' src={m?.user?.avatar} alt={m?.user?.username} />
                                     <Text lineClamp={1} size='sm'>{m?.user?.username}</Text>
                                 </Group>
@@ -101,11 +101,11 @@ export default function TeamList({ params }: Props) {
             <Tabs.Panel value='settings'>
                 <Stack>
                     <Group align='flex-end'>
-                        <TextInput flex={1} label='Name' defaultValue={data?.team?.name} />
+                        <TextInput flex={1} label='Name' defaultValue={data?.team?.name || undefined} />
                         <Button variant='default' size='sm'>Изменить</Button>
                     </Group>
                     <Group>
-                        <Textarea flex={1} label='Description' minRows={1} defaultValue={data?.team?.name} />
+                        <Textarea flex={1} label='Description' minRows={1} defaultValue={data?.team?.name || undefined} />
                         <Button variant='default' size='sm'>Изменить</Button>
                     </Group>
                     <Fieldset color='red' legend="Danger Zone">
