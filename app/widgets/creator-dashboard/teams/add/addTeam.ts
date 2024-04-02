@@ -1,9 +1,9 @@
 'use server'
+import { uploadImages } from '@/app/features/upload-image';
+import { getClient } from '@/app/shared/lib/apollo/client';
 import { graphql } from '@/app/shared/api/graphql';
 import { teamsQuery } from '../../sidebar/queries';
 import { AddTeamFormInput } from '@/app/entities/team';
-import { uploadImages } from '@/app/features/upload-image';
-import { getClient } from '@/app/shared/lib/apollo/client';
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
