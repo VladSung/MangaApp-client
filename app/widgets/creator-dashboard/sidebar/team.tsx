@@ -14,8 +14,7 @@ type Props = {
 
 export const AddTeamWidget = ({ teams, labels }: Props) => {
     const onSubmit = async (values: FormInput) => {
-        'use server'
-        addTeam({ input: values })
+        // addTeam({ input: values })
     }
     return (
         <>
