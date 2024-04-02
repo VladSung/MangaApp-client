@@ -16,6 +16,7 @@ export const AddTeamWidget = ({ teams, labels }: Props) => {
         // addTeam({ input: values })
         console.log(values)
     }
+    
     return (
         <>
             <NavLink variant='light' defaultOpened px={16} style={{ borderRadius: 99 }} label={labels.teams} leftSection={<IconUsers />}>
