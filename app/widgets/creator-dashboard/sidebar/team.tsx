@@ -1,7 +1,7 @@
 import { NavLink } from "@mantine/core"
 import { IconPlus, IconUsers } from "@tabler/icons-react"
-import { AddTeam } from "../teams"
 import { FormInput } from '@/app/entities/team/add-form';
+import { AddTeam } from "../teams"
 
 type Props = {
     teams?: JSX.Element[]
