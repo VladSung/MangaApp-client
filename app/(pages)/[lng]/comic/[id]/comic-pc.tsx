@@ -46,6 +46,9 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                     display: 'flex',
                     gap: 4 * 8,
                     padding: '40px 32px',
+                    '@media(max-width:600px)':{
+                        flexDirection:'column'
+                    },
                 }}
             >
                 <Box id="poster" style={{ width: 230 }}>
