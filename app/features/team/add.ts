@@ -28,30 +28,6 @@ export const add = async (
             context: {
                 headers,
             },
-            update:(cache, {data: addTeam})=>{
-                cache.updateQuery({query: teamsQuery}, (data)=>{
-                    if(data?.me?.member) {
-                        return ({
-                        me:{
-                            member:[
-                            ...data?.me?.member,
-                                {
-                                team: addTeam?.createTeam
-                                }]
-                            }
-                        })
-                    } else {
-                        return ({
-                            me:{
-                            member:[
-                                {
-                                team: addTeam?.createTeam
-                            }]
-                        }
-                        })
-                    }
-                })
-            }
         });
     } catch (error) {
         console.log('error:', error);
