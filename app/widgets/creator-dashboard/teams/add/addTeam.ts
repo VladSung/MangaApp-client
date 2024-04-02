@@ -32,31 +32,6 @@ export const AddTeam: (data: AddTeamFormInput) => void = async (data) => {
                     tagline: data.tagline,
                 },
             },
-            update:(cache, {data: addTeam})=>{
-                const teams = cache.readQuery({query:teamsQuery})
-                cache.updateQuery({query: teamsQuery}, (data)=>{
-                    if(data?.me?.member) {
-                        return ({
-                        me:{
-                            member:[
-                            ...data?.me?.member,
-                                {
-                                team: addTeam?.createTeam
-                                }]
-                            }
-                        })
-                    } else {
-                        return ({
-                            me:{
-                            member:[
-                                {
-                                team: addTeam?.createTeam
-                            }]
-                        }
-                        })
-                    }
-                })
-            }
         });
 
     };
