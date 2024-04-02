@@ -1,15 +1,17 @@
 'use client';
 import { useMutation } from '@apollo/client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
+import { Center, Loader } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { AddComicForm, AddComicFormInput } from '@/app/entities/comic';
-import { Teams } from '@/app/entities/comic/add-form/types';
-import { uploadImage } from '@/app/features/upload-image';
+import { Team } from '@/app/entities/comic/add-form/types';
+import { uploadImages } from '@/app/features/upload-image';
 import { ComicStatuses, graphql, MaturityRatings } from '@/app/shared/api/graphql';
-import { useSearchParams } from 'next/navigation';
-import { notifications } from '@mantine/notifications';
-import { useLocalStorage } from '@mantine/hooks';
-import { Center, Loader } from '@mantine/core';
+
+import { getComicSelectionsQuery } from './queries';
 
 
 const addComicMutation = graphql(`
@@ -22,64 +24,55 @@ const addComicMutation = graphql(`
             }
         }
     }
-`);
-
-const getComicSelectionsQuery = graphql(`
-    query ComicSelections {
-        genres {
-            id
-            title
-        }
-        tags {
-            id
-            title
-        }
-        teams {
-            id
-            avatar
-            name
-        }
-    }
-`);
-
+`)
 
 const maturityRatings = [{ title: 'Everyone' }, { title: 'Teen' }, { title: 'Mature' }];
 
 export const AddComic = () => {
-    const [addComic, { error }] = useMutation(addComicMutation);
-    error?.graphQLErrors.map(e => {
-        notifications.show({
-            title: `[Error]: ${e.extensions.code}`,
-            message: e.message as string,
-            color: 'red',
-            withBorder: true
-        })
-    })
+    const [addComic, { error, reset }] = useMutation(addComicMutation);
+
+    if (error?.graphQLErrors) {
+        error.graphQLErrors.map(e => {
+            notifications.show({
+                title: `[Error]: ${e.extensions.code as string}`,
+                message: e.message,
+                color: 'red',
+                withBorder: true
+            })
+        });
+
+        reset()
+    }
 
     const teamId = useSearchParams().get('teamId');
 
-    const { data, loading } = useQuery(getComicSelectionsQuery);
-    const [image, setImage] = useLocalStorage({
+    const { data, loading } = useQuery(getComicSelectionsQuery, {
+        context: {
+            headers: ''
+        }
+    });
+
+    const [image, setImage] = useLocalStorage<string>({
         key: 'add-comic-image-id',
         defaultValue: JSON.stringify({ 'imageId': '', 'name': '' })
     })
 
     const onSubmit = async (data: AddComicFormInput) => {
 
-        let imageId = JSON.parse(image).imageId || ''
-        let storedImage = JSON.parse(image)
-        if (storedImage?.name !== data.cover.name) {
-            const imageData = await uploadImage(data.cover, data.title)
-            imageId = imageData.data.path;
-            setImage(JSON.stringify({ imageId, name: data.cover.name }));
+        const storedImage = (JSON.parse(image) as { 'imageId': string, 'name': string })
+
+        if (storedImage?.name !== data?.cover?.name && data?.cover) {
+            const imageData = await uploadImages([data.cover], data.title)
+            storedImage.imageId = imageData.data[0].path;
+            setImage(JSON.stringify({ imageId: storedImage.imageId, name: data.cover.name }));
         }
 
         const newComic = await addComic({
             variables: {
                 input: {
                     title: data.title,
-                    alternativeTitles: [data.alternativeTitles],
-                    cover: imageId,
+                    alternativeTitles: data.alternativeTitles,
+                    cover: storedImage.imageId,
                     description: data.description,
                     language: 'ru',
                     status: ComicStatuses.Continues,
@@ -90,6 +83,7 @@ export const AddComic = () => {
                 },
             },
         });
+
         notifications.show({
             color: 'green',
             title: `${newComic.data?.addComic?.title}`,
@@ -105,7 +99,7 @@ export const AddComic = () => {
         </Center>;
     }
 
-    if (!data?.teams || !data?.tags || !data?.genres) {
+    if (!data?.me?.member || !data?.tags || !data?.genres) {
         return <div>err...</div>;
     }
 
@@ -115,7 +109,7 @@ export const AddComic = () => {
                 selectionValues={{
                     loading: false,
                     maturityRatings,
-                    teams: data?.teams as Teams,
+                    teams: data.me.member.map(m => (m.team as Team)),
                     tags: data?.tags,
                     genres: data?.genres,
                 }}

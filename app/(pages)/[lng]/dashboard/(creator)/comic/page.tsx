@@ -1,8 +1,8 @@
-import { Flex, Container, Title, Button, rem, Group, AppShellMain } from '@mantine/core';
+import { AppShellMain,Button, Container, Flex, Group, rem, Title } from '@mantine/core';
+import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 
 import { Comics } from '@/app/widgets/creator-dashboard/comics';
-import { IconPlus } from '@tabler/icons-react';
 
 const Projects = () => {
     return (

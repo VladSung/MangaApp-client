@@ -60,10 +60,10 @@ export const Comics = () => {
                         key={comic.id}
                         href={`/dashboard/comic/${comic.id}`}
                         data={{
-                            title: comic.title as string,
-                            subtitle: (comic.alternativeTitles as string) || undefined,
+                            title: comic.title,
+                            subtitle: (comic.alternativeTitles) || undefined,
                             lastChange: (comic.updatedAt as Date).toLocaleString(),
-                            cover: comic.cover!,
+                            cover: comic.cover,
                         }}
                     />
                 </Grid>

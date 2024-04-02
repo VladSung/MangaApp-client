@@ -16,11 +16,11 @@ export const Error = ({ errorCode, message, children }: Properties) => {
                 alignItems: 'center',
             }}
         >
-            <Title mb={3} order={1} variant="h2">
+            <Title mb={8} order={1} variant="h2">
                 {errorCode}
             </Title>
             <Text
-                mb={children ? 16 : 16}
+                mb={children ? 24 : 16}
                 style={{ textAlign: 'center', maxWidth: 360 }}
                 variant="subtitle1"
                 component={'p'}

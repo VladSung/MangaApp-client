@@ -8,6 +8,7 @@ import {
 import { getAccessToken } from '@auth0/nextjs-auth0';
 
 import { config } from '@/app/shared/config';
+
 import { apolloLinks } from './links';
 
 const authLink = setContext(async (_, { headers }) => {

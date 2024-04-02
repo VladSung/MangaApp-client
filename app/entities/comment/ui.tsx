@@ -1,13 +1,13 @@
-import { graphql } from "@/app/shared/api/graphql";
 import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
-import { ActionIcon, Avatar, Text, Button, Collapse, Group, Stack, Loader, Center } from "@mantine/core";
+import { ActionIcon, Avatar, Button, Center, Collapse, Group, Loader, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconPinFilled, IconDotsVertical, IconHeart, IconMessageReply, IconCaretUpFilled, IconCaretDownFilled } from "@tabler/icons-react";
-import dayjs from "dayjs";
-var relativeTime = require('dayjs/plugin/relativeTime')
-dayjs.extend(relativeTime)
+import { IconCaretDownFilled, IconCaretUpFilled, IconDotsVertical, IconHeart, IconMessageReply, IconPinFilled } from "@tabler/icons-react";
+import { Dayjs } from "dayjs";
 
-type CommentBase = { id?: string, createdAt?: Date, _count?: { replies: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author: { avatar: string | null, username: string | null } | null };
+import { dayjsRelativeTime } from "@/app/shared/api/dayjs";
+import { graphql } from "@/app/shared/api/graphql";
+
+type CommentBase = { id?: string, createdAt?: Date, _count?: { replies?: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author?: { avatar?: string | null, username?: string | null } | null };
 
 type CommentProps = {
     comment: CommentBase,
@@ -16,6 +16,7 @@ type CommentProps = {
 
 export const Comment = ({ comment, depth = 0 }: CommentProps) => {
     const [opened, { toggle }] = useDisclosure(false);
+
     return (
         <Stack gap={depth ? 0 : 'md'} style={{ borderRadius: depth ? 0 : 16, borderLeft: `${comment?.pinned || depth > 0 ? 2 : 0}px solid var(--mantine-color-blue-6)` }} py={8} pl={4}>
             <Group wrap='nowrap' key={comment?.id} align='flex-start'>
@@ -23,7 +24,7 @@ export const Comment = ({ comment, depth = 0 }: CommentProps) => {
                 <Stack gap={0} style={{ flexGrow: 1 }}>
                     <Group>
                         <Text component='h3' fw='bold' size='xs'>{comment?.author?.username}</Text>
-                        <Text size='xs'>{(dayjs(comment?.createdAt) as any).fromNow()}</Text>
+                        <Text size='xs'>{(dayjsRelativeTime(comment?.createdAt)).fromNow()}</Text>
                         {comment?.pinned && <IconPinFilled size={16} />}
                         <ActionIcon ml='auto' color='gray' variant='transparent'>
                             <IconDotsVertical size={18} />
@@ -71,7 +72,9 @@ export const Replies = ({ commentId, depth = 0 }: { commentId: string, depth: nu
 
     const { data, loading } = useQuery(getCommentRepliesQuery, { variables: { commentId: commentId } })
 
-    if (loading) return <Center><Loader size='sm' /></Center>
+    if (loading) {
+        return <Center><Loader size='sm' /></Center>
+    }
 
-    return data?.repliesOnCommentByCommentId?.map((r: CommentBase) => (<Comment depth={depth + 1} key={r.id} comment={r} />))
+    return data?.repliesOnCommentByCommentId?.map((r) => (<Comment depth={depth + 1} key={r.id} comment={r} />))
 }

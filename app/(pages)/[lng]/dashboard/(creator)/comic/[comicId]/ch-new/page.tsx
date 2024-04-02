@@ -1,17 +1,18 @@
 'use client'
-import { Anchor, AppShellSection, Center, Stack, Breadcrumbs, Button, Text, Container, Group, NumberInput, Loader, Radio, RadioGroup, TextInput, ActionIcon, InputError, Overlay } from "@mantine/core";
-import { DatePickerInput } from '@mantine/dates';
-import Link from "next/link";
-import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
-import { graphql } from "@/app/shared/api/graphql";
-import { ManyImagesUpload } from "@/app/entities/image-upload";
-import { createFormContext, hasLength } from "@mantine/form";
-import { FileWithPath } from "@mantine/dropzone";
-import { IconTrash } from "@tabler/icons-react";
-import { DndFileList } from "@/app/entities/image-upload/file-list";
 import { useMutation } from "@apollo/client";
-import { uploadManyImages } from "@/app/features/upload-image";
+import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
+import { ActionIcon, Anchor, AppShellSection, Breadcrumbs, Button, Center, Container, Group, InputError, Loader, NumberInput, Overlay, Radio, RadioGroup, Stack, Text, TextInput } from "@mantine/core";
+import { DatePickerInput } from '@mantine/dates';
+import { FileWithPath } from "@mantine/dropzone";
+import { createFormContext, hasLength } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import { IconTrash } from "@tabler/icons-react";
+import Link from "next/link";
+
+import { ManyImagesUpload, ManyUploadUseFormContext } from "@/app/entities/image-upload";
+import { DndFileList } from "@/app/entities/image-upload/file-list";
+import { uploadImages } from "@/app/features/upload-image";
+import { graphql } from "@/app/shared/api/graphql";
 
 const getComicAndChaptersData = graphql(`
     query getComicAndLastChapterData($id: ID!){
@@ -48,18 +49,17 @@ mutation addChapter($input: addChapterInput!){
 
 const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string } }) => {
     const { data: comicData } = useQuery(getComicAndChaptersData, { variables: { id: params.comicId } })
-    const minComicVolume = comicData?.comic?.chapters?.[comicData?.comic.chapters.length - 1]?.volume || 0;
+    const minComicVolume = comicData?.comic?.chapters?.[comicData?.comic.chapters.length - 1]?.volume || 1;
     const minComicNumber = comicData?.comic?.chapters?.[comicData?.comic.chapters.length - 1]?.number || 0;
-    const [uploadChapter, { data, error, loading }] = useMutation(uploadChapterMutation, {
-        updateQueries: {
+    const [uploadChapter, { data, error, loading }] = useMutation(uploadChapterMutation)
 
-        }
-    })
     const onSubmit = (data: FormInput) => {
         const upload = async () => {
 
-            const uploadImages = await uploadManyImages(data.images, `${params.comicId}/${data.volume}/${data.number}`, 'token.accessToken');
-            uploadChapter({
+            const uploadedImages = await uploadImages(data.images, `${params.comicId}/${data.volume}/${data.number}`, 'token.accessToken');
+            console.log(uploadedImages)
+
+            await uploadChapter({
                 variables: {
                     input: {
                         comicId: params.comicId,
@@ -67,32 +67,44 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
                         number: data.number,
                         title: data.name,
                         language: '',
-                        images: uploadImages.data,
-                        publishDate: (new Date()).getTime()
+                        images: uploadedImages.data,
+                        publishDate: Date.now()
                     },
                 },
                 update: (cache, { data: newChapterData }) => {
                     const data = cache.readQuery({ query: getComicAndChaptersData });
-                    const chapters = Array.isArray(data?.comic?.chapters) && [...data?.comic?.chapters] || [];
-                    cache.writeQuery({
+                    const chapters = (data?.comic?.chapters && Array.isArray(data?.comic?.chapters)) ? [...data.comic.chapters] : [];
+
+                    data?.comic && newChapterData?.addChapter && cache.writeQuery({
                         query: getComicAndChaptersData, data:
-                            { ...data, comic: { ...data?.comic, title: data?.comic?.title!, chapters: [...chapters, newChapterData?.addChapter!] } }
+                        {
+                            ...data,
+                            comic: {
+                                ...data.comic,
+                                title: data.comic.title,
+                                chapters: [...chapters, newChapterData?.addChapter]
+                            }
+                        }
                     })
                 }
             })
+
+            form.reset()
         }
+
         upload()
     }
 
-    // { data?.addChapter?.id && notifications.show({ message: 'Chapter uploaded', c: 'green' }) }
-    // { error && notifications.show({ message: 'Возникла ошибка', c: 'red' }) }
+    data?.addChapter?.id && notifications.show({ message: 'Chapter uploaded', c: 'green' })
+    error && notifications.show({ message: 'Возникла ошибка', c: 'red' })
+
 
     const form = useForm({
         name: 'upload-chapter',
         initialValues: {
             images: [],
-            volume: minComicVolume + 1,
-            number: minComicNumber + 1,
+            volume: (data?.addChapter.volume || minComicVolume),
+            number: (data?.addChapter.number || minComicNumber) + 1,
             name: ''
         },
         validate: {
@@ -101,7 +113,7 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
     })
 
 
-    if (data?.addChapter) form.reset()
+    const images = form.getInputProps('images').value as FileWithPath[] | []
 
     return (
         <AppShellSection component={Container} pt={40}>
@@ -127,13 +139,15 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
                     </Overlay>}
                     <Stack>
                         <Group>
-                            <NumberInput {...form.getInputProps('volume')} label='Volume' min={minComicVolume + 1} max={minComicVolume + 1} />
+                            <NumberInput {...form.getInputProps('volume')} label='Volume' min={minComicVolume} max={minComicVolume + 1} />
                             <NumberInput  {...form.getInputProps('number')} label='Chapter' min={minComicNumber + 1} max={minComicNumber + 1.99} />
                             <TextInput  {...form.getInputProps('name')} label='Chapter name' style={{ flexGrow: 1 }} />
                         </Group>
-                        <ManyImagesUpload width={'100%'} height={300} useFormContext={useFormContext} />
+                        <ManyImagesUpload width={'100%'} height={300} useFormContext={useFormContext as unknown as ManyUploadUseFormContext} />
                         <InputError>{form.errors.images}</InputError>
-                        {form.getInputProps('images').value && <DndFileList list={form.getInputProps('images').value} setValue={(files: FileWithPath[]) => { form.setFieldValue('images', files) }} />}
+                        {images && <DndFileList list={images} setValue={(files: FileWithPath[]) => {
+                            form.setFieldValue('images', files)
+                        }} />}
                         <RadioGroup defaultValue="immediately" name='publishDate' label='Publish'>
                             <Radio value='immediately' name='publishDate' label='immediately' />
                             <Radio value='schedule' name='publishDate' label='schedule for later' />

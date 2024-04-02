@@ -1,5 +1,6 @@
 import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
+
 export const GET = handleAuth({
     login: handleLogin({
         authorizationParams: {

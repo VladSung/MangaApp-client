@@ -1,9 +1,10 @@
+import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
+import { ActionIcon,Group, Stack, Textarea, Title } from '@mantine/core';
+import { IconSend2 } from '@tabler/icons-react';
+
 import { Comment } from '@/app/entities/comment';
 import { graphql } from '@/app/shared/api/graphql';
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { Avatar } from '@/app/shared/ui/Avatar';
-import { Title, Group, Textarea, Stack, ActionIcon } from '@mantine/core';
-import { IconSend2 } from '@tabler/icons-react';
 
 const getCommentsQuery = graphql(`
     query CommentsByComic($comicId:ID!){

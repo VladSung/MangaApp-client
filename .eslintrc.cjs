@@ -91,9 +91,9 @@ module.exports = {
         'import/no-unresolved': [2, { ignore: ['\\.img$', 'assets/*'] }],
         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
         '@typescript-eslint/no-non-null-assertion': 'off',
-
         '@typescript-eslint/no-floating-promises': ['warn'],
-
+        "require-await": "off",
+    "@typescript-eslint/require-await": "warn",
         '@typescript-eslint/no-misused-promises': ['warn'],
 
         'linebreak-style': [2, process.platform === 'win32' ? 'windows' : 'unix'],

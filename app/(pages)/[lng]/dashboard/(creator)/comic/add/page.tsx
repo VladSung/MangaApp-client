@@ -1,5 +1,6 @@
-import { AddComicWidget } from '@/app/widgets/comic';
 import { AppShellSection, Container } from '@mantine/core';
+
+import { AddComicWidget } from '@/app/widgets/comic';
 
 const AddComic = () => {
     return (

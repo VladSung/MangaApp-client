@@ -1,18 +1,19 @@
-import { Paper, Group, Flex, Text, rem, ActionIcon } from "@mantine/core";
-import { IconEdit, IconTrash, IconLock, IconCoins } from "@tabler/icons-react";
+import { ActionIcon, Flex, Group, Paper, rem, Text } from "@mantine/core";
+import { IconCoins, IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 
 type ItemProps = {
     comicId: string | number;
     chapter: {
         id: string | number;
-        title: string | null;
+        title?: string | null;
         volume: number;
         number: number;
-        price: number | null;
+        price?: number | null;
         createdAt: string;
     }
 }
+
 export const ListItem = ({ chapter, comicId }: ItemProps) => {
 
     return (

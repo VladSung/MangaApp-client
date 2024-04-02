@@ -1,33 +1,35 @@
-import { createFormContext } from '@mantine/form';
+'use client'
 import {
-    MultiSelect,
     ActionIcon,
-    Flex,
-    Select,
-    Stack,
-    TextInput,
-    Textarea,
-    Text,
+    Avatar,
     Button,
     Checkbox,
     Combobox,
-    InputBase,
-    Input,
-    useCombobox,
-    Avatar,
-    Tooltip,
+    Flex,
     Group,
+    Input,
+    InputBase,
+    MultiSelect,
     Radio,
-    RadioGroup
+    RadioGroup,
+    Select,
+    Stack,
+    Text,
+    Textarea,
+    TextInput,
+    Tooltip,
+    useCombobox
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
+import { createFormContext } from '@mantine/form';
 import { IconCalendar, IconEraser } from '@tabler/icons-react';
 
 import { MaturityRatings } from '@/app/shared/api/graphql';
-import { ImageUpload } from '../../image-upload';
-import { Genres, Teams } from './types';
-import classes from './styles.module.css';
+
+import { ImageUpload, ImageUploadUseFormContext } from '../../image-upload';
 import { AddComicFormInput } from '..';
+import classes from './styles.module.css';
+import { Genres, Teams } from './types';
 
 
 const defaultFormValues = {
@@ -61,7 +63,7 @@ export interface AddFormProps {
         maturityRating?: keyof typeof MaturityRatings;
         teams?: string;
     };
-    onSubmit: (data: AddComicFormInput) => {}
+    onSubmit: (data: AddComicFormInput) => void
 }
 const mRatings = Object.values(MaturityRatings);
 
@@ -77,6 +79,7 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
+
     const options = selectionValues.teams.map((team) => {
         return (
             <Flex gap={8} w='auto' align='center' component={Combobox.Option} active={form.getInputProps('teams')?.value === team.id} value={team.id!} key={team.id}>
@@ -85,11 +88,14 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
             </Flex>
         )
     });
+
     return (
         <FormProvider form={form}>
-            <form style={{ padding: '32px 24px', height: '100%' }} onReset={() => { form.reset() }} onSubmit={form.onSubmit(onSubmit)}>
+            <form style={{ padding: '32px 24px', height: '100%' }} onReset={() => {
+                form.reset()
+            }} onSubmit={form.onSubmit(onSubmit)}>
                 <Flex gap={24} mb={24}>
-                    <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext} />
+                    <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as ImageUploadUseFormContext} />
                     <Stack gap={16} flex='1 0 auto'>
                         <TextInput
                             required
@@ -147,14 +153,14 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
                                 component="button"
                                 type="button"
                                 pointer
-                                leftSection={<Flex justify='center' align='center'><Avatar size='sm' src={selectionValues.teams.filter((team => (team?.id === form.getInputProps('teams')?.value)))[0]?.avatar || ''} /></Flex>}
+                                leftSection={<Flex justify='center' align='center'><Avatar size='sm' src={selectionValues.teams.find((team => (team?.id === form.getInputProps('teams')?.value)))?.avatar || ''} /></Flex>}
 
                                 rightSection={<Combobox.Chevron />}
                                 rightSectionPointerEvents="none"
                                 onFocus={() => combobox.openDropdown()}
                                 onClick={() => combobox.toggleDropdown()}
                             >
-                                {selectionValues.teams.filter((team => (team?.id === form.getInputProps('teams')?.value)))[0]?.name || <Input.Placeholder>Pick value</Input.Placeholder>}
+                                {selectionValues.teams.find((team => (team?.id === form.getInputProps('teams')?.value)))?.name || <Input.Placeholder>Pick value</Input.Placeholder>}
                             </InputBase>
                         </Combobox.Target>
                         <Combobox.Dropdown>

@@ -1,16 +1,22 @@
-import { Text, Flex, Paper, Overlay } from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from '@mantine/dropzone';
+'use client'
+import { Flex, Overlay, Paper, Text } from '@mantine/core';
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { UseFormReturnType } from '@mantine/form';
-import { DndFileList } from './file-list';
+import dynamic from 'next/dynamic';
 
-type FormInput = { images: FileWithPath[] | [] } & any
+// const Dropzone = dynamic(()=>import('@mantine/dropzone').then(mod=>mod.Dropzone))
+
+type FormInput = { images: FileWithPath[] | [] }
+export type UseFormContext = () => UseFormReturnType<FormInput, (values: FormInput) => FormInput>
 type Props = {
     initialImages?: string[],
     height?: number | string
     width?: number | string
     resolution?: string
-    useFormContext: () => UseFormReturnType<FormInput, (values: FormInput) => FormInput>
+    useFormContext: UseFormContext
 }
+
+
 export const ManyUpload = ({ initialImages, height, width, resolution = '(800 x any px)', useFormContext }: Props) => {
     const form = useFormContext();
     const files = form?.values?.images as FileWithPath[]
@@ -27,7 +33,9 @@ export const ManyUpload = ({ initialImages, height, width, resolution = '(800 x 
                         h='100%'
                         // c='blue'
                         style={{ cursor: 'pointer', overflow: 'auto', padding: 16 }}
-                        onDrop={(newFiles) => { form.setFieldValue('images', [...files, ...(newFiles as unknown as FileWithPath[])]) }}
+                        onDrop={(newFiles) => {
+                            form.setFieldValue('images', [...files, ...(newFiles as unknown as FileWithPath[])])
+                        }}
                         justify='center'
                         align='center'
                     >

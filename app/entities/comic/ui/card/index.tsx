@@ -1,14 +1,13 @@
+import { Box, Card as MantineCard, CardSection, Title } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
-
-import { Box, Card as MantineCard, Title } from '@mantine/core';
 
 type Props = {
     data?: {
         cover?: string;
         title?: string;
         id: string;
-    };
+    } | null;
 };
 
 // .card {
@@ -32,9 +31,9 @@ const cardWidth = 156;
 
 export const Card = ({ data }: Props) => {
     return (
-        <Box>
-            <MantineCard radius='md' shadow='md' style={{ maxWidth: cardWidth }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
-                <MantineCard.Section
+        <div>
+            <MantineCard mb='sm' radius='md' shadow='md' style={{ maxWidth: cardWidth }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
+                <CardSection
                     style={{
                         aspectRatio: '6/9',
                         width: cardWidth,
@@ -45,13 +44,13 @@ export const Card = ({ data }: Props) => {
                 >
                     <Image
                         blurDataURL={data?.cover}
-                        style={{ verticalAlign: 'top' }}
+                        style={{ verticalAlign: 'top', objectFit: 'cover' }}
                         alt=""
                         width={cardWidth}
                         height={cardWidth * 1.5}
                         src={(data?.cover) as string}
                     />
-                </MantineCard.Section>
+                </CardSection>
             </MantineCard>
             <Box className='card-content' w={cardWidth}>
                 <Title order={5}
@@ -61,6 +60,6 @@ export const Card = ({ data }: Props) => {
                     <Link href={`/comic/${data?.id}`}>{data?.title}</Link>
                 </Title>
             </Box>
-        </Box>
-    );
-};
+        </div>
+    )
+}

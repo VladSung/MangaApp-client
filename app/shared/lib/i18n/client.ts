@@ -33,7 +33,7 @@ i18next
         preload: runsOnServerSide ? languages : [],
     });
 
-export const i18nextInstance =i18next
+
 
 export function useTranslation(
     lng?: string,
@@ -70,3 +70,5 @@ return;
 
     return ret;
 }
+
+export {default as i18nextInstance} from 'i18next';

@@ -5,6 +5,7 @@
         "notifications": "Notifications",
         "projects": "Projects",
         "teams": "Teams",
-        "chats": "Chats"
+        "chats": "Chats",
+        "create-team": "Создать команду"
     }
 }

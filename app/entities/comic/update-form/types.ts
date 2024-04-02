@@ -1,5 +1,6 @@
-import { MaturityRatings } from '@/app/shared/api/graphql';
 import { FileWithPath } from '@mantine/dropzone';
+
+import { MaturityRatings } from '@/app/shared/api/graphql';
 
 export type Team = {
     id?: string;

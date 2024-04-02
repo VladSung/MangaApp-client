@@ -1,12 +1,21 @@
-'use client';
+import { ComicCard } from '@/app/entities/comic';
+import { getClient } from '@/app/shared/lib/apollo/client';
 
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { comicListQuery } from './api';
 import { List } from './ui';
-import { ComicCardListQuery } from './ui/types';
 
-export const ComicList = () => {
-    const { data, loading } = useQuery<ComicCardListQuery['data']>(comicListQuery);
+export const ComicList = async () => {
+    const { data, loading } = await getClient().query({ query: comicListQuery });
 
-    return <List data={data} loading={loading} />;
+    if (!data?.comics || loading) {
+        return <div>laoding</div>
+    }
+
+    return <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', gap: 16, rowGap: 24 }}>
+        {data.comics.map((m) =>
+        (
+            <ComicCard key={m?.id} data={m} />
+        )
+        )}
+    </div>;
 };

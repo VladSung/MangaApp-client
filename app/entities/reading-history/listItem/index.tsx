@@ -1,6 +1,7 @@
-import { Avatar, Typography } from '@mui/material';
+import { Text } from '@mantine/core';
 import Link from 'next/link';
 
+import { Avatar } from '@/app/shared/ui/Avatar';
 import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';
 
 type Properties = {
@@ -17,14 +18,12 @@ type Properties = {
 
 export const ListItem = ({ link, cover, title, createdAt, lastChapterRead }: Properties) => {
     return (
-        <Link href={link}>
-            <ListItemWithAvatar avatar={<Avatar src={cover} />}>
-                <Typography>{title}</Typography>
-                <Typography>
+        <ListItemWithAvatar avatar={<Avatar src={cover} />} href={link}>
+            <Text>{title}</Text>
+            <Text>
                     Глава {lastChapterRead.volume}-{lastChapterRead.number}. {lastChapterRead.title}
-                </Typography>
-                <Typography>{createdAt.getDate()}</Typography>
-            </ListItemWithAvatar>
-        </Link>
+            </Text>
+            <Text>{createdAt.getDate()}</Text>
+        </ListItemWithAvatar>
     );
 };

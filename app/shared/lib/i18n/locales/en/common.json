@@ -4,7 +4,7 @@
     "error": {
         "404": {
             "title": "404",
-            "description": "Page not found! Maybe page was deleted or "
+            "description": "Page not found! Maybe page was deleted or moved permanently"
         }
     }
 }

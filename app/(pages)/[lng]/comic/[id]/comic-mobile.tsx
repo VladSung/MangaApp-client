@@ -1,9 +1,9 @@
+import { AppShellMain, Box, Button, Card, Container, Flex, Stack, Text, Title } from '@mantine/core';
+import { IconBookmark } from '@tabler/icons-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ComicContent } from './comic-content';
-import Link from 'next/link';
-import { Box, Button, Card, Container, Title, Stack, Text, Flex, AppShellMain } from '@mantine/core';
-import { IconBookmark } from '@tabler/icons-react';
 import { ComicPageProps } from './types';
 
 
@@ -39,7 +39,7 @@ export default function ComicPage({ t, comic: { comic }, params }: ComicPageProp
                     fill
                     style={{ filter: 'blur(8px) brightness(.7)', objectFit: 'cover', objectPosition: '  center' }}
                     src={comic?.cover}
-                    sizes='(max-width:750px) 100px'
+                    sizes='100px'
                     alt=""
                 />
                 <Box style={{ display: 'flex', width: '100%', position: 'relative', zIndex: 1, justifyContent: 'space-around' }}>
@@ -88,7 +88,7 @@ export default function ComicPage({ t, comic: { comic }, params }: ComicPageProp
                     component={Link}
                     href={`/comic/${params.id}/ch/1/1`}
                 >{t('edit')}</Button>
-                <ComicContent t={t} comic={comic} />
+                <ComicContent lng={params.lng} comic={comic} />
             </Container>
             <Box style={{ width: '100%', maxWidth: 256 }}>
                 <Title order={5} style={{ marginBottom: 2 * 8 }}>

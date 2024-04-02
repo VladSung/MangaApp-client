@@ -6,7 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "next lint --fix",
         "codegen": "graphql-codegen --config ./codegen.ts"
     },
     "dependencies": {
@@ -36,6 +36,7 @@
         "next-intl": "^3.5.4",
         "react": "^18",
         "react-dom": "^18",
+        "react-easy-crop": "^5.0.6",
         "react-i18next": "^14.0.2",
         "sass": "^1.70.0",
         "translation-check": "^1.1.0",

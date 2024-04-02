@@ -1,43 +1,47 @@
-import { createFormContext } from '@mantine/form';
+'use client'
 import {
-    MultiSelect,
     ActionIcon,
-    Flex,
-    Select,
-    Stack,
-    TextInput,
-    Textarea,
-    Text,
+    Avatar,
     Button,
     Checkbox,
     Combobox,
-    InputBase,
-    Input,
-    useCombobox,
-    Avatar,
-    Tooltip,
+    Flex,
     Group,
+    Input,
+    InputBase,
+    MultiSelect,
+    Paper,
+    Radio,
     RadioGroup,
-    Radio
+    Select,
+    Stack,
+    Text,
+    Textarea,
+    TextInput,
+    Tooltip,
+    useCombobox
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
+import { FileWithPath } from '@mantine/dropzone';
+import { createFormContext, UseFormReturnType } from '@mantine/form';
 import { IconCalendar, IconEraser } from '@tabler/icons-react';
 
 import { MaturityRatings } from '@/app/shared/api/graphql';
+
 import { ImageUpload } from '../../image-upload';
-import { Genres, Teams } from './types';
-import classes from './styles.module.css';
 import { AddComicFormInput } from '..';
+import classes from './styles.module.css';
+import { Genres, Teams } from './types';
 
 const defaultFormValues = {
     title: '',
     alternativeTitles: '',
-    cover: [],
+    cover: {},
     description: '',
     altTitle: '',
     tags: [],
     genres: [],
-    maturityRating: 'Everyone',
+    maturityRating: 'EVERYONE',
     teams: '',
     publishDate: undefined
 }
@@ -52,7 +56,7 @@ export interface AddFormProps {
     };
     selectedValues?: {
         title?: string;
-        alternativeTitles?: string;
+        alternativeTitles?: string | null;
         cover?: string;
         description?: string;
         tags?: string[];
@@ -60,9 +64,11 @@ export interface AddFormProps {
         maturityRating?: keyof typeof MaturityRatings;
         teams?: string;
     };
-    onSubmit: (data: AddComicFormInput) => {}
+    onSubmit: (data: AddComicFormInput) => void
 }
 const mRatings = ['EVERYONE', 'TEEN', 'MATURE'];
+
+type UseFormContext = () => UseFormReturnType<{ cover: FileWithPath }, (values: { cover: FileWithPath }) => { cover: FileWithPath }>
 
 const [FormProvider, useFormContext, useForm] =
     createFormContext<AddComicFormInput>();
@@ -77,19 +83,21 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
+
     const options = selectionValues.teams.map((team) => {
         return (
             <Flex gap={8} w='auto' align='center' component={Combobox.Option} active={form.getInputProps('teams')?.value === team.id} value={team.id!} key={team.id}>
-                <Avatar size='md' src={team.avatar!} />
+                <Avatar size='md' src={team.avatar} />
                 <Text>{team.name!}</Text>
             </Flex>
         )
     });
+
     return (
         <FormProvider form={form}>
             <form style={{ padding: '32px 24px', height: '100%' }} onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>
                 <Flex gap={24} mb={24}>
-                    <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext} />
+                    <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as UseFormContext} />
                     <Stack gap={16} flex='1 0 auto'>
                         <TextInput
                             required
@@ -148,14 +156,14 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                                 component="button"
                                 type="button"
                                 pointer
-                                leftSection={<Flex justify='center' align='center'><Avatar size='sm' src={selectionValues.teams.filter((team => (team?.id === form.getInputProps('teams')?.value)))[0]?.avatar || ''} /></Flex>}
+                                leftSection={<Flex justify='center' align='center'><Avatar size='sm' src={selectionValues.teams.find((team => (team?.id === form.getInputProps('teams')?.value)))?.avatar || ''} /></Flex>}
 
                                 rightSection={<Combobox.Chevron />}
                                 rightSectionPointerEvents="none"
                                 onFocus={() => combobox.openDropdown()}
                                 onClick={() => combobox.toggleDropdown()}
                             >
-                                {selectionValues.teams.filter((team => (team?.id === form.getInputProps('teams')?.value)))[0]?.name || <Input.Placeholder>Pick value</Input.Placeholder>}
+                                {selectionValues.teams.find((team => (team?.id === form.getInputProps('teams')?.value)))?.name || <Input.Placeholder>Pick value</Input.Placeholder>}
                             </InputBase>
                         </Combobox.Target>
                         <Combobox.Dropdown>
@@ -188,14 +196,14 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                         <Radio value='deny' label='Deny' />
                     </RadioGroup>
                 </Flex>
-                <Flex align='center' justify='center' pos='sticky' p='md' bottom={0}>
-                    <Group align='center' justify='center' gap='xl' px='xl' py='lg' w='max-content'>
+                <Flex align='center' style={{ zIndex: 5 }} justify='center' pos='sticky' p='md' bottom={0}>
+                    <Paper component={Group} radius='xl' withBorder align='center' justify='center' gap='xl' px='xl' py='md' w='max-content'>
                         <ActionIcon color='red' variant='default' size='lg' type='reset'><IconEraser /></ActionIcon>
                         <Tooltip position='top' offset={16} label="If the checkbox is checked, the comic will be visible to everyone and will appear in search." refProp='rootRef'>
                             <Checkbox type='checkbox' {...form.getInputProps('public')} label='Public access' />
                         </Tooltip>
                         <Button type='submit'>Save</Button>
-                    </Group>
+                    </Paper>
                 </Flex>
             </form>
         </FormProvider>

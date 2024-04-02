@@ -1,17 +1,18 @@
 import { ComicCard } from '@/app/entities/comic';
 
-import { ComicCardListQuery } from './types';
+type Props = {
+    comics: {
+        cover: string;
+        title: string;
+        id: string;
+    }[]
+};
 
-export const List = ({ data, loading }: ComicCardListQuery) => {
-    if (loading) {
-        return (
-            <div>Loading</div>
-        );
-    }
+export const List = ({ comics }: Props) => {
 
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', gap: 16, rowGap: 24 }}>
-            {data?.comics?.map((m) =>
+            {comics.map((m) =>
             (
                 <ComicCard key={m.id} data={m} />
             )

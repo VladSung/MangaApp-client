@@ -1,7 +1,7 @@
 import {
     Avatar,
-    Button,
     Box,
+    Button,
 } from '@mantine/core';
 import Link from 'next/link';
 
@@ -20,7 +20,7 @@ export const ListItemWithAvatar = ({
 }: Properties) => {
     return (
         <Button radius='sm' px={16} py={8} justify='flex-start' fullWidth variant='default' href={href} component={Link}>
-            <Avatar w='sm'>{avatar}</Avatar>
+            {avatar}
             <Box>{children}</Box>
             {rightChildren}
         </Button>

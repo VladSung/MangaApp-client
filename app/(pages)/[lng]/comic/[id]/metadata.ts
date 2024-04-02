@@ -1,5 +1,5 @@
 'use server'
-import { graphql } from "@/app/shared/api/graphql";
+import { comicQuery } from '@/app/shared/api/queries';
 import { getClient } from "@/app/shared/lib/apollo/client";
 
 type Props = {
@@ -9,16 +9,9 @@ type Props = {
     };
 };
 
-const comicQuery = graphql(`
-    query ComicName($id:ID!){
-        comic(id:$id){
-            title
-        }
-    }
-`)
-
 export async function generateMetadata({ params: { id } }: Props) {
-    const c = await getClient().query({ query: comicQuery, variables: { id } })
+    const c = await getClient().query({ query: comicQuery, variables: { id } });
+
     return {
         title: c?.data?.comic?.title,
     };

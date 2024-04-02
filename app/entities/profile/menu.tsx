@@ -1,40 +1,29 @@
 'use client'
-import { ActionIcon, Button, useMantineColorScheme } from '@mantine/core'
-import Image from 'next/image';
-import { Menu, rem } from '@mantine/core';
-import {
-    IconSettings,
-    IconPhoto,
-    IconMessageCircle,
-    IconLogout,
-    IconSun,
-    IconMoonStars,
-} from '@tabler/icons-react';
+import { ActionIcon, Button, Menu, rem, useMantineColorScheme } from "@mantine/core";
+import { IconLogout,IconMessageCircle, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
+import Link from "next/link";
 
-import Link from 'next/link';
-import { Avatar as InnerAvatar } from '@/app/shared/ui/Avatar';
+import { Avatar } from "@/app/shared/ui/Avatar";
 
-type Props = {
-    avatar: string | null;
-};
-
-export const Avatar = ({ avatar }: Props) => {
+export const ProfileMenu = ({ avatar }: { avatar?: string | null }) => {
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const dark = colorScheme === 'dark';
 
     return (
         <Menu shadow="md" width={200} position='bottom-end'>
             <Menu.Target>
-                <ActionIcon w={40} h={40} radius={99} style={{ overflow: 'hidden' }}>
-                    <InnerAvatar size='md' src={avatar} alt='me' />
+                <ActionIcon style={{ flexGrow: 0 }} size='xl' variant='transparent'>
+                    <Avatar component='span' size='md' src={avatar} alt='' />
                 </ActionIcon>
             </Menu.Target>
-
             <Menu.Dropdown>
-                <Menu.Item component={Button}
-                    onClick={() => toggleColorScheme()} leftSection={dark ? <IconSun color='yellow' size={14} /> : <IconMoonStars color='blue' size={14} />}>
+                <Menu.Item
+                    onClick={() => {
+                        toggleColorScheme()
+                    }} leftSection={dark ? <IconSun color='yellow' size={14} /> : <IconMoonStars color='blue' size={14} />}>
                     Switch theme
                 </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item href='/dashboard' component={Link} leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>
                     Dashboard
                 </Menu.Item>

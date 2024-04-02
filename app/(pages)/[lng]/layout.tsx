@@ -1,19 +1,20 @@
-import { getSession } from '@auth0/nextjs-auth0';
-import { dir } from 'i18next';
-import { ScriptProps } from 'next/script';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/nprogress/styles.css';
 import './global.css';
+
+import { getAccessToken } from '@auth0/nextjs-auth0';
 import { AppShell, ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications'
-
-import { useTranslation } from '@/app/shared/lib/i18n';
-import { PageProps } from '@/app/shared/types';
+import { dir } from 'i18next';
+import { ScriptProps } from 'next/script';
 
 import { WithProviders } from '@/app/_providers';
+import { useTranslation } from '@/app/shared/lib/i18n';
+import { PageProps } from '@/app/shared/types';
 import Header from '@/app/widgets/header';
+
 type Props = {
     token?: string;
 
@@ -38,9 +39,9 @@ export async function generateMetadata({ params: { lng } }: PageProps) {
         },
     };
 }
+
 export const viewport = {
-    colorScheme: 'dark',
-    themeColor: 'black'
+    colorScheme: 'dark'
 }
 
 
@@ -50,22 +51,23 @@ export function generateStaticParams() {
 
 const theme = createTheme({
     defaultRadius: 'lg',
-    primaryColor: 'blue',
+    primaryColor: 'pink',
     cursorType: 'pointer'
 });
 
 export default async function RootLayout({ children, params }: Props & ScriptProps) {
-    const session = await getSession();
+    const session = await getAccessToken()
 
     return (
         <html lang={params.lng} dir={dir(params.lng)}>
             <head>
                 <ColorSchemeScript />
+                <link rel="icon" href="/assets/favicon.ico" sizes="any" />
             </head>
             <body>
                 <MantineProvider defaultColorScheme='auto' theme={theme}>
                     <Notifications />
-                    <WithProviders token={session?.accessToken}>
+                    <WithProviders token={session.accessToken}>
                         <AppShell header={{ height: 60 }}>
                             <Header lng={params.lng} />
                             {children}

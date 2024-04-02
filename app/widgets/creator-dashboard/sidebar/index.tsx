@@ -1,14 +1,14 @@
 import { AppShellNavbar, BoxProps, Flex } from '@mantine/core';
 import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMessageCircle } from '@tabler/icons-react';
 
-
-import { PageProps } from '@/app/shared/types';
 import { getClient } from '@/app/shared/lib/apollo/client';
 import { useTranslation } from '@/app/shared/lib/i18n';
-import { NavLink } from '@/app/shared/ui/NavLink';
+import { PageProps } from '@/app/shared/types';
 import { Avatar } from '@/app/shared/ui/Avatar';
-import { AddTeamWidget } from './Team';
+import { NavLink } from '@/app/shared/ui/NavLink';
+
 import { teamsQuery } from './queries';
+import { AddTeamWidget } from './team';
 
 export const DashboardSidebar = async ({ params }: BoxProps & PageProps) => {
     const { t } = await useTranslation(params.lng, 'creator-dashboard/common');

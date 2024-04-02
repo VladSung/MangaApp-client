@@ -1,7 +1,8 @@
 'use client'
-import { i18nextInstance } from "@/app/shared/lib/i18n/client";
-import { Avatar,Text, Combobox, Flex, InputBase, useCombobox } from "@mantine/core";
+import { Avatar,Combobox, Flex, InputBase, Text, useCombobox } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
+
+import { i18nextInstance } from "@/app/shared/lib/i18n/client";
 
 const supportedLanguages = [{
     lng: 'English',
@@ -23,6 +24,7 @@ export const LanguagePicker = ({currentLng}:{currentLng:string})=>{
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
+
     const options = supportedLanguages.map((lng) => {
         return (
             <Flex gap={8} w='auto' align='center' component={Combobox.Option} value={lng.value} key={lng.value}>

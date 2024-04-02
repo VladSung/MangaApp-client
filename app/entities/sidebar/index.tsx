@@ -1,10 +1,9 @@
-/** @jsxImportSource @emotion/react */
 import {
+    Button,
     Divider,
     Drawer,
     List,
     ListItem,
-    Button,
     Text,
 } from '@mantine/core';
 import { ReactNode } from 'react';
@@ -105,7 +104,7 @@ export const Sidebar = ({ open, Header, children, ...props }: SidebarProps) => {
         <Drawer
             variant="permanent"
             opened={open}
-            onClose={() => { }}
+            onClose={() => {}}
             component='aside'
             style={{
                 'width': open ? 200 : 57,

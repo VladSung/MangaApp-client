@@ -1,12 +1,11 @@
-// import { graphql } from "#shared/api"
-import { gql } from '@apollo/client';
+import { graphql } from '@/app/shared/api/graphql';
 
-export const comicListQuery = gql(`
-    query getComics{
-        comics(paginate:{take:50}){
+export const comicListQuery = graphql(`
+    query getComics {
+        comics(paginate: { take: 50 }) {
             cover
             title
             id
         }
     }
-    `);
+`);

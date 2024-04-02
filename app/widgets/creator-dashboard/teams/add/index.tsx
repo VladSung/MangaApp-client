@@ -1,13 +1,10 @@
-'use client';
-import { useMutation } from '@apollo/client';
-
+'use client'
 import { ImageUpload } from '@/app/entities/image-upload';
-import { AddTeamForm, AddTeamFormInput } from '@/app/entities/team';
-import { uploadImage } from '@/app/features/upload-image';
+import { AddTeamForm } from '@/app/entities/team';
 import { graphql } from '@/app/shared/api/graphql';
-import { notifications } from '@mantine/notifications';
-import { teamsQuery } from '../../sidebar/queries';
-import { Dispatch, SetStateAction } from 'react';
+
+import { FormInput } from '@/app/entities/team/add-form';
+import { useDisclosure } from '@mantine/hooks';
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -20,42 +17,20 @@ const addTeamMutation = graphql(`
 `);
 
 type AddTeamProps = {
-    open: boolean;
-    setNewTeams: Dispatch<SetStateAction<({ __typename?: "Team" | undefined; avatar: string | null; id: string | null; name: string | null; } | undefined)[]>>;
-    handleClose: () => void;
+    onSubmit: (values: FormInput) => void
 };
 
-export const Add = ({ open, setNewTeams, handleClose }: AddTeamProps) => {
-    const [addTeam] = useMutation(addTeamMutation);
+export const Add = ({ onSubmit }: AddTeamProps) => {
 
-    const onSubmit: (data: AddTeamFormInput) => void = async (data) => {
-        if (!data?.cover) {
-            throw new Error('image not set');
-        }
+    const [opened, { close, open }] = useDisclosure(true)
 
-        const imageData = await uploadImage(data.cover, data.name);
-
-        const newTeam = await addTeam({
-            variables: {
-                input: {
-                    avatar: imageData.imageId,
-                    name: data.name,
-                    tagline: data.tagline,
-                },
-            },
-            refetchQueries: [teamsQuery]
-        });
-        setNewTeams((prev) => ([...prev, newTeam.data?.createTeam]))
-        notifications.show({ message: 'Команда успешно создана' })
-
-    };
 
     return (
         <AddTeamForm
             ImageUpload={ImageUpload}
             onSubmit={onSubmit}
-            open={open}
-            handleClose={handleClose}
+            open={opened}
+            handleClose={close}
         />
     );
 };

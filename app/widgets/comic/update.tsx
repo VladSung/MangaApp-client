@@ -1,14 +1,14 @@
 'use client';
 import { useMutation } from '@apollo/client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-
-import { UpdateComicForm, AddComicFormInput } from '@/app/entities/comic';
-import { ExactTeam, Teams } from '@/app/entities/comic/add-form/types';
-import { uploadImage } from '@/app/features/upload-image';
-import { ComicStatuses, graphql, MaturityRatings } from '@/app/shared/api/graphql';
-import { nullsToUndefined } from '@/app/shared/types';
-import { useSearchParams } from 'next/navigation';
 import { useLocalStorage } from '@mantine/hooks';
+
+import { AddComicFormInput, UpdateComicForm } from '@/app/entities/comic';
+import { Team } from '@/app/entities/comic/update-form/types';
+import { uploadImages } from '@/app/features/upload-image';
+import { ComicStatuses, graphql, MaturityRatings } from '@/app/shared/api/graphql';
+
+import { getComicSelectionsQuery } from './queries';
 
 const updateComicMutation = graphql(`
     mutation UpdateComic($id: ID!, $input: UpdateComicInput!) {
@@ -18,23 +18,7 @@ const updateComicMutation = graphql(`
     }
 `);
 
-const getComicSelectionsQuery = graphql(`
-    query ComicSelections {
-        genres {
-            id
-            title
-        }
-        tags {
-            id
-            title
-        }
-        teams {
-            id
-            avatar
-            name
-        }
-    }
-`);
+
 
 const getUserComicQuery = graphql(`
     query getUserComic($id: ID!) {
@@ -80,17 +64,20 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
 
     const onSubmit = async (data: AddComicFormInput) => {
         let newImage = image || null
-        if (data.cover && !image) {
-            const imageData = await uploadImage(data.cover, data.title, comicData?.comic?.cover);
-            newImage = imageData?.data?.path;
+
+        if ((data.cover)) {
+            const imageData = await uploadImages([data.cover], data.title, comicData?.comic?.cover);
+            console.log(imageData)
+            newImage = imageData?.data?.[0].path;
             setImage(newImage);
         }
+
         const newComic = await updateComic({
             variables: {
                 id: comicId,
                 input: {
                     title: data.title,
-                    alternativeTitles: [data.alternativeTitles],
+                    alternativeTitles: data.alternativeTitles,
                     cover: newImage,
                     genres: data.genres,
                     description: data.description,
@@ -108,7 +95,7 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
         return <div>Loading...</div>;
     }
 
-    if (!data?.teams || !data?.tags || !data?.genres) {
+    if (!data?.me?.member || !data?.tags || !data?.genres) {
         return <div>{JSON.stringify(error)} {JSON.stringify(comicError)}</div>;
     }
 
@@ -118,7 +105,7 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
                 selectionValues={{
                     loading: false,
                     maturityRatings,
-                    teams: data?.teams as Teams,
+                    teams: data.me.member.map(m => (m.team as Team)),
                     tags: data?.tags,
                     genres: data?.genres,
                 }}

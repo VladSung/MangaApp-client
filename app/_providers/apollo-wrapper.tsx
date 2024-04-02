@@ -12,8 +12,10 @@ import {
 import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 import { PropsWithChildren } from 'react';
-import { apolloLinks } from '../shared/lib/apollo/links';
+
 import { config } from '@/app/shared/config';
+
+import { apolloLinks } from '../shared/lib/apollo/links';
 
 const wsLink = () =>
     new GraphQLWsLink(
@@ -48,6 +50,7 @@ const makeClient = (token?: string) => () => {
         split(
             ({ query }) => {
                 const definition = getMainDefinition(query);
+
                 return (
                     definition.kind === Kind.OPERATION_DEFINITION &&
                     definition.operation === OperationTypeNode.SUBSCRIPTION

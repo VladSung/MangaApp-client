@@ -1,9 +1,11 @@
-import cx from 'clsx';
+'use client'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { ActionIcon, rem, ScrollArea, Text } from '@mantine/core';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { IconGripVertical, IconTrash } from '@tabler/icons-react';
-import classes from './DndListHandle.module.css';
 import { FileWithPath } from '@mantine/dropzone';
+import { IconGripVertical, IconTrash } from '@tabler/icons-react';
+import cx from 'clsx';
+
+import classes from './DndListHandle.module.css';
 
 export function DndFileList({ list, setValue }: { list: FileWithPath[], setValue: (files: FileWithPath[]) => void }) {
 
@@ -18,9 +20,10 @@ export function DndFileList({ list, setValue }: { list: FileWithPath[], setValue
     }
 
     const items = list.map((item, index) => (
-        <Draggable key={item.name + item} index={index} draggableId={item.name}>
+        <Draggable key={item.name} index={index} draggableId={item.name}>
             {(provided, snapshot) => {
                 const url = URL.createObjectURL(item);
+
                 return (
                     <div
                         className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
@@ -60,7 +63,7 @@ export function DndFileList({ list, setValue }: { list: FileWithPath[], setValue
         >
             <Droppable droppableId="dnd-list" direction="vertical">
                 {(provided) => (
-                    <ScrollArea h='max-content' mah={300}  {...provided.droppableProps} style={{ 'width': '100%' }} ref={provided.innerRef}>
+                    <ScrollArea h={items.length > 3 ? 300 : 'max-content'} mah={300}  {...provided.droppableProps} style={{ 'width': '100%' }} ref={provided.innerRef}>
                         {items}
                         {provided.placeholder}
                     </ScrollArea>

@@ -1,23 +1,34 @@
 'use client'
-import { BottomNavigation, BottomNavigationAction, Paper, Typography } from "@mui/material"
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import BookmarksRoundedIcon from '@mui/icons-material/BookmarksRounded';
+
+import { ActionIcon, Flex, Paper } from "@mantine/core"
+import { IconBookmarks, IconDotsVertical, IconHome, IconSearch } from "@tabler/icons-react"
+import { PropsWithChildren } from "react"
+
+const BottomNavigation = ({ children }: PropsWithChildren) => {
+    return (
+        <Flex style={{ position: 'fixed', paddingTop: 8, bottom: 0, left: 0, right: 0 }}>
+            {children}
+        </Flex>
+    )
+}
 
 export const MobileNavbar = () => {
 
     return (
-        <Paper sx={(theme) => ({
-            [theme.breakpoints.up('md')]: {
-                display: 'none'
-            }, position: 'fixed', bottom: 0, left: 0, right: 0, overflow: 'hidden', borderRadius: '24px 24px 0 0'
-        })} elevation={1}>
-            <BottomNavigation showLabels value='home' sx={{ paddingTop: 1 }}>
-                <BottomNavigationAction sx={{ gap: .5 }} value='home' label={<Typography variant='caption'>Главная</Typography>} icon={<HomeRoundedIcon fontSize='small' />} />
-                <BottomNavigationAction sx={{ gap: .5 }} value='catalog' label={<Typography variant='caption'>Поиск</Typography>} icon={<SearchRoundedIcon fontSize='small' />} />
-                <BottomNavigationAction sx={{ gap: .5 }} value='library' label={<Typography variant='caption'>Библиотека</Typography>} icon={<BookmarksRoundedIcon fontSize='small' />} />
-                <BottomNavigationAction sx={{ gap: .5 }} value='more' label={<Typography variant='caption'>Больше</Typography>} icon={<MoreVertIcon fontSize='small' />} />
+        <Paper>
+            <BottomNavigation>
+                <ActionIcon radius={0} style={{ gap: 4 }} value='home' aria-label={'Главная'}>
+                    <IconHome fontSize='small' />
+                </ActionIcon>
+                <ActionIcon radius={0} style={{ gap: 4 }} value='catalog' aria-label={'Поиск'}>
+                    <IconSearch fontSize='small' />
+                </ActionIcon>
+                <ActionIcon radius={0} style={{ gap: 4 }} value='library' aria-label='Библиотека'>
+                    <IconBookmarks fontSize='small' />
+                </ActionIcon>
+                <ActionIcon radius={0} style={{ gap: 4 }} value='more' aria-label={'Больше'}>
+                    <IconDotsVertical fontSize='small' />
+                </ActionIcon>
             </BottomNavigation>
         </Paper>
     )

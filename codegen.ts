@@ -12,9 +12,7 @@ const config: CodegenConfig = {
     generates: {
         './app/shared/api/graphql/generated/': {
             preset: 'client',
-            config: {
-                avoidOptionals: true,
-            },
+            config: {},
         },
     },
 };

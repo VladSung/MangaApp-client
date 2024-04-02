@@ -1,6 +1,8 @@
-import { Box, Button, Modal, TextInput, Title } from '@mantine/core';
-import { UseFormReturnType, createFormContext } from '@mantine/form';
+import { Box, Button, Modal, Textarea, TextInput, Title } from '@mantine/core';
 import { FileWithPath } from '@mantine/dropzone';
+import { createFormContext, UseFormReturnType } from '@mantine/form';
+
+import { ImageUpload } from '../../image-upload';
 
 export interface FormInput {
     name: string;
@@ -17,19 +19,22 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
+
+type UseFormContext = () => UseFormReturnType<{ cover: FileWithPath }, (values: { cover: FileWithPath }) => { cover: FileWithPath }>
+
 type Props = {
     initialImage?: string,
     height?: number
     width?: number
     resolution?: string
-    useFormContext: () => UseFormReturnType<FormInput, (values: FormInput) => FormInput>
+    useFormContext: UseFormContext
 }
 
 type AddProps = {
     open: boolean;
     handleClose: () => void;
     onSubmit: (values: FormInput) => void,
-    ImageUpload: ({ initialImage, useFormContext }: Props) => JSX.Element;
+    ImageUpload: typeof ImageUpload;
 };
 
 
@@ -43,24 +48,16 @@ export const Add = ({ open, onSubmit, ImageUpload, handleClose }: AddProps) => {
             tagline: '',
         }
     })
+
     return (
         <Modal
             opened={open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-content"
+            title="Создать новую команду"
         >
             <FormProvider form={form}>
-                <Title
-                    id="modal-modal-title"
-                    order={5}
-                    variant="h2"
-                    style={{ textAlign: 'center' }}
-                    mb='md'
-                >
-                    Создать новую команду!
-                </Title>
-
                 <Box
                     id="modal-modal-content"
                     style={{
@@ -81,19 +78,19 @@ export const Add = ({ open, onSubmit, ImageUpload, handleClose }: AddProps) => {
                             gap: 1,
                         }}
                     >
-                        <ImageUpload height={200} width={200} resolution='(256 x 256 px)' useFormContext={useFormContext} />
+                        <ImageUpload height={200} width={200} resolution='(256 x 256 px)' useFormContext={useFormContext as unknown as UseFormContext} />
                     </Box>
                     <TextInput
-                        size={'small'}
                         withAsterisk
                         {...form.getInputProps('name', { require: true })}
                         label={'Название'}
                     />
-                    <TextInput
-                        size={'small'}
+                    <Textarea
                         {...form.getInputProps('tagline', { require: true })}
                         label={'Cлоган команды'}
-                        style={{ mb: 2 }}
+                        autosize
+                        minRows={1}
+                        mb={16}
                     />
                     <Box>
                         <Button variant="contained" type="submit">

@@ -1,5 +1,5 @@
 'use client';
-import { Button, AppShellMain } from '@mantine/core';
+import { AppShellMain,Button } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 
 import { Error } from '@/app/entities/error';

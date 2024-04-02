@@ -1,59 +1,55 @@
+import { getSession } from '@auth0/nextjs-auth0';
 import {
-    Group,
-    Button,
-    rem,
-    ThemeIcon,
-    Box,
     AppShellHeader,
-    Skeleton,
-    Avatar
+    Group
 } from '@mantine/core';
-import Link from 'next/link';
-import { IconSearch } from '@tabler/icons-react';
+import { redirect } from 'next/navigation';
+
+import ProfileOrLoginMenu from '@/app/features/auth';
+import { graphql } from '@/app/shared/api/graphql';
+import { getClient } from '@/app/shared/lib/apollo/client';
 
 import classes from './header.module.css';
-import { Logo } from '@/app/shared/ui/logo';
-import { LoginButtonOrAvatar } from '@/app/features/auth';
-import { Suspense } from 'react';
-import { LanguagePicker } from '@/app/features/language';
-import { useTranslation } from '@/app/shared/lib/i18n';
+import { Navigation } from './navigation';
+
+
+const authMutation = graphql(`
+    mutation getAuth($input: AuthInput) {
+        auth(input: $input) {
+            id
+            avatar
+        }
+    }
+`);
 
 async function Header({ lng }: { lng: string }) {
-    // const { toggleColorScheme } = useMantineColorScheme();
-    const { t } = await useTranslation(lng, 'header')
+    const session = await getSession();
+
+    const auth = session?.user ? await getClient().mutate({
+        mutation: authMutation,
+        errorPolicy: 'all',
+        variables: {
+            input: {
+                email: (session?.user?.email as string) || null,
+                username: (session?.user?.name as string) || null,
+                avatar: null,
+            },
+        },
+    }) : {};
+
+    if (auth.errors?.filter(err => (err.extensions.code === 'TOKEN_EXPIRED'))[0]) {
+        // if (session?.accessTokenExpiresAt && session?.accessTokenExpiresAt * 1000 < new Date().getTime()) {
+        redirect('/api/auth/authorize')
+        // }
+    }
+
     return (
         <AppShellHeader className={classes.header}>
-            <Group px={32} justify="space-between" h="100%">
-                <Box>
-                    <Link href="/" className={classes.link}>
-                        <Logo size={40} />
-                    </Link>
-                </Box>
-
-                <Group h="100%" gap={0} style={{ margin: '0 auto 0 40px' }} visibleFrom="sm">
-                    <Link href="/popular" className={classes.link}>
-                        {t('popular')}
-                    </Link>
-                    <Link href="/comic" className={classes.link}>
-                        {t('catalog')}
-                    </Link>
-                </Group>
-
-                <Group>
-                    <Button
-                        visibleFrom="sm"
-                        variant='outline'
-                        className={classes.search}
-                        style={{ marginLeft: 16, 'span': { justifyContent: 'flex-start' }, minWidth: 200 }}
-                        leftSection={<IconSearch style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
-                        rightSection={'⌘K'}
-                    >
-                        Search
-                    </Button>
-                    <LanguagePicker currentLng={lng} />
-                    <Suspense fallback={<Avatar />}>
-                        <LoginButtonOrAvatar />
-                    </Suspense>
+            <Group px={32} wrap='nowrap' justify="space-between" h="100%">
+                <Navigation lng={lng} />
+                <Group justify='flex-end' grow w='50%'>
+                    {/* <LanguagePicker currentLng={lng} /> */}
+                    <ProfileOrLoginMenu id={auth.data?.auth.id} avatar={auth.data?.auth.avatar} />
                 </Group>
             </Group>
         </AppShellHeader>

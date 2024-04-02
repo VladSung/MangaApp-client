@@ -1,26 +1,28 @@
+import { AppShellMain, Box, Button, Card, CardSection, Container, Group, Stack, Text, Title } from '@mantine/core';
+import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import Image from 'next/image';
+import Link from 'next/link';
+
 import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';
+import { NotFoundError } from '@/app/widgets/not-found';
 
 import { ComicContent } from './comic-content';
-import Link from 'next/link';
-import { Box, Button, Card, Title, Text, CardSection, AppShellMain, Group, Container } from '@mantine/core';
-import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import { ComicPageProps } from './types';
 
 const Statistics = () => {
     return (
         <Group mb='md'>
-            <Group gap={4}>
-                <IconStarFilled color='yellow' size={16} />
-                <Text fw={700} span size='md' tt='uppercase'>18к</Text>
+            <Group align='center' gap={4} c='yellow'>
+                <IconStarFilled color='inherit' size={14} />
+                <Text c='yellow' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
-            <Group gap={4}>
-                <IconEyeFilled size={16} />
-                <Text fw={700} span size='md' tt='uppercase'>18к</Text>
+            <Group align='center' gap={4}>
+                <IconEyeFilled size={14} />
+                <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
-            <Group gap={4}>
-                <IconBookmarksFilled size={16} />
-                <Text fw={700} span size='md' tt='uppercase'>18к</Text>
+            <Group align='center' gap={4}>
+                <IconBookmarksFilled size={14} />
+                <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
         </Group>
     );
@@ -29,8 +31,11 @@ const Statistics = () => {
 
 
 export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicPageProps) {
+
     if (!comic) {
-        return <p>dd</p>;
+        return <AppShellMain>
+            <NotFoundError params={params} />
+        </AppShellMain>
     }
 
     return (
@@ -47,8 +52,7 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                     <Card id="poster" style={{ marginBottom: 3 * 8 }}>
                         <CardSection>
                             <Image
-                                priority
-                                style={{ borderRadius: '8px' }}
+                                style={{ borderRadius: '8px', objectFit: 'cover' }}
                                 src={comic?.cover}
                                 width={230}
                                 height={230 * 1.5}
@@ -57,15 +61,19 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                         </CardSection>
                     </Card>
                     <Button
-                        component={Link}
-                        href={`/comic/${params.id}/ch/1/1`}
+                        component={comic.lastReadedChapter?.id ? Link : undefined}
+                        href={`/comic/${comic.id}/ch/${comic.lastReadedChapter?.volume}/${comic.lastReadedChapter?.number}`}
                         size="sm"
-                        disabled={!comic.chapters?.length}
+                        disabled={!comic.lastReadedChapter?.id}
                         variant="contained"
                         fullWidth
                         style={{ marginBottom: 2 * 8 }}
                     >
-                        {t('start-reading')}
+                        {(comic.lastReadedChapter?.number || 1) > 1
+                            ? <>
+                                {t('continue')} Vol. {comic.lastReadedChapter?.volume} Ch. {comic.lastReadedChapter?.number}
+                            </>
+                            : t('start-reading')}
                     </Button>
                     <Button style={{ marginBottom: 2 * 8 }} size="xs" leftSection={<IconBookmark size={20} />} variant="default" fullWidth>
                         {t('add-bookmark')}
@@ -86,16 +94,15 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                     <Group align='flex-start'>
                         <div>
                             <Text size='xs'>{comic.alternativeTitles}</Text>
-                            <Title order={1} size='h2' style={{ marginBottom: 2 * 8, fontWeight: 700 }}>
+                            <Title order={1} size='h2' style={{ marginBottom: 16, fontWeight: 700 }}>
                                 {comic.title} <Text component='span' size='sm'>[{comic.status}]</Text>
                             </Title>
                         </div>
-                        <Group ml='auto' c='yellow' gap='xs' justify='flex-end'>
-                            <IconStarFilled size={20} />
-                            <Text fw={700} size='h4' component={'span'}>9.2</Text>
-                        </Group>
+
+                        <Text fw={700} ml='auto'>2022</Text>
                     </Group>
-                    <ComicContent t={t} comic={comic} />
+                    <Statistics />
+                    <ComicContent lng={params.lng} comic={comic} />
 
                 </Box>
                 <Box style={{ width: '100%', maxWidth: 256 }}>

@@ -2,6 +2,7 @@ import { ApolloLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { notifications } from '@mantine/notifications';
 import { removeTypenameFromMutationLink } from 'apollo-remove-typename-mutation-link';
+import { redirect } from 'next/navigation';
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
@@ -11,6 +12,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
                 message: error.message,
                 color: 'red',
             });
+
             console.log(
                 `[GraphQL error]: Message: ${error.message}, Location: ${JSON.stringify(
                     error.locations
@@ -25,6 +27,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
             message: JSON.stringify(networkError),
             color: 'red',
         });
+
         console.log(`[Network error]: ${JSON.stringify(networkError)}`);
     }
 });

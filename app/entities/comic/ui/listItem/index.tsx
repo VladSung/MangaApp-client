@@ -5,9 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 type Props = {
-    data: { title: string; subtitle?: string; lastChange?: string | null; cover: string };
+    data: { title: string; subtitle?: string | null; lastChange?: string | null; cover: string };
     children?: React.ReactNode;
-    href: any | string;
+    href: string;
 };
 
 export const ListItem = ({
@@ -36,6 +36,7 @@ export const ListItem = ({
                     >
                         <Image
                             loading="lazy"
+                            style={{ objectFit: 'cover' }}
                             height={106}
                             width={70.7}
                             src={cover}

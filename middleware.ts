@@ -1,17 +1,18 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest, NextFetchEvent } from 'next/server';
 import acceptLanguage from 'accept-language';
 import { fallbackLng, languages } from './app/shared/lib/i18n/settings';
+import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 
 acceptLanguage.languages(languages);
 
 export const config = {
     // matcher: '/:lng*',
-    matcher: ['/((?!api|_next/static|_error|_next/image|assets|favicon.ico|sw.js).*)'],
+    matcher: ['/((?!api|_next/static|_error|_next/public|_next/image|assets|favicon.ico|sw.js).*)'],
 };
 
 const cookieName = 'i18next';
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest, event: NextFetchEvent) {
     let lng;
     if (req?.cookies?.has(cookieName))
         lng = acceptLanguage.get(req?.cookies?.get(cookieName)?.value);
@@ -19,7 +20,6 @@ export function middleware(req: NextRequest) {
     if (!lng) lng = fallbackLng;
 
     // Redirect if lng in path is not supported
-
     if (
         !languages.some((loc) => req.url.includes(`/${loc}`)) &&
         !req.nextUrl.pathname.startsWith('/_next')
@@ -27,6 +27,10 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(
             new URL(`/${lng}${req.nextUrl.pathname}${req.nextUrl?.search}`, req.url)
         );
+    }
+
+    if (req.nextUrl.pathname?.startsWith(`/${lng}/dashboard`)) {
+        return withMiddlewareAuthRequired({ returnTo: req.nextUrl.pathname })(req, event);
     }
 
     if (req.headers.has('referer')) {
