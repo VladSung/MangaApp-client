@@ -14,6 +14,7 @@ type Props = {
 export const AddTeamWidget = ({ teams, labels }: Props) => {
     const onSubmit = (values: FormInput) => {
         // addTeam({ input: values })
+        console.log(values)
     }
     return (
         <>
