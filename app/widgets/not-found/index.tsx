@@ -1,5 +1,5 @@
 'use client';
-import { AppShellMain,Button } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 
 import { Error } from '@/app/entities/error';
@@ -17,7 +17,6 @@ export const NotFoundError = ({ params: { lng } }: Properties) => {
     };
 
     return (
-        <AppShellMain>
             <Error
                 errorCode={t('error.404.title')}
                 message={t('error.404.description')}
@@ -25,7 +24,6 @@ export const NotFoundError = ({ params: { lng } }: Properties) => {
                 <Button onClick={goBack} variant="contained">
                     {t('go-back')}
                 </Button>
-            </Error>
-        </AppShellMain>
+        </Error>
     );
 };

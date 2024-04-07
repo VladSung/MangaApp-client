@@ -17,6 +17,9 @@ import { config } from '@/app/shared/config';
 
 import { apolloLinks } from '../shared/lib/apollo/links';
 
+import { setVerbosity } from "ts-invariant";
+setVerbosity("debug");
+
 const wsLink = () =>
     new GraphQLWsLink(
         createClient({

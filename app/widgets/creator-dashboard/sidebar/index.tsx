@@ -1,19 +1,20 @@
-import { AppShellNavbar, BoxProps, Flex } from '@mantine/core';
-import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMessageCircle } from '@tabler/icons-react';
+'use client';
+import { BoxProps } from '@mantine/core';
+import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMenu, IconMessageCircle, IconUsers } from '@tabler/icons-react';
 
-import { getClient } from '@/app/shared/lib/apollo/client';
-import { useTranslation } from '@/app/shared/lib/i18n';
+import { useTranslation } from '@/app/shared/lib/i18n/client';
 import { PageProps } from '@/app/shared/types';
 import { Avatar } from '@/app/shared/ui/Avatar';
 import { NavLink } from '@/app/shared/ui/NavLink';
 
 import { teamsQuery } from './queries';
 import { AddTeamWidget } from './team';
+import Wrapper from './wrapper';
+import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 
-export const DashboardSidebar = async ({ params }: BoxProps & PageProps) => {
-    const { t } = await useTranslation(params.lng, 'creator-dashboard/common');
-
-    const teamData = await getClient().query({ query: teamsQuery })
+export const DashboardSidebar = ({ params }: BoxProps & PageProps) => {
+    const { t } = useTranslation(params.lng, 'creator-dashboard/common');
+    const teamData = useQuery(teamsQuery)
     const teamsList = teamData?.data?.me?.member?.map((member =>
     (
         <NavLink key={member.team?.id} variant='outline' px={16} style={{ borderRadius: 99 }}
@@ -23,15 +24,16 @@ export const DashboardSidebar = async ({ params }: BoxProps & PageProps) => {
     )))
 
     return (
-        <AppShellNavbar w={230} p='md'>
-            <Flex direction='column' gap={10} style={{ padding: 0, margin: 0 }}>
-                <NavLink exact variant='light' px={16} style={{ borderRadius: 99 }} label={t('sidebar.overview')} href='/dashboard' leftSection={<IconLayoutGrid />} />
-                <NavLink variant='light' px={16} style={{ borderRadius: 99 }} label={t('sidebar.stats')} href={'/dashboard/statistic'} leftSection={<IconChartHistogram />} />
-                <NavLink variant='light' px={16} style={{ borderRadius: 99 }} label={t('sidebar.notifications')} href={'/dashboard/notification'} leftSection={<IconBellPlus />} />
-                <NavLink variant='light' px={16} style={{ borderRadius: 99 }} label={t('sidebar.projects')} href={'/dashboard/comic'} leftSection={<IconLayoutCollage />} />
-                <AddTeamWidget teams={teamsList} labels={{ teams: t('sidebar.teams'), createTeam: t('sidebar.create-team') }} />
-                <NavLink variant='light' px={16} style={{ borderRadius: 99 }} label={t('sidebar.chats')} href={'/dashboard/chat'} leftSection={<IconMessageCircle />} />
-            </Flex>
-        </AppShellNavbar>
+        <Wrapper>
+            <NavLink exact variant='light' style={{ borderRadius: 99 }} label={t('sidebar.overview')} href='/dashboard' leftSection={<IconLayoutGrid />} />
+            <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.stats')} href={'/dashboard/statistic'} leftSection={<IconChartHistogram />} />
+            <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.notifications')} href={'/dashboard/notification'} leftSection={<IconBellPlus />} />
+            <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.projects')} href={'/dashboard/comic'} leftSection={<IconLayoutCollage />} />
+            <NavLink decorative variant='light' defaultOpened style={{ borderRadius: 99 }} label={t('sidebar.teams')} leftSection={<IconUsers />} href={'/dashboard/team'}>
+                {teamsList}
+                <AddTeamWidget labels={{ createTeam: t('sidebar.create-team') }} />
+            </NavLink>
+            <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.chats')} href={'/dashboard/chat'} leftSection={<IconMessageCircle />} />
+        </Wrapper>
     );
 };

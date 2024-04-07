@@ -1,9 +1,11 @@
 'use client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { Grid, Text } from '@mantine/core';
+import { ActionIcon, Flex, Group, Select, SimpleGrid, Text } from '@mantine/core';
 
 import { ComicListItem } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
+import { Filter } from './ComicFilter';
+import { IconSortAscending } from '@tabler/icons-react';
 
 const userComicsQuery = graphql(`
     query getUserComics {
@@ -48,26 +50,42 @@ export const Comics = () => {
         }
     }
 
-    if (comics.length === 0) {
+    if (comics.length < 1) {
         return <Text>Здесь пусто</Text>;
     }
 
     return (
-        <Grid p={24}>
-            {comics.map((comic) => (
-                <Grid key={comic.id}>
-                    <ComicListItem
-                        key={comic.id}
-                        href={`/dashboard/comic/${comic.id}`}
-                        data={{
-                            title: comic.title,
-                            subtitle: (comic.alternativeTitles) || undefined,
-                            lastChange: (comic.updatedAt as Date).toLocaleString(),
-                            cover: comic.cover,
-                        }}
-                    />
-                </Grid>
-            ))}
-        </Grid>
+        <Flex gap='xl'>
+            <div>
+                {/* <SimpleGrid
+                    cols={{ base: 1, md: 2, lg: 3 }}
+                    spacing={{ base: 'sm', sm: 'md' }}
+                    verticalSpacing={{ base: 'sm', sm: 'md' }}
+                > */}
+                <Group mb='lg'>
+                    <Select size='xs' defaultValue={'По изменению'} data={['По изменению', 'По Названию', 'по Году', 'по Оценке', 'по Статусу']} />
+                    <ActionIcon variant='default'>
+                        <IconSortAscending size={16} />
+                    </ActionIcon>
+                </Group>
+
+                <Group gap='md'>
+                    {comics.map((comic) => (
+                        <ComicListItem
+                            key={comic.id}
+                            href={`/dashboard/comic/${comic.id}`}
+                            data={{
+                                title: comic.title,
+                                subtitle: (comic.alternativeTitles) || undefined,
+                                lastChange: (comic.updatedAt as Date).toLocaleString(),
+                                cover: comic.cover,
+                            }}
+                        />
+                    ))}
+                </Group>
+                {/* </SimpleGrid> */}
+            </div>
+            <Filter onSubmitHandler={() => { }} />
+        </Flex>
     );
 };

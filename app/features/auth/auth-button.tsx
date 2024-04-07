@@ -27,7 +27,7 @@ function ThemeSwitcher() {
 
 export const AuthButton = () => {
 
-    return (<Group>
+    return (<Group justify="flex-end">
         <ThemeSwitcher />
         <Button size='xs' href={'/api/auth/login'} component='a'>Sign In</Button>
     </Group >)

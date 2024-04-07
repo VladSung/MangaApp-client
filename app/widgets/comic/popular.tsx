@@ -21,7 +21,7 @@ const Popular = async ({ lng }: { lng: string }) => {
                 </Title>
                 <Anchor href='/popular' component={Link}>{t('more')}</Anchor>
             </Group>
-            <Group>
+            <Group align='flex-start'>
                 {Lists}
             </Group>
         </AppShellSection>

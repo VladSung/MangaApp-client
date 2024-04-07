@@ -1,5 +1,5 @@
 'use client'
-import { useMutation } from "@apollo/client"
+import { gql, Reference, useMutation } from "@apollo/client"
 import { ActionIcon, Box, Button, Divider, Fieldset, Flex, Group, Modal, rem, Select, Stack, Table, Tabs, Text, Textarea, TextInput,Title } from "@mantine/core"
 import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -12,6 +12,7 @@ import { graphql } from "@/app/shared/api/graphql"
 import { useTranslation } from "@/app/shared/lib/i18n/client"
 import { PageProps } from "@/app/shared/types"
 import { Avatar } from "@/app/shared/ui/Avatar"
+import { useRouter } from "next/navigation"
 
 type Props = PageProps & {
     team?: Pick<Team, 'avatar' | 'name' | 'id' | 'members' | 'tagline'> | null
@@ -19,7 +20,7 @@ type Props = PageProps & {
     params: { teamId: string; }
 }
 
-
+// !Разобрать на отдельные компоненты
 
 const genInviteLinkMutation = graphql(`
     mutation generateInviteLink($teamId:ID!){
@@ -33,7 +34,37 @@ const sendInviteToEmailMutation = graphql(`
     }
 `)
 
+const deleteTeamMutation = graphql(`
+    mutation DeleteUserTeam($teamId:ID!){
+        deleteTeam(id:$teamId){
+            id
+        }
+    }
+`)
+
 export const TeamPageHeader = ({ params, team }: Props) => {
+
+    const router = useRouter()
+    const [deleteTeam] = useMutation(deleteTeamMutation)
+
+    const deleteTeamHandler = () => {
+        deleteTeam({
+            variables: { teamId: params.teamId },
+            update: (cache, { data }) => {
+                cache.evict({
+                    id: `Team:${data?.deleteTeam.id}`,
+                    args: {
+                        id: null,
+                        name: null,
+                        avatar: null
+                    }
+                });
+                cache.gc();
+            }
+        })
+        notifications.show({ title: "Team", message: "Team successfuly deleted" })
+        router.push('/dashboard')
+    }
 
     const clipboard = useClipboard({ timeout: 5000 });
     const { t } = useTranslation(params.lng, "creator-dashboard/team");
@@ -129,7 +160,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
                     <Fieldset color='red' legend="Danger Zone">
                         <Text mb={8} size='md' fw={700}>Delete this team</Text>
                         <Text mb={24} size='sm'>Once you delete a team, there is no going back. Please be certain.</Text>
-                        <Button color='red' variant='light'>Delete team</Button>
+                        <Button onClick={deleteTeamHandler} color='red' variant='light'>Delete team</Button>
 
                     </Fieldset>
                 </Stack>
@@ -137,7 +168,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
         </Tabs >);
 
     return (
-        <Flex component='header' mb={24} justify='space-between' align='center'>
+        <Flex component='header' mb='lg' justify='space-between' align='center'>
             <Flex gap={8} align='center'>
                 <Avatar size='lg' src={team?.avatar} alt={team?.name} />
                 <Title style={{ mb: 2 }} order={2} component='p'>

@@ -6,7 +6,7 @@ import { CreatorDashboardSidebar } from '@/app/widgets/creator-dashboard';
 
 const CreatorDashboardLayout = async ({ children, params }: PropsWithChildren & PageProps) => {
     return (
-        <AppShell component='section' navbar={{ width: '230', breakpoint: 'sm' }}>
+        <AppShell component='section' navbar={{ width: '230', breakpoint: 'md' }}>
             <CreatorDashboardSidebar params={params} />
             <AppShellMain>
                 {children}

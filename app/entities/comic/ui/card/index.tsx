@@ -1,4 +1,4 @@
-import { Box, Card as MantineCard, CardSection, Title } from '@mantine/core';
+import { Box, Card as MantineCard, CardSection, Title, rem } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -32,11 +32,11 @@ const cardWidth = 156;
 export const Card = ({ data }: Props) => {
     return (
         <div>
-            <MantineCard mb='sm' radius='md' shadow='md' style={{ maxWidth: cardWidth }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
+            <MantineCard mb='sm' radius='md' shadow='md' style={{ maxWidth: rem(cardWidth) }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
                 <CardSection
                     style={{
                         aspectRatio: '6/9',
-                        width: cardWidth,
+                        width: rem(cardWidth),
                         borderRadius: 0.5,
                         overflow: 'hidden',
                     }}

@@ -21,6 +21,7 @@ const documents = {
     "\n    query ChaptersByComicId($id:ID!){\n        chapters(comicId:$id){\n            title\n            volume\n            number\n            id\n            publishDate\n            price\n        }    \n    }\n": types.ChaptersByComicIdDocument,
     "\n    mutation generateInviteLink($teamId:ID!){\n    generateTeamInviteLink(teamId:$teamId, role: \"Viewer\")\n    }\n": types.GenerateInviteLinkDocument,
     "\n    mutation SendIviteEmail($teamId:ID!, $email:String!){\n        sendInviteToEmail(teamId:$teamId, email:$email, role:\"Viewer\")\n    }\n": types.SendIviteEmailDocument,
+    "\n    mutation DeleteUserTeam($teamId:ID!){\n        deleteTeam(id:$teamId){\n            id\n        }\n    }\n": types.DeleteUserTeamDocument,
     "\n    query MyTeamInfo($id:ID!) {\n        team(id:$id) {\n            id\n            name\n            tagline\n            avatar\n            members{\n                role\n                user{\n                    username\n                    avatar\n                    email\n                }\n            }\n            comics{\n                id\n                title\n                alternativeTitles\n                cover\n                updatedAt\n            }\n        }\n    }\n": types.MyTeamInfoDocument,
     "\n    query getComicPage($id: ID!) {\n        comic(id: $id) {\n            id\n            title\n            alternativeTitles\n            cover\n            description\n            status\n            lastReadedChapter {\n                id\n                volume\n                number\n            }\n            genres {\n                id\n                title\n            }\n            tags {\n                id\n                title\n            }\n            team {\n                members {\n                    user {\n                        id\n                        avatar\n                        username\n                    }\n                }\n            }\n        }\n    }\n": types.GetComicPageDocument,
     "\n    query getComicMeta($id: ID!) {\n        comic(id: $id) {\n            title\n            description\n        }\n    }\n": types.GetComicMetaDocument,
@@ -87,6 +88,10 @@ export function graphql(source: "\n    mutation generateInviteLink($teamId:ID!){
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n    mutation SendIviteEmail($teamId:ID!, $email:String!){\n        sendInviteToEmail(teamId:$teamId, email:$email, role:\"Viewer\")\n    }\n"): (typeof documents)["\n    mutation SendIviteEmail($teamId:ID!, $email:String!){\n        sendInviteToEmail(teamId:$teamId, email:$email, role:\"Viewer\")\n    }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    mutation DeleteUserTeam($teamId:ID!){\n        deleteTeam(id:$teamId){\n            id\n        }\n    }\n"): (typeof documents)["\n    mutation DeleteUserTeam($teamId:ID!){\n        deleteTeam(id:$teamId){\n            id\n        }\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

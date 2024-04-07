@@ -201,7 +201,6 @@ module.exports = {
             'error',
             {
                 cases: {
-                    camelCase: true,
                     kebabCase: true,
                 },
             },

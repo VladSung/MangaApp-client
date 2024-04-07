@@ -23,22 +23,23 @@ export const ListItem = ({
             radius='sm'
             style={{
                 display: 'flex',
-                width: 300,
+                maxWidth: '50%',
+                flex: '1 0 auto',
                 gap: 3,
             }}
         >
             <CardSection style={{ padding: 2 }}>
                 <Flex gap={16} direction='row'>
                     <Avatar
-                        style={{ height: 106, aspectRatio: '180/270', width: 70.7 }}
+                        style={{ height: 'auto', aspectRatio: '180/270', minWidth: 70.7, width: '100%', maxWidth: 180, maxHeight: 270 }}
                         variant="rounded"
                         radius='sm'
                     >
                         <Image
                             loading="lazy"
                             style={{ objectFit: 'cover' }}
-                            height={106}
-                            width={70.7}
+                            height={270}
+                            width={180}
                             src={cover}
                             alt=""
                         />
@@ -47,14 +48,7 @@ export const ListItem = ({
                         <Title
                             order={3}
                             size='h4'
-                            style={{
-                                mb: 1,
-                                textWrap: 'balance',
-                                WebkitLineClamp: '2',
-                                display: '-webkit-box',
-                                overflow: 'hidden',
-                                WebkitBoxOrient: 'vertical',
-                            }}
+                            lineClamp={1}
                         >
                             {title}
                         </Title>

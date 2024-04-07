@@ -4,14 +4,15 @@ import {
     Group
 } from '@mantine/core';
 import { redirect } from 'next/navigation';
-
-import ProfileOrLoginMenu from '@/app/features/auth';
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 
 import classes from './header.module.css';
 import { Navigation } from './navigation';
+import dynamic from 'next/dynamic';
 
+
+const ProfileOrLoginMenu = dynamic(() => import('@/app/features/auth'), { ssr: false })
 
 const authMutation = graphql(`
     mutation getAuth($input: AuthInput) {
@@ -37,10 +38,8 @@ async function Header({ lng }: { lng: string }) {
         },
     }) : {};
 
-    if (auth.errors?.filter(err => (err.extensions.code === 'TOKEN_EXPIRED'))[0]) {
-        // if (session?.accessTokenExpiresAt && session?.accessTokenExpiresAt * 1000 < new Date().getTime()) {
+    if (auth.errors?.find(err => (err.extensions.code === 'TOKEN_EXPIRED'))) {
         redirect('/api/auth/authorize')
-        // }
     }
 
     return (
@@ -48,7 +47,6 @@ async function Header({ lng }: { lng: string }) {
             <Group px={32} wrap='nowrap' justify="space-between" h="100%">
                 <Navigation lng={lng} />
                 <Group justify='flex-end' grow w='50%'>
-                    {/* <LanguagePicker currentLng={lng} /> */}
                     <ProfileOrLoginMenu id={auth.data?.auth.id} avatar={auth.data?.auth.avatar} />
                 </Group>
             </Group>

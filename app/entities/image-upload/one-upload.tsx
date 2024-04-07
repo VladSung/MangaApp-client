@@ -8,21 +8,21 @@ import { memo } from 'react';
 export type UseFormContext = () => UseFormReturnType<{ cover: FileWithPath }, (values: { cover: FileWithPath }) => { cover: FileWithPath }>
 type Props = {
     initialImage?: string,
+    className?: string
     height?: number
     width?: number
     resolution?: string
     useFormContext: UseFormContext
 }
 
-export const OneUpload = memo(({ initialImage, height, width, resolution = '(960 x 1440 px)', useFormContext }: Props) => {
+export const OneUpload = memo(({ initialImage, className, height = 378, width = 253, resolution = '(960 x 1440 px)', useFormContext }: Props) => {
     const form = useFormContext();
     const file = form?.values?.cover
-
     const imageUrl = file?.name ? URL.createObjectURL(file) : (initialImage);
-    const imagePreview = imageUrl ? <img style={{ zIndex: -1, objectFit: 'cover', position: 'absolute', top: 0, width: 253, height: 378 }} src={imageUrl} onLoad={() => URL.revokeObjectURL(imageUrl)} /> : null;
+    const imagePreview = imageUrl ? <img style={{ zIndex: -1, objectFit: 'cover', position: 'absolute', top: 0, left: 0, width, height }} src={imageUrl} onLoad={() => URL.revokeObjectURL(imageUrl)} /> : null;
 
     return (
-        <Paper withBorder h={height || 378} pos='relative' w={width || 253} radius='lg' style={{ background: imagePreview ? 'transparent' : undefined, overflow: 'hidden' }}>
+        <Paper className={className} withBorder h={height} pos='relative' w={width} radius='lg' style={{ background: imagePreview ? 'transparent' : undefined, overflow: 'hidden' }}>
             <Dropzone
                 p={24}
                 accept={IMAGE_MIME_TYPE}

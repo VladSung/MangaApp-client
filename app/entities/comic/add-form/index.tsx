@@ -10,6 +10,7 @@ import {
     Input,
     InputBase,
     MultiSelect,
+    Paper,
     Radio,
     RadioGroup,
     Select,
@@ -94,7 +95,7 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
             <form style={{ padding: '32px 24px', height: '100%' }} onReset={() => {
                 form.reset()
             }} onSubmit={form.onSubmit(onSubmit)}>
-                <Flex gap={24} mb={24}>
+                <Flex gap={24} mb={24} className={classes['form-container']}>
                     <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as ImageUploadUseFormContext} />
                     <Stack gap={16} flex='1 0 auto'>
                         <TextInput
@@ -110,8 +111,8 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
                         />
                         <Textarea
                             autosize
-                            minRows={8}
-                            maxRows={8}
+                            minRows={7.6}
+                            maxRows={7.6}
                             error={form.errors?.description?.toString()}
                             {...form.getInputProps('description')}
                             label={'Description'}
@@ -193,14 +194,14 @@ export const AddForm = ({ selectedValues, onSubmit, selectionValues }: AddFormPr
                         <Radio value='deny' label='Deny' />
                     </RadioGroup>
                 </Flex>
-                <Flex align='center' justify='center' pos='sticky' p='md' bottom={0}>
-                    <Group align='center' justify='center' gap='xl' px='xl' py='lg' w='max-content'>
+                <Flex align='center' style={{ zIndex: 5 }} justify='center' pos='sticky' p='md' bottom={0}>
+                    <Paper component={Group} radius='xl' withBorder align='center' justify='center' gap='xl' px='xl' py='md' w='max-content'>
                         <ActionIcon color='red' variant='default' size='lg' type='reset'><IconEraser /></ActionIcon>
                         <Tooltip position='top' offset={16} label="If the checkbox is checked, the comic will be visible to everyone and will appear in search." refProp='rootRef'>
                             <Checkbox type='checkbox' {...form.getInputProps('public')} label='Public access' />
                         </Tooltip>
                         <Button type='submit'>Save</Button>
-                    </Group>
+                    </Paper>
                 </Flex>
             </form>
         </FormProvider >
