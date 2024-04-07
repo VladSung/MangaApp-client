@@ -62,7 +62,7 @@ export const Comics = () => {
                     spacing={{ base: 'sm', sm: 'md' }}
                     verticalSpacing={{ base: 'sm', sm: 'md' }}
                 > */}
-                <Group mb='lg'>
+                <Group>
                     <Select size='xs' defaultValue={'По изменению'} data={['По изменению', 'По Названию', 'по Году', 'по Оценке', 'по Статусу']} />
                     <ActionIcon variant='default'>
                         <IconSortAscending size={16} />
