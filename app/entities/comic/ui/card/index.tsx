@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 type Props = {
+    href?: string;
     data?: {
         cover?: string;
         title?: string;
@@ -29,7 +30,7 @@ type Props = {
 
 const cardWidth = 156;
 
-export const Card = ({ data }: Props) => {
+export const Card = ({ data, href }: Props) => {
     return (
         <div>
             <MantineCard mb='sm' radius='md' shadow='md' style={{ maxWidth: rem(cardWidth) }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
@@ -57,7 +58,7 @@ export const Card = ({ data }: Props) => {
                     lineClamp={2}
                     size='h6'
                 >
-                    <Link href={`/comic/${data?.id}`}>{data?.title}</Link>
+                    <Link href={href || `/comic/${data?.id}`}>{data?.title}</Link>
                 </Title>
             </Box>
         </div>

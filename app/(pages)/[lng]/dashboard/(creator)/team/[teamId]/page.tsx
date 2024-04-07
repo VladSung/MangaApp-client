@@ -1,7 +1,7 @@
 import { AppShellSection, Container, Divider, Group, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 
-import { ComicListItem } from '@/app/entities/comic';
+import { ComicCard, ComicListItem } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 import { PageProps } from '@/app/shared/types';
@@ -59,14 +59,15 @@ const TeamList = async ({ params }: Props) => {
         <Container fluid p={24}>
             <TeamPageHeader team={data.team} params={params} />
             <AppShellSection component='section'>
-                <Group gap='md' w='100%'>
+                <Group gap='md' w='100%' align='flex-start'>
                     {data?.team?.comics?.map(c => (
-                        <ComicListItem
+                        <ComicCard
                             key={c.id}
                             data={{
+                                id: c.id,
                                 title: c.title,
-                                subtitle: c.alternativeTitles,
-                                lastChange: dayjs(c.updatedAt as string).format('DD.MM.YYYY'),
+                                // subtitle: c.alternativeTitles,
+                                // lastChange: dayjs(c.updatedAt as string).format('DD.MM.YYYY'),
                                 cover: c.cover
                             }}
                             href={`/dashboard/comic/${c.id}`} />

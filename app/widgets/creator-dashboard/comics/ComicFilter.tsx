@@ -6,7 +6,7 @@ type Props = {
 
 export const Filter = ({ onSubmitHandler }: Props) => {
     return (
-        <Paper withBorder radius='md' p='lg'>
+        <Paper maw={320} withBorder radius='md' p='lg'>
             <Flex justify='space-between'>
                 <Title order={4} mb='lg'>Filters</Title>
                 <Button size="compact-sm" variant="subtle">Очистить</Button>

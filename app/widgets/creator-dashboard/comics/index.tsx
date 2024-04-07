@@ -1,8 +1,8 @@
 'use client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { ActionIcon, Flex, Group, Select, SimpleGrid, Text } from '@mantine/core';
+import { ActionIcon, Flex, Group, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 
-import { ComicListItem } from '@/app/entities/comic';
+import { ComicCard, ComicListItem } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
 import { Filter } from './ComicFilter';
 import { IconSortAscending } from '@tabler/icons-react';
@@ -56,7 +56,7 @@ export const Comics = () => {
 
     return (
         <Flex gap='xl'>
-            <div>
+            <Stack style={{ flexGrow: 1 }}>
                 {/* <SimpleGrid
                     cols={{ base: 1, md: 2, lg: 3 }}
                     spacing={{ base: 'sm', sm: 'md' }}
@@ -69,22 +69,23 @@ export const Comics = () => {
                     </ActionIcon>
                 </Group>
 
-                <Group gap='md'>
+                <Group gap='md' align='flex-start'>
                     {comics.map((comic) => (
-                        <ComicListItem
+                        <ComicCard
                             key={comic.id}
                             href={`/dashboard/comic/${comic.id}`}
                             data={{
                                 title: comic.title,
-                                subtitle: (comic.alternativeTitles) || undefined,
-                                lastChange: (comic.updatedAt as Date).toLocaleString(),
+                                id: comic.id,
+                                // subtitle: (comic.alternativeTitles) || undefined,
+                                // lastChange: (comic.updatedAt as Date).toLocaleString(),
                                 cover: comic.cover,
                             }}
                         />
                     ))}
                 </Group>
                 {/* </SimpleGrid> */}
-            </div>
+            </Stack>
             <Filter onSubmitHandler={() => { }} />
         </Flex>
     );
