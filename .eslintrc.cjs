@@ -168,7 +168,7 @@ module.exports = {
         // 'quotes': [2, 'single', { avoidEscape: true }],
         'yoda': 2,
 
-        'simple-import-sort/imports': 'error',
+        'simple-import-sort/imports': 'warn',
         'simple-import-sort/exports': 'error',
         'import/first': 'error',
         'import/newline-after-import': 'error',
@@ -181,6 +181,7 @@ module.exports = {
 
         'unicorn/no-abusive-eslint-disable': 2,
         'unicorn/no-for-loop': 2,
+        'unicorn/consistent-function-scoping':1
         'unicorn/no-array-instanceof': 2,
         'unicorn/no-zero-fractions': 2,
         'unicorn/prefer-includes': 2,
