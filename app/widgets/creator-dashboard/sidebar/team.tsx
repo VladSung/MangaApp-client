@@ -1,18 +1,17 @@
 'use client'
 import { NavLink } from "@mantine/core"
 import { IconPlus, IconUsers } from "@tabler/icons-react"
-<<<<<<< HEAD:app/widgets/creator-dashboard/sidebar/Team.tsx
 import { ImageUpload } from '@/app/entities/image-upload';
 import { AddTeamForm } from '@/app/entities/team';
 import { graphql } from '@/app/shared/api/graphql';
 
-import { FormInput } from '@/app/entities/team/add-form';
 import { useDisclosure } from '@mantine/hooks';
 import { gql, useMutation } from "@apollo/client";
 import { uploadImages } from "@/app/features/upload-image";
 import { Avatar } from "@/app/shared/ui/Avatar";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
+import { FormInput } from '@/app/entities/team/add-form';
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -24,10 +23,6 @@ const addTeamMutation = graphql(`
     }
 `);
 
-=======
-import { FormInput } from '@/app/entities/team/add-form';
-import { AddTeam } from "../teams"
->>>>>>> b266a19677a2f8b68dd7fd41210ca504ad3da883:app/widgets/creator-dashboard/sidebar/team.tsx
 
 type Props = {
     labels: {
@@ -35,7 +30,6 @@ type Props = {
     }
 }
 
-<<<<<<< HEAD:app/widgets/creator-dashboard/sidebar/Team.tsx
 export const AddTeamWidget = ({ labels }: Props) => {
 
     const router = useRouter()
@@ -79,15 +73,6 @@ export const AddTeamWidget = ({ labels }: Props) => {
             router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
         }
     }
-
-=======
-export const AddTeamWidget = ({ teams, labels }: Props) => {
-    const onSubmit = (values: FormInput) => {
-        // addTeam({ input: values })
-        console.log(values)
-    }
-    
->>>>>>> b266a19677a2f8b68dd7fd41210ca504ad3da883:app/widgets/creator-dashboard/sidebar/team.tsx
     return (
         <>
 
