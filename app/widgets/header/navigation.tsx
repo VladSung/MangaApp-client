@@ -1,6 +1,6 @@
 'use client'
 import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr"
-import { Box,Button, ButtonGroup, Group } from "@mantine/core"
+import { ActionIcon, Box, Button, ButtonGroup, Group } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 import Image from 'next/image'
 import Link from "next/link"
@@ -34,17 +34,17 @@ export const Navigation = ({ lng }: { lng: string }) => {
 
     if (comic.volume && comic.chapter && comic.id) {
         return (<>
-            <Group w='50%' style={{ flexGrow: 1 }}>
+            <div className={classes.logoBox}>
                 <Box>
-                    <Link href="/" className={classes.link}>
-                        <Image width={40} height={40} src='/assets/logo.svg' alt='logo' />
-                    </Link>
+                    <ActionIcon size='xl' radius='sm' variant="subtle" href="/" component={Link}>
+                        <Image width={32} height={32} src='/assets/logo.svg' alt='logo' />
+                    </ActionIcon>
                 </Box>
-                <Button variant="subtle" c='initial' component={Link} href={`/comic/${comic.id}`}>
+                <Button visibleFrom='xs' variant="subtle" c='initial' component={Link} href={`/comic/${comic.id}`}>
                     {data?.comic?.title}
                 </Button>
-            </Group>
-            <ButtonGroup mr='auto'>
+            </div>
+            <ButtonGroup >
                 <Button disabled={Number(comic.chapter || 0) - 1 < 1} component={(Number(comic.chapter || 0) - 1 >= 1) ? Link : undefined} variant="default" href={`/comic/${comic.id}/ch/${comic.volume}/${Number(comic.chapter) - 1}`}>&lt;</Button>
                 <Button variant="default">
                     Vol. {comic.volume} Ch. {comic.chapter}
@@ -56,9 +56,9 @@ export const Navigation = ({ lng }: { lng: string }) => {
 
     return (<>
         <Box>
-            <Link href="/" className={classes.link}>
-                <Image width={40} height={40} src='/assets/logo.svg' alt='logo' />
-            </Link>
+            <ActionIcon size='xl' radius='sm' variant="subtle" href="/" component={Link}>
+                <Image width={32} height={32} src='/assets/logo.svg' alt='logo' />
+            </ActionIcon>
         </Box>
         <Group h="100%" gap={0} visibleFrom="md">
             <Button c='initial' variant="subtle" component={Link} href="/popular">

@@ -1,29 +1,10 @@
 .header {
-  height: rem(60px);
+  padding: 8px;
+  height:max-content;
+  min-height: rem(60px);
   padding-left: var(--mantine-spacing-md);
   padding-right: var(--mantine-spacing-md);
   border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-}
-
-.link {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding-left: var(--mantine-spacing-md);
-  padding-right: var(--mantine-spacing-md);
-  text-decoration: none;
-  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-  font-weight: 500;
-  font-size: var(--mantine-font-size-sm);
-
-  @media (max-width: $mantine-breakpoint-sm) {
-    height: rem(42px);
-    width: 100%;
-  }
-
-  @mixin hover {
-    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
-  }
 }
 
 .subLink {
@@ -44,13 +25,37 @@
   padding-bottom: var(--mantine-spacing-xl);
   border-top: rem(1px) solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }
+.headerInner {
+  display: flex;
+  justify-content: space-between;
+  height:100%;
+  flex-wrap: nowrap;
+  align-items:center;
+}
+.chapterNavigation{
+  order:2;
+  display: flex;
+  width: 100%;
+  @mixin larger-than $mantine-breakpoint-sm{
+    display: none;
+  }
+}
 .profileBoxWrapper {
   @mixin larger-than $mantine-breakpoint-sm{
     padding-inline:32px;
   }
 }
+.logoBox{
+  display: flex;
+  flex-wrap: nowrap;
+  flex-grow:1;
+  @mixin larger-than $mantine-breakpoint-sm{
+    width:50%;
+  }
+}
 .profileBox{
   display: flex;
+  align-items:center;
   flex-grow:1;
   justify-content: flex-end;
   @mixin larger-than $mantine-breakpoint-sm{
