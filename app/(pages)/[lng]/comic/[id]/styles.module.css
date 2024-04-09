@@ -65,7 +65,7 @@
     position:absolute;
     margin-top: -40px;
     left:0;
-    width: calc(100vw - 17px);
+    width: 100%;
     & .overlay {
         background: linear-gradient(0deg, var(--mantine-color-body) 20%, alpha(var(--mantine-color-body), .3));
         width: 100%;
