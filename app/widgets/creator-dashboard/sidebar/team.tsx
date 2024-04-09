@@ -54,12 +54,10 @@ export const AddTeamWidget = ({ labels }: Props) => {
                     cache.writeFragment({
                         id: `Team:${addTeam?.createTeam.id}`,
                         fragment: gql`
-                            fragment _ on Team {
-                            team {
+                            fragment _Team on Team {
                                 id
                                 avatar
                                 name
-                            }
                             }
                         `,
                         data: {

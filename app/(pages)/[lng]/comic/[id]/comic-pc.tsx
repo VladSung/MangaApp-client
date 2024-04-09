@@ -8,22 +8,28 @@ import { NotFoundError } from '@/app/widgets/not-found';
 
 import { ComicContent } from './comic-content';
 import { ComicPageProps } from './types';
+import classes from './styles.module.css'
 
 const Statistics = () => {
     return (
-        <Group mb='md'>
-            <Group align='center' gap={4} c='yellow'>
+        <Group align='center' mb='md'>
+            <Group gap={4} c='yellow'>
                 <IconStarFilled color='inherit' size={14} />
                 <Text c='yellow' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
-            <Group align='center' gap={4}>
+            <Group gap={4}>
                 <IconEyeFilled size={14} />
                 <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
-            <Group align='center' gap={4}>
+            <Group gap={4}>
                 <IconBookmarksFilled size={14} />
                 <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
             </Group>
+            <Group align='center' gap={4}>
+                <Text component='span'>Year:</Text>
+                <Text component='span' fw={700}>2022</Text>
+            </Group>
+
         </Group>
     );
 };
@@ -41,21 +47,29 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
     return (
         <AppShellMain>
             <Container
+                className={classes.container}
                 size='xl'
                 style={{
                     display: 'flex',
                     gap: 4 * 8,
-                    padding: '40px 32px',
-                    '@media(max-width:600px)':{
-                        flexDirection:'column'
-                    },
+                    padding: '40px 32px'
                 }}
             >
-                <Box id="poster" style={{ width: 230 }}>
-                    <Card id="poster" style={{ marginBottom: 3 * 8 }}>
+                <Box className={classes.posterWrapper}>
+                    <Box className={classes.posterBackground}>
+                        <div className={classes.overlay}></div>
+                        <Image
+
+                            src={comic?.cover}
+                            width={40}
+                            height={40 * 1.5}
+                            alt=""
+                        />
+                    </Box>
+                    <Card className={classes.poster}>
                         <CardSection>
                             <Image
-                                style={{ borderRadius: '8px', objectFit: 'cover' }}
+                                className={classes.posterImage}
                                 src={comic?.cover}
                                 width={230}
                                 height={230 * 1.5}
@@ -70,7 +84,7 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                         disabled={!comic.lastReadedChapter?.id}
                         variant="contained"
                         fullWidth
-                        style={{ marginBottom: 2 * 8 }}
+                        mb={16}
                     >
                         {(comic.lastReadedChapter?.number || 1) > 1
                             ? <>
@@ -78,11 +92,11 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                             </>
                             : t('start-reading')}
                     </Button>
-                    <Button style={{ marginBottom: 2 * 8 }} size="xs" leftSection={<IconBookmark size={20} />} variant="default" fullWidth>
+                    <Button mb={16} size="xs" leftSection={<IconBookmark size={20} />} variant="default" fullWidth>
                         {t('add-bookmark')}
                     </Button>
                     <Button
-                        style={{ marginBottom: 2 * 8 }}
+                        mb={16}
                         component={Link}
                         href={`/dashboard/comic/${params.id}`}
                         size="xs"
@@ -93,22 +107,16 @@ export default function ComicDesktopPage({ t, comic: { comic }, params }: ComicP
                         {t('edit')}
                     </Button>
                 </Box>
-                <Box style={{ width: '100%', maxWidth: 600 }}>
-                    <Group align='flex-start'>
-                        <div>
-                            <Text size='xs'>{comic.alternativeTitles}</Text>
-                            <Title order={1} size='h2' style={{ marginBottom: 16, fontWeight: 700 }}>
-                                {comic.title} <Text component='span' size='sm'>[{comic.status}]</Text>
-                            </Title>
-                        </div>
-
-                        <Text fw={700} ml='auto'>2022</Text>
-                    </Group>
+                <Box className={classes.content}>
+                    <Text size='xs'>{comic.alternativeTitles}</Text>
+                    <Title order={1} size='h2' style={{ marginBottom: 16, fontWeight: 700 }}>
+                        {comic.title} <Text component='span' size='sm'>[{comic.status}]</Text>
+                    </Title>
                     <Statistics />
                     <ComicContent lng={params.lng} comic={comic} />
 
                 </Box>
-                <Box style={{ width: '100%', maxWidth: 256 }}>
+                <Box className={classes.creators}>
                     <Title order={2} size="h5" style={{ marginBottom: 2 * 8 }}>
                         Creators
                     </Title>

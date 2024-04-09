@@ -3,13 +3,15 @@ import { useQuery } from '@apollo/client';
 import { Box, Button, Center, Divider, Group, Loader, Spoiler, Tabs, TabsList, TabsPanel, TabsTab, Text } from '@mantine/core';
 import { IconEye, IconEyeClosed, IconSortAscendingNumbers, IconSortDescendingNumbers } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { dayjsRelativeTime } from '@/app/shared/api/dayjs';
 import { OrderBy } from '@/app/shared/api/graphql';
 import { getComicChapters } from '@/app/shared/api/queries';
 import { useTranslation } from '@/app/shared/lib/i18n/client';
-import { CommentList } from '@/app/widgets/comment';
+import dynamic from 'next/dynamic';
+
+const CommentList = dynamic(() => import('@/app/widgets/comment/list'), { suspense: true })
 
 type ComicContentProps = {
     lng: string
@@ -136,7 +138,9 @@ export const ComicContent = ({ comic, lng }: ComicContentProps) => {
                 {!chaptersData.loading && !chaptersData.data?.chapters?.length && <Text>{t('publish-not-started')}</Text>}
             </TabsPanel>
             <TabsPanel value='comments'>
-                <CommentList comicId={comic.id} />
+                <Suspense fallback={<Loader />}>
+                    <CommentList comicId={comic.id} />
+                </Suspense>
             </TabsPanel>
         </Tabs >
     );
