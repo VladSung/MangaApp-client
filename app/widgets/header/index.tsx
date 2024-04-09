@@ -44,11 +44,11 @@ async function Header({ lng }: { lng: string }) {
 
     return (
         <AppShellHeader className={classes.header}>
-            <Group px={32} wrap='nowrap' justify="space-between" h="100%">
+            <Group wrap='nowrap' justify="space-between" h="100%">
                 <Navigation lng={lng} />
-                <Group justify='flex-end' grow w='50%'>
+                <div className={classes.profileBox}>
                     <ProfileOrLoginMenu id={auth.data?.auth.id} avatar={auth.data?.auth.avatar} />
-                </Group>
+                </div>
             </Group>
         </AppShellHeader>
     );

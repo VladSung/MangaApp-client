@@ -29,21 +29,6 @@ const ComicPage = async (props: Props) => {
 
     const { data } = await getComic(props.params.id);
     const { t } = await useTranslation(props.params.lng, 'comic/id')
-    const isMobile = userAgentFromString(headers().get('user-agent') || undefined).device.type === 'mobile'
-
-    if (!data.comic?.id) {
-        return (
-            <AppShellMain>
-                <NotFoundError params={{
-                    lng: props.params.lng
-                }} />
-            </AppShellMain>
-        )
-    }
-
-    if (isMobile) {
-        return <ComicMobile params={props.params} comic={data} t={t} />
-    }
 
     return <ComicDesktopPage params={props.params} comic={data} t={t} />
 }

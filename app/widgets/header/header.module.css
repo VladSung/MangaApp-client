@@ -44,3 +44,16 @@
   padding-bottom: var(--mantine-spacing-xl);
   border-top: rem(1px) solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }
+.profileBoxWrapper {
+  @mixin larger-than $mantine-breakpoint-sm{
+    padding-inline:32px;
+  }
+}
+.profileBox{
+  display: flex;
+  flex-grow:1;
+  justify-content: flex-end;
+  @mixin larger-than $mantine-breakpoint-sm{
+    width:50%;
+  }
+}
