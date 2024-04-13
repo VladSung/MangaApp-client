@@ -3,13 +3,14 @@ import {
     AppShellHeader,
     Group
 } from '@mantine/core';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
+
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 
 import classes from './header.module.css';
 import { Navigation } from './navigation';
-import dynamic from 'next/dynamic';
 
 
 const ProfileOrLoginMenu = dynamic(() => import('@/app/features/auth'), { ssr: false })

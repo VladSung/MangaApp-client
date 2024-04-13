@@ -12,12 +12,12 @@ import {
 import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 import { PropsWithChildren } from 'react';
+import { setVerbosity } from "ts-invariant";
 
 import { config } from '@/app/shared/config';
 
 import { apolloLinks } from '../shared/lib/apollo/links';
 
-import { setVerbosity } from "ts-invariant";
 setVerbosity("debug");
 
 const wsLink = () =>

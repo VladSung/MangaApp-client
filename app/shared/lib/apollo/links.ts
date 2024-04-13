@@ -2,7 +2,6 @@ import { ApolloLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { notifications } from '@mantine/notifications';
 import { removeTypenameFromMutationLink } from 'apollo-remove-typename-mutation-link';
-import { redirect } from 'next/navigation';
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
@@ -28,7 +27,9 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
             color: 'red',
         });
 
-        console.log(`[Network error]: ${JSON.stringify(networkError)}`);
+        console.log(
+            `[Network error]: ${JSON.stringify(networkError) || 'Check your internet connection'}`
+        );
     }
 });
 

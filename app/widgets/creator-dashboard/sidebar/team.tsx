@@ -1,17 +1,17 @@
 'use client'
+import { gql, useMutation } from "@apollo/client";
 import { NavLink } from "@mantine/core"
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from "@mantine/notifications";
 import { IconPlus, IconUsers } from "@tabler/icons-react"
+import { useRouter } from "next/navigation";
+
 import { ImageUpload } from '@/app/entities/image-upload';
 import { AddTeamForm } from '@/app/entities/team';
-import { graphql } from '@/app/shared/api/graphql';
-
-import { useDisclosure } from '@mantine/hooks';
-import { gql, useMutation } from "@apollo/client";
-import { uploadImages } from "@/app/features/upload-image";
-import { Avatar } from "@/app/shared/ui/Avatar";
-import { notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
 import { FormInput } from '@/app/entities/team/add-form';
+import { uploadImages } from "@/app/features/upload-image";
+import { graphql } from '@/app/shared/api/graphql';
+import { Avatar } from "@/app/shared/ui/Avatar";
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -39,9 +39,9 @@ export const AddTeamWidget = ({ labels }: Props) => {
 
 
     const onSubmit = async (values: FormInput) => {
-        if (values.cover) {
+        if (values.cover && values.name) {
             const { cover, name } = values;
-            const imagePath = await uploadImages([cover], values.name)
+            const imagePath = await uploadImages([cover], name)
 
             const newTeam = await addTeam({
                 variables: {
@@ -66,11 +66,13 @@ export const AddTeamWidget = ({ labels }: Props) => {
                     });
                 }
             })
+
             close();
             newTeam.data?.createTeam && notifications.show({ title: `Team: ${newTeam.data?.createTeam.name}`, message: "Team successfully created" })
             router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
         }
     }
+
     return (
         <>
 

@@ -1,11 +1,12 @@
 'use client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { ActionIcon, Flex, Group, Select, SimpleGrid, Stack, Text } from '@mantine/core';
+import { IconSortAscending } from '@tabler/icons-react';
 
 import { ComicCard, ComicListItem } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
-import { Filter } from './ComicFilter';
-import { IconSortAscending } from '@tabler/icons-react';
+
+import { Filter } from './comic-filter';
 
 const userComicsQuery = graphql(`
     query getUserComics {
@@ -50,7 +51,7 @@ export const Comics = () => {
         }
     }
 
-    if (comics.length < 1) {
+    if (comics.length === 0) {
         return <Text>Здесь пусто</Text>;
     }
 
@@ -86,7 +87,7 @@ export const Comics = () => {
                 </Group>
                 {/* </SimpleGrid> */}
             </Stack>
-            <Filter onSubmitHandler={() => { }} />
+            <Filter onSubmitHandler={() => {}} />
         </Flex>
     );
 };

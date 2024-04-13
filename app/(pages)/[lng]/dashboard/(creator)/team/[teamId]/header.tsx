@@ -5,6 +5,7 @@ import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { IconLink, IconPlus, IconTrash, IconUser } from "@tabler/icons-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { Team } from "@/app/entities/team"
@@ -12,7 +13,6 @@ import { graphql } from "@/app/shared/api/graphql"
 import { useTranslation } from "@/app/shared/lib/i18n/client"
 import { PageProps } from "@/app/shared/types"
 import { Avatar } from "@/app/shared/ui/Avatar"
-import { useRouter } from "next/navigation"
 
 type Props = PageProps & {
     team?: Pick<Team, 'avatar' | 'name' | 'id' | 'members' | 'tagline'> | null
@@ -59,9 +59,11 @@ export const TeamPageHeader = ({ params, team }: Props) => {
                         avatar: null
                     }
                 });
+
                 cache.gc();
             }
         })
+
         notifications.show({ title: "Team", message: "Team successfuly deleted" })
         router.push('/dashboard')
     }

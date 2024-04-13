@@ -1,10 +1,13 @@
+'use client'
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { Stack, Title } from '@mantine/core';
 
 import { Comment } from '@/app/entities/comment';
-import { getCommentsQuery } from './api/queries';
+
 import { Add } from './add';
+import { getCommentsQuery } from './api/queries';
 import Replies from './replies';
+import CommentMenu from './menu';
 
 const List = ({ comicId }: { comicId: string }) => {
     const { data: commentsData } = useQuery(getCommentsQuery, { variables: { comicId } })
@@ -14,7 +17,7 @@ const List = ({ comicId }: { comicId: string }) => {
             <Title order={2} mt={24} mb={8} size='h4'>{commentsData?.commentsByComic?.count} comments</Title>
             <Stack gap={16}>
                 <Add comicId={comicId} />
-                {commentsData?.commentsByComic?.comments?.map(c => (<Comment comicId={comicId} AddReplyWidget={Add} Replies={Replies} depth={0} key={c.id} comment={c} />))}
+                {commentsData?.commentsByComic?.comments?.map(c => (<Comment Menu={CommentMenu} comicId={comicId} AddReplyWidget={Add} Replies={Replies} depth={0} key={c.id} comment={c} />))}
             </Stack>
         </>
     )

@@ -3,7 +3,9 @@ import { NavLink as Link, NavLinkProps as MantineLinkProps } from '@mantine/core
 import NextLink, { LinkProps } from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { forwardRef } from 'react';
+
 import classes from './styles.module.css';
+
 export type NavLinkProps = LinkProps & MantineLinkProps & {
     exact?: boolean;
     decorative?: boolean;

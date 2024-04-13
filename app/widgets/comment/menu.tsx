@@ -1,8 +1,10 @@
 'use client'
-import { graphql } from "@/app/shared/api/graphql";
 import { gql, useMutation } from "@apollo/client";
-import { Menu, ActionIcon } from "@mantine/core";
+import { ActionIcon,Menu } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
+
+import { graphql } from "@/app/shared/api/graphql";
+
 import { getCommentsQuery } from "./api/queries";
 
 const deleteCommentMutation = graphql(`
@@ -23,7 +25,9 @@ const CommentMenu = ({ commentId }: { commentId: string }) => {
                 cache.evict({
                     id: `Comment:${commentId}`
                 });
+
                 cache.gc();
+
                 cache.updateQuery({
                     query: getCommentsQuery,
                 }, data => {

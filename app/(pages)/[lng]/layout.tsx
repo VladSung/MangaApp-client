@@ -8,13 +8,15 @@ import { getAccessToken, getSession } from '@auth0/nextjs-auth0';
 import { AppShell, ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications'
 import { dir } from 'i18next';
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { redirect } from 'next/navigation';
 import { ScriptProps } from 'next/script';
 
 import { WithProviders } from '@/app/_providers';
 import { useTranslation } from '@/app/shared/lib/i18n';
 import { PageProps } from '@/app/shared/types';
 import Header from '@/app/widgets/header';
-import { redirect } from 'next/navigation';
+import ErrorC from './error';
 
 type Props = {
     token?: string;
@@ -56,12 +58,13 @@ const theme = createTheme({
     cursorType: 'pointer'
 });
 
+
 export default async function RootLayout({ children, params }: Props & ScriptProps) {
 
     const session = await getSession()
 
 
-    if (session?.accessToken && (new Date((session?.accessTokenExpiresAt || 0) * 1000)).getTime() < (new Date()).getTime()) {
+    if (session?.accessToken && (new Date((session?.accessTokenExpiresAt || 0) * 1000)).getTime() < Date.now()) {
         redirect('/api/auth/logout')
     }
 
@@ -77,7 +80,9 @@ export default async function RootLayout({ children, params }: Props & ScriptPro
                     <WithProviders token={session?.accessToken}>
                         <AppShell header={{ height: 60 }}>
                             <Header lng={params.lng} />
-                            {children}
+                            <ErrorBoundary errorComponent={ErrorC}>
+                                {children}
+                            </ErrorBoundary>
                         </AppShell>
                     </WithProviders>
                 </MantineProvider>

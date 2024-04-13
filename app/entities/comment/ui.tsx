@@ -7,20 +7,25 @@ import { dayjsRelativeTime } from "@/app/shared/api/dayjs";
 type CommentBase = { id?: string, createdAt?: Date, _count?: { replies?: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author?: { avatar?: string | null, username?: string | null } | null };
 
 type AddReplyWidget = ({ comicId, chapterId, parentCommentId }: { comicId: string, chapterId?: string, parentCommentId?: string }) => React.JSX.Element
+type Menu = ({ commentId }: { commentId: string }) => React.JSX.Element
 type CommentProps = {
     comment: CommentBase
     depth: number
     comicId: string
-    menu?: React.ReactNode
+    Menu: Menu
     AddReplyWidget: AddReplyWidget
-    Replies?: ({ depth, AddReplyWidget, commentId }: { depth: number, AddReplyWidget: AddReplyWidget, comicId: string, commentId: string }) => undefined | React.JSX.Element | React.JSX.Element[]
+    Replies?: ({ depth, Menu, AddReplyWidget, commentId }: { Menu: Menu, depth: number, AddReplyWidget: AddReplyWidget, comicId: string, commentId: string }) => undefined | React.JSX.Element | React.JSX.Element[]
 }
 
-export const Comment = ({ comment, comicId, AddReplyWidget, menu, Replies, depth = 0 }: CommentProps) => {
+export const Comment = ({ comment, comicId, AddReplyWidget, Menu, Replies, depth = 0 }: CommentProps) => {
     const [opened, { toggle }] = useDisclosure(false);
     const [openedAddReplyWidget, { toggle: toggleAddReplyWidget }] = useDisclosure(false);
+
     const RepliesList = () => {
-        if (Replies && comment?.id && opened) return <Replies AddReplyWidget={AddReplyWidget} comicId={comicId} depth={depth + 1} commentId={comment.id} />
+        if (Replies && comment?.id && opened) {
+            return <Replies Menu={Menu} AddReplyWidget={AddReplyWidget} comicId={comicId} depth={depth + 1} commentId={comment.id} />
+        }
+
         return <></>
     }
 
@@ -33,7 +38,7 @@ export const Comment = ({ comment, comicId, AddReplyWidget, menu, Replies, depth
                         <Text component='h3' fw='bold' size='xs'>{comment?.author?.username}</Text>
                         <Text size='xs'>{(dayjsRelativeTime(comment?.createdAt)).fromNow()}</Text>
                         {comment?.pinned && <IconPinFilled size={16} />}
-                        {menu}
+                        {comment.id && <Menu commentId={comment?.id} />}
                     </Group>
                     <Text size='md'>{comment?.content}</Text>
                     <Group gap='md'>
@@ -50,7 +55,7 @@ export const Comment = ({ comment, comicId, AddReplyWidget, menu, Replies, depth
                 </Stack>
             </Group>
             {openedAddReplyWidget && <Stack pl={4} style={{ borderLeft: `${openedAddReplyWidget ? 2 : 0}px solid var(--mantine-color-blue-6)` }}>
-                {AddReplyWidget ? <AddReplyWidget comicId={comicId} parentCommentId={comment.id!} /> : null}
+                {AddReplyWidget ? <AddReplyWidget comicId={comicId} parentCommentId={comment.id} /> : null}
             </Stack>}
             <Collapse in={opened}>
                 <RepliesList />
