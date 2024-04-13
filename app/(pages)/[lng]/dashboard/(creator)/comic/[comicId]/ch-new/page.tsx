@@ -94,8 +94,8 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
         upload()
     }
 
-    data?.addChapter?.id && notifications.show({ message: 'Chapter uploaded', c: 'green' })
-    error && notifications.show({ message: 'Возникла ошибка', c: 'red' })
+    data?.addChapter?.id && window && notifications.show({ message: 'Chapter uploaded', c: 'green' })
+    error && window && notifications.show({ message: 'Возникла ошибка', c: 'red' })
 
 
     const form = useForm({

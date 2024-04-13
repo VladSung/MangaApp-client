@@ -76,7 +76,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
 
     const [email, setEmail] = useState<string>()
 
-    const handleSendInvite = async () => {
+    const handleSendInvite = () => {
         if (email) {
             sendInviteToEmail({ variables: { teamId: params.teamId, email: email } })
             notifications.show({ title: "Invite", message: `Email successfuly send to ${email}` })

@@ -84,11 +84,13 @@ export const AddComic = () => {
             },
         });
 
-        notifications.show({
-            color: 'green',
-            title: `${newComic.data?.addComic?.title}`,
-            message: `Comic saved`
-        })
+        if (window) {
+            notifications.show({
+                color: 'green',
+                title: `${newComic.data?.addComic?.title}`,
+                message: `Comic saved`
+            })
+        }
 
         setImage('{}');
     };

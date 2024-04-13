@@ -68,7 +68,7 @@ export const AddTeamWidget = ({ labels }: Props) => {
             })
 
             close();
-            newTeam.data?.createTeam && notifications.show({ title: `Team: ${newTeam.data?.createTeam.name}`, message: "Team successfully created" })
+            newTeam.data?.createTeam && window && notifications.show({ title: `Team: ${newTeam.data?.createTeam.name}`, message: "Team successfully created" })
             router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
         }
     }
