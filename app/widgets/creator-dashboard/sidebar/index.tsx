@@ -1,7 +1,7 @@
 'use client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { BoxProps } from '@mantine/core';
-import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMenu, IconMessageCircle, IconUsers } from '@tabler/icons-react';
+import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMessageCircle, IconUsers } from '@tabler/icons-react';
 
 import { useTranslation } from '@/app/shared/lib/i18n/client';
 import { PageProps } from '@/app/shared/types';

@@ -1,4 +1,4 @@
-import { ActionIcon, AppShellSection, Button, Flex, Group, Paper, rem, Stack, Text, Title } from '@mantine/core';
+import { AppShellSection, Button, Flex, Group, Paper, rem, Stack, Text, Title } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 

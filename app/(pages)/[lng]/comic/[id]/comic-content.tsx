@@ -1,5 +1,4 @@
 import { Box, Button, Divider, Loader, Spoiler, Tabs, TabsList, TabsPanel, TabsTab, Text } from '@mantine/core';
-
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Suspense } from "react";

@@ -1,5 +1,5 @@
 import { ActionIcon, Flex, Group, Paper, rem, Text } from "@mantine/core";
-import { IconCoins, IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
+import { IconCoins, IconEdit, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 
 type ItemProps = {

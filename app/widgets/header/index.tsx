@@ -1,7 +1,6 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import {
-    AppShellHeader,
-    Group
+    AppShellHeader
 } from '@mantine/core';
 import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';

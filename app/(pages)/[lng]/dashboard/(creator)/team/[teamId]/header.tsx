@@ -1,6 +1,6 @@
 'use client'
-import { gql, Reference, useMutation } from "@apollo/client"
-import { ActionIcon, Box, Button, Divider, Fieldset, Flex, Group, Modal, rem, Select, Stack, Table, Tabs, Text, Textarea, TextInput,Title } from "@mantine/core"
+import { useMutation } from "@apollo/client"
+import { ActionIcon, Box, Button, Fieldset, Flex, Group, Modal, rem, Select, Stack, Table, Tabs, Text, Textarea, TextInput, Title } from "@mantine/core"
 import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { IconLink, IconPlus, IconTrash, IconUser } from "@tabler/icons-react"

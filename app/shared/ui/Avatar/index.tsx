@@ -1,6 +1,5 @@
 import { Box, MantineSize } from "@mantine/core"
 import Image, { ImageProps } from "next/image"
-import { ElementType } from "react"
 
 type Props = Omit<ImageProps, 'src' | 'alt' | 'height' | 'width'> & {
     src?: string | null

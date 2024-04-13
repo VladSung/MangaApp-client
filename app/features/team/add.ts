@@ -1,6 +1,5 @@
-import { AddTeamInput, Exact,graphql  } from '@/app/shared/api/graphql';
+import { AddTeamInput, graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
-import { teamsQuery } from '@/app/widgets/creator-dashboard/sidebar/queries';
 
 const addTeamMutation = graphql(`
     mutation AddTeam($input: AddTeamInput!) {
@@ -11,11 +10,7 @@ const addTeamMutation = graphql(`
     }
 `);
 
-export const add = async (
-    variables: {
-        input: AddTeamInput;
-    }
-) => {
+export const add = async (variables: { input: AddTeamInput }) => {
     const headers = new Headers();
     headers.append('Access-Control-Request-Headers', 'Content-Type');
 

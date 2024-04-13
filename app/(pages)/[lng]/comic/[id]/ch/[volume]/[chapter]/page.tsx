@@ -1,11 +1,10 @@
 import { AppShellMain, Container } from '@mantine/core';
 import Image from 'next/image';
 
+import { AddHistory } from '@/app/features/read-history/add-read-history';
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 import { NotFoundError } from '@/app/widgets/not-found';
-
-import { AddHistory } from '@/app/features/read-history/add-read-history';
 
 
 

@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client"
 import { Center, Loader } from "@mantine/core"
 
 import { Comment } from '@/app/entities/comment'
+
 import { getCommentRepliesQuery } from "./api/mutations"
 
 
@@ -22,8 +23,6 @@ const Replies = ({ commentId, AddReplyWidget, Menu, comicId, depth = 0 }: {
     }
 
     return data?.repliesOnCommentByCommentId?.map((r) => {
-        console.log('count', r._count)
-
         return (<Comment Menu={Menu} AddReplyWidget={AddReplyWidget} Replies={Replies} comicId={comicId} depth={depth + 1} key={r.id} comment={r} />)
     })
 }

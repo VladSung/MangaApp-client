@@ -1,10 +1,11 @@
 
-import { AppShellMain, Box, Button, Card, CardSection, Container, Group, Stack, Text, Title } from '@mantine/core';
-import { getComic, getComicMeta } from "@/app/entities/comic/queries";
-import { useTranslation } from "@/app/shared/lib/i18n";
+import { AppShellMain, Box, Button, Card, CardSection, Container, Group, Text, Title } from '@mantine/core';
 import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+import { getComic, getComicMeta } from "@/app/entities/comic/queries";
+import { useTranslation } from "@/app/shared/lib/i18n";
 import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';
 import { NotFoundError } from '@/app/widgets/not-found';
 
@@ -58,6 +59,7 @@ export default async function ComicDesktopPage({ params }: Props) {
 
     const { data } = await getComic(params.id);
     const { t } = await useTranslation(params.lng, 'comic/id')
+
     if (!data.comic) {
         return <AppShellMain>
             <NotFoundError params={params} />

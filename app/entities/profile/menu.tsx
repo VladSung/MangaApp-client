@@ -1,5 +1,5 @@
 'use client'
-import { ActionIcon, Button, Menu, rem, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, Menu, rem, useMantineColorScheme } from "@mantine/core";
 import { IconLogout,IconMessageCircle, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
 import Link from "next/link";
 

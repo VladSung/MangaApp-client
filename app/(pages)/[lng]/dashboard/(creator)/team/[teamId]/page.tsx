@@ -1,7 +1,6 @@
-import { AppShellSection, Container, Divider, Group, Title } from '@mantine/core';
-import dayjs from 'dayjs';
+import { AppShellSection, Container, Group, Title } from '@mantine/core';
 
-import { ComicCard, ComicListItem } from '@/app/entities/comic';
+import { ComicCard } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 import { PageProps } from '@/app/shared/types';

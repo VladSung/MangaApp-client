@@ -4,7 +4,7 @@ import '@mantine/notifications/styles.css';
 import '@mantine/nprogress/styles.css';
 import './global.css';
 
-import { getAccessToken, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { AppShell, ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications'
 import { dir } from 'i18next';
@@ -16,6 +16,7 @@ import { WithProviders } from '@/app/_providers';
 import { useTranslation } from '@/app/shared/lib/i18n';
 import { PageProps } from '@/app/shared/types';
 import Header from '@/app/widgets/header';
+
 import ErrorC from './error';
 
 type Props = {

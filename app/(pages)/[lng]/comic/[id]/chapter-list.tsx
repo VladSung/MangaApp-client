@@ -1,12 +1,13 @@
 'use client'
-import { IconEye, IconEyeClosed, IconSortAscendingNumbers, IconSortDescendingNumbers } from '@tabler/icons-react';
 import { useQuery } from '@apollo/client';
+import { Box,Button, Center, Group, Loader, Text } from '@mantine/core';
+import { IconEye, IconEyeClosed, IconSortAscendingNumbers, IconSortDescendingNumbers } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
 import { dayjsRelativeTime } from '@/app/shared/api/dayjs';
 import { OrderBy } from '@/app/shared/api/graphql';
 import { getComicChapters } from '@/app/shared/api/queries';
-import { useState } from 'react';
-import { Group, Button, Text, Center, Loader, Box } from '@mantine/core';
-import Link from 'next/link';
 import { useTranslation } from '@/app/shared/lib/i18n/client';
 
 const ChaptersList = ({ comic, lng }: { lng: string, comic: { id: string } }) => {
@@ -20,6 +21,7 @@ const ChaptersList = ({ comic, lng }: { lng: string, comic: { id: string } }) =>
             }
         }
     })
+
     return (
         <>
             {!!chaptersData.data?.chapters?.length && <Group mb={16} align='center'>

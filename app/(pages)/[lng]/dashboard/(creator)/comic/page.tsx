@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Group, Paper, rem, TextInput,Title } from '@mantine/core';
+import { Button, Container, Flex, rem, Title } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 

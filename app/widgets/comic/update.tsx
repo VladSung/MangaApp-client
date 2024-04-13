@@ -72,7 +72,7 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
             setImage(newImage);
         }
 
-        const newComic = await updateComic({
+        await updateComic({
             variables: {
                 id: comicId,
                 input: {

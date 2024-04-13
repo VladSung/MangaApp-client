@@ -2,7 +2,6 @@
 import { Flex, Overlay, Paper, Text } from '@mantine/core';
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { UseFormReturnType } from '@mantine/form';
-import dynamic from 'next/dynamic';
 
 // const Dropzone = dynamic(()=>import('@mantine/dropzone').then(mod=>mod.Dropzone))
 

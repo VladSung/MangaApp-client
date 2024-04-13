@@ -1,7 +1,5 @@
 'use client';
-import { ActionIcon, AppShellNavbar, Flex } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconMenu } from "@tabler/icons-react";
+import { AppShellNavbar, Flex } from "@mantine/core";
 import { PropsWithChildren } from "react";
 
 import classes from './styles.module.css';

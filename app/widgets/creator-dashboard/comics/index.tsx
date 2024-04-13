@@ -1,9 +1,9 @@
 'use client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { ActionIcon, Flex, Group, Select, SimpleGrid, Stack, Text } from '@mantine/core';
+import { ActionIcon, Flex, Group, Select, Stack, Text } from '@mantine/core';
 import { IconSortAscending } from '@tabler/icons-react';
 
-import { ComicCard, ComicListItem } from '@/app/entities/comic';
+import { ComicCard } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
 
 import { Filter } from './comic-filter';

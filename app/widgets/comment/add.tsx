@@ -5,6 +5,7 @@ import { IconSend2 } from "@tabler/icons-react";
 import { KeyboardEvent, useState } from "react";
 
 import { graphql } from "@/app/shared/api/graphql";
+
 import { getCommentRepliesQuery } from "./api/mutations";
 import { getCommentsQuery } from "./api/queries";
 

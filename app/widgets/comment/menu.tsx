@@ -1,5 +1,5 @@
 'use client'
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { ActionIcon,Menu } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
 
@@ -21,7 +21,7 @@ const CommentMenu = ({ commentId }: { commentId: string }) => {
     const deleteCommentHandler = () => {
         deleteComment({
             variables: { commentId },
-            update: (cache, { data }) => {
+            update: (cache) => {
                 cache.evict({
                     id: `Comment:${commentId}`
                 });

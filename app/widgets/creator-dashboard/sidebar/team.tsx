@@ -3,7 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { NavLink } from "@mantine/core"
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from "@mantine/notifications";
-import { IconPlus, IconUsers } from "@tabler/icons-react"
+import { IconPlus } from "@tabler/icons-react"
 import { useRouter } from "next/navigation";
 
 import { ImageUpload } from '@/app/entities/image-upload';

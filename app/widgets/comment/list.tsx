@@ -6,8 +6,8 @@ import { Comment } from '@/app/entities/comment';
 
 import { Add } from './add';
 import { getCommentsQuery } from './api/queries';
-import Replies from './replies';
 import CommentMenu from './menu';
+import Replies from './replies';
 
 const List = ({ comicId }: { comicId: string }) => {
     const { data: commentsData } = useQuery(getCommentsQuery, { variables: { comicId } })
