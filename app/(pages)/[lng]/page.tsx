@@ -17,5 +17,4 @@ export async function generateMetadata({ params: { lng } }: PageProps) {
 }
 
 
-
 export { Home as default } from './home';

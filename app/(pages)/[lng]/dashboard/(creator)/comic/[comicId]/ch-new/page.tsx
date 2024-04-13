@@ -57,7 +57,6 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
         const upload = async () => {
 
             const uploadedImages = await uploadImages(data.images, `${params.comicId}/${data.volume}/${data.number}`, 'token.accessToken');
-            console.log(uploadedImages)
 
             await uploadChapter({
                 variables: {

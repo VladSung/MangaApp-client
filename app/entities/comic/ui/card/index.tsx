@@ -1,4 +1,4 @@
-import { Box, Card as MantineCard, CardSection, Title, rem } from '@mantine/core';
+import { Box, Card as MantineCard, CardSection, rem,Title } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 

@@ -1,6 +1,4 @@
 'use client'
-import { useRef } from 'react';
-
 import { ProfileMenu } from '@/app/entities/profile';
 
 import { AuthButton } from './auth-button';

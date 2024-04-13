@@ -1,15 +1,15 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import {
-    AppShellHeader,
-    Group
+    AppShellHeader
 } from '@mantine/core';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
+
 import { graphql } from '@/app/shared/api/graphql';
 import { getClient } from '@/app/shared/lib/apollo/client';
 
 import classes from './header.module.css';
 import { Navigation } from './navigation';
-import dynamic from 'next/dynamic';
 
 
 const ProfileOrLoginMenu = dynamic(() => import('@/app/features/auth'), { ssr: false })
@@ -44,12 +44,12 @@ async function Header({ lng }: { lng: string }) {
 
     return (
         <AppShellHeader className={classes.header}>
-            <Group px={32} wrap='nowrap' justify="space-between" h="100%">
+            <div className={classes.headerInner}>
                 <Navigation lng={lng} />
-                <Group justify='flex-end' grow w='50%'>
+                <div className={classes.profileBox}>
                     <ProfileOrLoginMenu id={auth.data?.auth.id} avatar={auth.data?.auth.avatar} />
-                </Group>
-            </Group>
+                </div>
+            </div>
         </AppShellHeader>
     );
 }

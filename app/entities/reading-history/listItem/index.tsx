@@ -1,5 +1,4 @@
 import { Text } from '@mantine/core';
-import Link from 'next/link';
 
 import { Avatar } from '@/app/shared/ui/Avatar';
 import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';

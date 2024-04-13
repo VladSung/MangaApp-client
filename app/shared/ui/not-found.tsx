@@ -1,7 +1,6 @@
 import { Flex } from '@mantine/core';
 
 import { PageProps } from '@/app/shared/types';
-import Maskot from '@/app/shared/ui/maskot';
 import { NotFoundError } from '@/app/widgets/not-found';
 
 const NotFoundPage = ({ params }: PageProps) => {
@@ -10,7 +9,6 @@ const NotFoundPage = ({ params }: PageProps) => {
             <NotFoundError
                 params={params}
             />
-            <Maskot params={params} />
         </Flex>
     );
 };

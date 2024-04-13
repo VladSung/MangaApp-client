@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { Center, Loader } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { AddComicForm, AddComicFormInput } from '@/app/entities/comic';
 import { Team } from '@/app/entities/comic/add-form/types';

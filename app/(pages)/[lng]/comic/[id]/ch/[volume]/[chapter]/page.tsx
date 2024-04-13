@@ -1,16 +1,10 @@
-import { useMutation } from '@apollo/client';
-import { Affix, AppShellMain, Button, Container, rem, Transition } from '@mantine/core';
-import { useWindowScroll } from '@mantine/hooks';
-import { IconArrowUp } from '@tabler/icons-react';
+import { AppShellMain, Container } from '@mantine/core';
 import Image from 'next/image';
 
-import { getComicQuery } from '@/app/entities/comic/graphql';
+import { AddHistory } from '@/app/features/read-history/add-read-history';
 import { graphql } from '@/app/shared/api/graphql';
-import { getComicChapters } from '@/app/shared/api/queries';
 import { getClient } from '@/app/shared/lib/apollo/client';
 import { NotFoundError } from '@/app/widgets/not-found';
-
-import { AddHistory } from './addReadHistory';
 
 
 

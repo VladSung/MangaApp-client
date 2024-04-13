@@ -1,4 +1,4 @@
-import { Box, Button, Modal, Textarea, TextInput, Title } from '@mantine/core';
+import { Box, Button, Modal, Textarea, TextInput } from '@mantine/core';
 import { FileWithPath } from '@mantine/dropzone';
 import { createFormContext, UseFormReturnType } from '@mantine/form';
 
@@ -10,26 +10,7 @@ export interface FormInput {
     cover?: FileWithPath;
 }
 
-const style = {
-    position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    boxShadow: 24,
-    p: 4,
-};
-
 type UseFormContext = () => UseFormReturnType<{ cover: FileWithPath }, (values: { cover: FileWithPath }) => { cover: FileWithPath }>
-
-type Props = {
-    initialImage?: string,
-    height?: number
-    width?: number
-    resolution?: string
-    useFormContext: UseFormContext
-}
-
 type AddProps = {
     open: boolean;
     handleClose: () => void;

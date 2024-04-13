@@ -1,4 +1,4 @@
-import { Flex, InputLabel, NumberInput, Paper, TextInput, Title, Select, MultiSelect, Button } from "@mantine/core"
+import { Button,Flex, InputLabel, MultiSelect, NumberInput, Paper, Select, TextInput, Title } from "@mantine/core"
 
 type Props = {
     onSubmitHandler: () => void

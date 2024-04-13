@@ -1,5 +1,5 @@
 'use client'
-import { ActionIcon, Button, Group, rem,Switch, useMantineColorScheme , useMantineTheme } from "@mantine/core";
+import { Button, Group, rem, Switch, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 import { IconMoonStars, IconSun } from "@tabler/icons-react";
 
 function ThemeSwitcher() {

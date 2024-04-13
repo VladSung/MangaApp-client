@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Box, Card, CardSection, Flex, Group, Stack, Text, Title } from '@mantine/core';
+import { Avatar, Box, Card, CardSection, Flex, Text, Title } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 

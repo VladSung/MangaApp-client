@@ -1,6 +1,7 @@
 'use client';
+import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { BoxProps } from '@mantine/core';
-import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMenu, IconMessageCircle, IconUsers } from '@tabler/icons-react';
+import { IconBellPlus, IconChartHistogram, IconLayoutCollage, IconLayoutGrid, IconMessageCircle, IconUsers } from '@tabler/icons-react';
 
 import { useTranslation } from '@/app/shared/lib/i18n/client';
 import { PageProps } from '@/app/shared/types';
@@ -10,7 +11,6 @@ import { NavLink } from '@/app/shared/ui/NavLink';
 import { teamsQuery } from './queries';
 import { AddTeamWidget } from './team';
 import Wrapper from './wrapper';
-import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 
 export const DashboardSidebar = ({ params }: BoxProps & PageProps) => {
     const { t } = useTranslation(params.lng, 'creator-dashboard/common');

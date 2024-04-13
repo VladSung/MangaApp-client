@@ -92,8 +92,8 @@ module.exports = {
         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-floating-promises': ['warn'],
-        "require-await": "off",
-    "@typescript-eslint/require-await": "warn",
+        'require-await': 'off',
+        '@typescript-eslint/require-await': 'warn',
         '@typescript-eslint/no-misused-promises': ['warn'],
 
         'linebreak-style': [2, process.platform === 'win32' ? 'windows' : 'unix'],
@@ -181,7 +181,7 @@ module.exports = {
 
         'unicorn/no-abusive-eslint-disable': 2,
         'unicorn/no-for-loop': 2,
-        'unicorn/consistent-function-scoping':1
+        'unicorn/consistent-function-scoping': 1,
         'unicorn/no-array-instanceof': 2,
         'unicorn/no-zero-fractions': 2,
         'unicorn/prefer-includes': 2,

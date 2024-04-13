@@ -1,7 +1,5 @@
-import { AppShellMain, BackgroundImage, Badge, Box, Button, Card, CardSection, Container, Flex, Loader, Overlay, Paper, ScrollArea, Text, Title } from '@mantine/core';
-import Image from 'next/image';
+import { AppShellMain, Container } from '@mantine/core';
 
-import { useTranslation } from '@/app/shared/lib/i18n';
 import { PageProps } from '@/app/shared/types';
 import { PopularComicsWidget } from '@/app/widgets/comic';
 
