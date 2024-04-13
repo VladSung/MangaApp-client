@@ -12,6 +12,7 @@ import { FormInput } from '@/app/entities/team/add-form';
 import { uploadImages } from "@/app/features/upload-image";
 import { graphql } from '@/app/shared/api/graphql';
 import { Avatar } from "@/app/shared/ui/Avatar";
+import { useEffect } from "react";
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -36,7 +37,6 @@ export const AddTeamWidget = ({ labels }: Props) => {
     const [opened, { close, open }] = useDisclosure()
 
     const [addTeam, { data }] = useMutation(addTeamMutation)
-
 
     const onSubmit = async (values: FormInput) => {
         if (values.cover && values.name) {
@@ -68,10 +68,14 @@ export const AddTeamWidget = ({ labels }: Props) => {
             })
 
             close();
-            newTeam.data?.createTeam && window && notifications.show({ title: `Team: ${newTeam.data?.createTeam.name}`, message: "Team successfully created" })
             router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
         }
     }
+
+    useEffect(() => {
+        notifications.show({ title: `Team: ${data?.createTeam.name}`, message: "Team successfully created" })
+
+    }, [data])
 
     return (
         <>

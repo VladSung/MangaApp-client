@@ -12,6 +12,7 @@ import { uploadImages } from '@/app/features/upload-image';
 import { ComicStatuses, graphql, MaturityRatings } from '@/app/shared/api/graphql';
 
 import { getComicSelectionsQuery } from './queries';
+import { useEffect } from 'react';
 
 
 const addComicMutation = graphql(`
@@ -29,20 +30,8 @@ const addComicMutation = graphql(`
 const maturityRatings = [{ title: 'Everyone' }, { title: 'Teen' }, { title: 'Mature' }];
 
 export const AddComic = () => {
-    const [addComic, { error, reset }] = useMutation(addComicMutation);
+    const [addComic, { data: comicData, error, reset }] = useMutation(addComicMutation);
 
-    if (error?.graphQLErrors) {
-        error.graphQLErrors.map(e => {
-            notifications.show({
-                title: `[Error]: ${e.extensions.code as string}`,
-                message: e.message,
-                color: 'red',
-                withBorder: true
-            })
-        });
-
-        reset()
-    }
 
     const teamId = useSearchParams().get('teamId');
 
@@ -84,14 +73,6 @@ export const AddComic = () => {
             },
         });
 
-        if (window) {
-            notifications.show({
-                color: 'green',
-                title: `${newComic.data?.addComic?.title}`,
-                message: `Comic saved`
-            })
-        }
-
         setImage('{}');
     };
 
@@ -100,6 +81,28 @@ export const AddComic = () => {
             <Loader />
         </Center>;
     }
+
+    useEffect(() => {
+        if (error?.graphQLErrors) {
+            error.graphQLErrors.map(e => {
+                notifications.show({
+                    title: `[Error]: ${e.extensions.code as string}`,
+                    message: e.message,
+                    color: 'red',
+                    withBorder: true
+                })
+            });
+
+            reset()
+        }
+
+        notifications.show({
+            color: 'green',
+            title: `${comicData?.addComic?.title}`,
+            message: `Comic saved`
+        })
+
+    }, [error, reset])
 
     if (!data?.me?.member || !data?.tags || !data?.genres) {
         return <div>err...</div>;

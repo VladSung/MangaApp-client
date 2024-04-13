@@ -13,6 +13,7 @@ import { ManyImagesUpload, ManyUploadUseFormContext } from "@/app/entities/image
 import { DndFileList } from "@/app/entities/image-upload/file-list";
 import { uploadImages } from "@/app/features/upload-image";
 import { graphql } from "@/app/shared/api/graphql";
+import { useEffect } from "react";
 
 const getComicAndChaptersData = graphql(`
     query getComicAndLastChapterData($id: ID!){
@@ -94,8 +95,15 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
         upload()
     }
 
-    data?.addChapter?.id && window && notifications.show({ message: 'Chapter uploaded', c: 'green' })
-    error && window && notifications.show({ message: 'Возникла ошибка', c: 'red' })
+    useEffect(() => {
+        data?.addChapter && notifications.show({
+            title: `Chapter ${data.addChapter.volume}-${data.addChapter.number}`,
+            message: 'Chapter successfully uploaded', c: 'green'
+        })
+
+        error && notifications.show({ message: 'Возникла ошибка', c: 'red' })
+
+    })
 
 
     const form = useForm({

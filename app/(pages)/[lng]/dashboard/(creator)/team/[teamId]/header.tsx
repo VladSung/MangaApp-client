@@ -6,7 +6,7 @@ import { notifications } from "@mantine/notifications"
 import { IconLink, IconPlus, IconTrash, IconUser } from "@tabler/icons-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Team } from "@/app/entities/team"
 import { graphql } from "@/app/shared/api/graphql"
@@ -45,7 +45,7 @@ const deleteTeamMutation = graphql(`
 export const TeamPageHeader = ({ params, team }: Props) => {
 
     const router = useRouter()
-    const [deleteTeam] = useMutation(deleteTeamMutation)
+    const [deleteTeam, { data: deleteTeamData }] = useMutation(deleteTeamMutation)
 
     const deleteTeamHandler = () => {
         deleteTeam({
@@ -64,14 +64,13 @@ export const TeamPageHeader = ({ params, team }: Props) => {
             }
         })
 
-        notifications.show({ title: "Team", message: "Team successfuly deleted" })
         router.push('/dashboard')
     }
 
     const clipboard = useClipboard({ timeout: 5000 });
     const { t } = useTranslation(params.lng, "creator-dashboard/team");
     const [genInviteLink, { loading: LinkLoading }] = useMutation(genInviteLinkMutation)
-    const [sendInviteToEmail] = useMutation(sendInviteToEmailMutation)
+    const [sendInviteToEmail, { data: sendInviteToEmailData }] = useMutation(sendInviteToEmailMutation)
     const [opened, { close: close, open: open }] = useDisclosure(false);
 
     const [email, setEmail] = useState<string>()
@@ -79,7 +78,6 @@ export const TeamPageHeader = ({ params, team }: Props) => {
     const handleSendInvite = () => {
         if (email) {
             sendInviteToEmail({ variables: { teamId: params.teamId, email: email } })
-            notifications.show({ title: "Invite", message: `Email successfuly send to ${email}` })
         }
     }
 
@@ -91,6 +89,11 @@ export const TeamPageHeader = ({ params, team }: Props) => {
     const handleOpenModal = () => {
         open()
     }
+
+    useEffect(() => {
+        deleteTeamData?.deleteTeam && notifications.show({ title: "Team", message: "Team successfuly deleted" })
+        sendInviteToEmailData?.sendInviteToEmail && notifications.show({ title: "Invite", message: `Email successfuly send to ${email}` })
+    }, [deleteTeamData, sendInviteToEmailData])
 
     const ModalContent = (
         <Tabs defaultValue='members' variant='pills' activateTabWithKeyboard>

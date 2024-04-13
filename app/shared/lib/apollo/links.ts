@@ -6,13 +6,7 @@ import { removeTypenameFromMutationLink } from 'apollo-remove-typename-mutation-
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
         for (const error of graphQLErrors) {
-            if(window){
-                notifications.show({
-                    title: 'GraphQL error',
-                    message: error.message,
-                    color: 'red',
-                });
-            }
+
 
             console.log(
                 `[GraphQL error]: Message: ${error.message}, Location: ${JSON.stringify(
@@ -23,14 +17,6 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     }
 
     if (networkError) {
-        if(window){
-            notifications.show({
-                title: 'Network error',
-                message: JSON.stringify(networkError),
-                color: 'red',
-            });
-        }
-
         console.log(
             `[Network error]: ${JSON.stringify(networkError) || 'Check your internet connection'}`
         );
