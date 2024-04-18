@@ -18,6 +18,7 @@ import { PageProps } from '@/app/shared/types';
 import Header from '@/app/widgets/header';
 
 import ErrorC from './error';
+import { MobileNavbar } from '@/app/widgets/mobile-navbar';
 
 type Props = {
     token?: string;
@@ -84,6 +85,7 @@ export default async function RootLayout({ children, params }: Props & ScriptPro
                             <ErrorBoundary errorComponent={ErrorC}>
                                 {children}
                             </ErrorBoundary>
+                            <MobileNavbar />
                         </AppShell>
                     </WithProviders>
                 </MantineProvider>

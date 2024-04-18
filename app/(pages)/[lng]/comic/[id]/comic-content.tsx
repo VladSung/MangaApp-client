@@ -1,7 +1,7 @@
-import { Box, Button, Divider, Loader, Spoiler, Tabs, TabsList, TabsPanel, TabsTab, Text } from '@mantine/core';
+'use server'
+import { Box, Button, Divider, Spoiler, Tabs, TabsList, TabsPanel, TabsTab, Text } from '@mantine/core';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Suspense } from "react";
 
 import { useTranslation } from '@/app/shared/lib/i18n';
 
@@ -84,14 +84,10 @@ export const ComicContent = async ({ comic, lng }: ComicContentProps) => {
 
             </TabsList>
             <TabsPanel value='chapters' py='xs'>
-                <Suspense fallback={<Loader />}>
-                    <ChaptersList lng={lng} comic={comic} />
-                </Suspense>
+                <ChaptersList lng={lng} comic={comic} />
             </TabsPanel>
             <TabsPanel value='comments'>
-                <Suspense fallback={<Loader />}>
-                    <CommentList comicId={comic.id} />
-                </Suspense>
+                <CommentList comicId={comic.id} />
             </TabsPanel>
         </Tabs >
     );

@@ -73,7 +73,7 @@ export const AddTeamWidget = ({ labels }: Props) => {
     }
 
     useEffect(() => {
-        notifications.show({ title: `Team: ${data?.createTeam.name}`, message: "Team successfully created" })
+        data?.createTeam && notifications.show({ title: `Team: ${data?.createTeam.name}`, message: "Team successfully created" })
 
     }, [data])
 

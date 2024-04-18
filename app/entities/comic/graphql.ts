@@ -23,6 +23,7 @@ export const getComicQuery = graphql(`
                 title
             }
             team {
+                id
                 members {
                     user {
                         id

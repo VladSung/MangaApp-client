@@ -12,6 +12,7 @@ export const Error = ({ errorCode, message, children }: Properties) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
+                height: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
             }}

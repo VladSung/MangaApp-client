@@ -1,6 +1,12 @@
 .container {
+    display: flex;
+    gap: rem(32);
+    padding: rem(40) rem(32);
     @mixin smaller-than $mantine-breakpoint-xs {
+        
+        padding: rem(40) rem(16);
         flex-direction: column;
+        gap: rem(16);
     }
     @mixin smaller-than $mantine-breakpoint-lg {
         flex-wrap: wrap;

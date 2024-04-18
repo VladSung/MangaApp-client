@@ -1,5 +1,5 @@
 .collapsed-links{
-    overlow: hidden;
+    overflow: hidden;
     &:global(.mantine-NavLink-root){
         padding-inline: 0;
     }

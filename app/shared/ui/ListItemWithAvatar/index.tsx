@@ -18,8 +18,7 @@ export const ListItemWithAvatar = ({
     href
 }: Properties) => {
     return (
-        <Button radius='sm' px={16} py={8} justify='flex-start' fullWidth variant='default' href={href} component={Link}>
-            {avatar}
+        <Button leftSection={avatar} radius='sm' px={16} py={8} justify='flex-start' fullWidth variant='default' href={href} component={Link}>
             <Box>{children}</Box>
             {rightChildren}
         </Button>

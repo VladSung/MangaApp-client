@@ -1,5 +1,5 @@
-
-import { AppShellMain, Box, Button, Card, CardSection, Container, Group, Text, Title } from '@mantine/core';
+'use server'
+import { ActionIcon, AppShellMain, Avatar, Box, Button, Card, CardSection, Container, Flex, Group, Skeleton, Text, Title } from '@mantine/core';
 import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,6 +11,8 @@ import { NotFoundError } from '@/app/widgets/not-found';
 
 import { ComicContent } from './comic-content';
 import classes from './styles.module.css'
+import { GetComicPageQuery } from '@/app/shared/api/graphql';
+import { AddBookmark } from '@/app/features/bookmark';
 
 type Props = {
     params: {
@@ -29,26 +31,28 @@ export async function generateMetadata({ params: { id } }: Props) {
 
 
 
-const Statistics = () => {
+const Statistics = ({ data }: { data: GetComicPageQuery }) => {
     return (
         <Group align='center' mb='md'>
-            <Group gap={4} c='yellow'>
+            <Group gap={4}>
                 <IconStarFilled color='inherit' size={14} />
-                <Text c='yellow' inline span size='md' tt='uppercase'>18к</Text>
+                <Text inline span size='md' tt='uppercase'>
+                    7/
+                    <Text inline span size='xs'>10</Text>
+                </Text>
             </Group>
             <Group gap={4}>
                 <IconEyeFilled size={14} />
-                <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
+                <Text inline span size='md' tt='uppercase'>18к</Text>
             </Group>
             <Group gap={4}>
                 <IconBookmarksFilled size={14} />
-                <Text c='gray' inline span size='md' tt='uppercase'>18к</Text>
+                <Text inline span size='md' tt='uppercase'>18к</Text>
             </Group>
             <Group align='center' gap={4}>
-                <Text component='span'>Year:</Text>
                 <Text component='span' fw={700}>2022</Text>
+                <Text component='span' size='sm'>[{data?.comic?.status}]</Text>
             </Group>
-
         </Group>
     );
 };
@@ -71,11 +75,6 @@ export default async function ComicDesktopPage({ params }: Props) {
             <Container
                 className={classes.container}
                 size='xl'
-                style={{
-                    display: 'flex',
-                    gap: 4 * 8,
-                    padding: '40px 32px'
-                }}
             >
                 <Box className={classes.posterWrapper}>
                     <Box className={classes.posterBackground}>
@@ -99,24 +98,23 @@ export default async function ComicDesktopPage({ params }: Props) {
                             />
                         </CardSection>
                     </Card>
-                    <Button
-                        component={data.comic.lastReadedChapter?.id ? Link : undefined}
-                        href={`/comic/${data.comic.id}/ch/${data.comic.lastReadedChapter?.volume}/${data.comic.lastReadedChapter?.number}`}
-                        size="sm"
-                        disabled={!data.comic.lastReadedChapter?.id}
-                        variant="contained"
-                        fullWidth
-                        mb={16}
-                    >
-                        {(data.comic.lastReadedChapter?.number || 1) > 1
-                            ? <>
-                                {t('continue')} Vol. {data.comic.lastReadedChapter?.volume} Ch. {data.comic.lastReadedChapter?.number}
-                            </>
-                            : t('start-reading')}
-                    </Button>
-                    <Button mb={16} size="xs" leftSection={<IconBookmark size={20} />} variant="default" fullWidth>
-                        {t('add-bookmark')}
-                    </Button>
+                    <Flex gap='sm' direction='column' className={classes.comicActions}>
+                        <Button
+                            component={data.comic.lastReadedChapter?.id ? Link : undefined}
+                            href={`/comic/${data.comic.id}/ch/${data.comic.lastReadedChapter?.volume}/${data.comic.lastReadedChapter?.number}`}
+                            size="sm"
+                            disabled={!data.comic.lastReadedChapter?.id}
+                            variant="contained"
+                            fullWidth
+                        >
+                            {(data.comic.lastReadedChapter?.number || 1) > 1
+                                ? <>
+                                    {t('continue')} Vol. {data.comic.lastReadedChapter?.volume} Ch. {data.comic.lastReadedChapter?.number}
+                                </>
+                                : t('start-reading')}
+                        </Button>
+                        <AddBookmark lng={params.lng} />
+                    </Flex>
                     <Button
                         mb={16}
                         component={Link}
@@ -132,33 +130,35 @@ export default async function ComicDesktopPage({ params }: Props) {
                 <Box className={classes.content}>
                     <Text size='xs'>{data.comic.alternativeTitles}</Text>
                     <Title order={1} size='h2' style={{ marginBottom: 16, fontWeight: 700 }}>
-                        {data.comic.title} <Text component='span' size='sm'>[{data.comic.status}]</Text>
+                        {data.comic.title}
                     </Title>
-                    <Statistics />
+                    <Statistics data={data} />
                     <ComicContent lng={params.lng} comic={data.comic} />
 
                 </Box>
                 <Box className={classes.creators}>
                     <Title order={2} size="h5" style={{ marginBottom: 2 * 8 }}>
-                        Creators
+                        {t('creators')}
                     </Title>
-                    {data.comic.team?.members?.map((m) => (
-                        <ListItemWithAvatar
-                            key={m?.user?.id}
-                            href={`/team/${m?.user?.id}`}
-                            avatar={m?.user?.avatar &&
-                                <Image
-                                    style={{ borderRadius: '4px', verticalAlign: 'top' }}
-                                    width={56}
-                                    height={56}
-                                    alt=""
-                                    src={m.user.avatar}
-                                />
-                            }
-                        >
-                            <Title order={2} size='h5' style={{ mb: 2 }}>{m?.user?.username}</Title>
-                        </ListItemWithAvatar>
-                    ))}
+                    <Group gap='sm'>
+                        {data.comic.team?.members?.map((m) => (
+                            <ListItemWithAvatar
+                                key={m?.user?.id}
+                                href={`/team/${data.comic?.team?.id}`}
+                                avatar={m?.user?.avatar
+                                    ? <Image
+                                        style={{ borderRadius: '4px', verticalAlign: 'top' }}
+                                        width={24}
+                                        height={24}
+                                        alt=""
+                                        src={m.user.avatar}
+                                    />
+                                    : <Avatar radius='sm' size={24} />}
+                            >
+                                <Title order={2} size='h5' style={{ mb: 2 }}>{m?.user?.username}</Title>
+                            </ListItemWithAvatar>
+                        ))}
+                    </Group>
                 </Box>
             </Container>
         </AppShellMain>
