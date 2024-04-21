@@ -1,4 +1,4 @@
-import { Box, Card as MantineCard, CardSection, rem,Title } from '@mantine/core';
+import { Box, Card as MantineCard, CardSection, rem, Title, UnstyledButton } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -28,16 +28,27 @@ type Props = {
 // }
 
 
-const cardWidth = 156;
+const cardWidth = 147;
 
 export const Card = ({ data, href }: Props) => {
     return (
-        <div>
-            <MantineCard mb='sm' radius='md' shadow='md' style={{ maxWidth: rem(cardWidth) }} className={'card  mantine-active'} title={data?.title} href={`/comic/${data?.id}`} component={Link}>
+        <UnstyledButton
+            variant='transparent'
+            className={'mantine-active'}
+            href={href || `/comic/${data?.id}`}
+            component={Link}
+            style={{ borderRadius: 'var(--mantine-radius-md)' }}
+        >
+            <MantineCard mb='sm'
+                radius='md'
+                shadow='md'
+                style={{ maxWidth: rem(cardWidth) }}
+                className='card'
+                title={data?.title}>
                 <CardSection
                     style={{
                         aspectRatio: '6/9',
-                        width: rem(cardWidth),
+                        width: 'max-content',
                         borderRadius: 0.5,
                         overflow: 'hidden',
                     }}
@@ -58,9 +69,9 @@ export const Card = ({ data, href }: Props) => {
                     lineClamp={2}
                     size='h6'
                 >
-                    <Link href={href || `/comic/${data?.id}`}>{data?.title}</Link>
+                    {data?.title}
                 </Title>
             </Box>
-        </div>
+        </UnstyledButton>
     )
 }

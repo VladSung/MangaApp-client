@@ -1,0 +1,51 @@
+{
+    "header": {
+        "project": "Project"
+    },
+    "team": {
+        "header": "Manage your team",
+        "members": "Members",
+        "settings": "Settings",
+        "table": {
+            "user": "User",
+            "email": "Email",
+            "role": "Role"
+        }
+    },
+    "actions": {
+        "create": {
+            "title": "Create new team",
+            "button": "Create",
+            "inputs": {
+                "name": "Name",
+                "description": "Description"
+            }
+        },
+        "invite": {
+            "button": "invite",
+            "header": "Invite members"
+        }
+    },
+    "messages": {
+        "create": {
+            "title": "Team",
+            "success": "Team successfully created: ",
+            "error": "Team not created"
+        },
+        "delete": {
+            "title": "Team",
+            "success": "Team successfully deleted: ",
+            "error": "Team not deleted"
+        },
+        "email-sended": {
+            "title": "Team",
+            "success": "Invite successfully sended: ",
+            "error": "Invite not sended"
+        },
+        "invite-link": {
+            "default": "Or get private invite link",
+            "success": "Link saved to Clipboard",
+            "expired": "Link expired after 24 hours"
+        }
+    }
+}

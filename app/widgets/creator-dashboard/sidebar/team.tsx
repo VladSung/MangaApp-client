@@ -1,6 +1,6 @@
 'use client'
 import { gql, useMutation } from "@apollo/client";
-import { NavLink } from "@mantine/core"
+import { Button, NavLink } from "@mantine/core"
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react"
@@ -13,6 +13,8 @@ import { uploadImages } from "@/app/features/upload-image";
 import { graphql } from '@/app/shared/api/graphql';
 import { Avatar } from "@/app/shared/ui/Avatar";
 import { useEffect } from "react";
+import { PageProps } from "@/app/shared/types";
+import { useTranslation } from "@/app/shared/lib/i18n/client";
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -25,18 +27,20 @@ const addTeamMutation = graphql(`
 `);
 
 
-type Props = {
+type Props = PageProps & {
     labels: {
         createTeam: string
     }
 }
 
-export const AddTeamWidget = ({ labels }: Props) => {
+export const AddTeamWidget = ({ labels, params }: Props) => {
+
+    const { t } = useTranslation(params.lng, 'dashboard/creator/team/index');
 
     const router = useRouter()
     const [opened, { close, open }] = useDisclosure()
 
-    const [addTeam, { data }] = useMutation(addTeamMutation)
+    const [addTeam, { data, error }] = useMutation(addTeamMutation)
 
     const onSubmit = async (values: FormInput) => {
         if (values.cover && values.name) {
@@ -73,8 +77,11 @@ export const AddTeamWidget = ({ labels }: Props) => {
     }
 
     useEffect(() => {
-        data?.createTeam && notifications.show({ title: `Team: ${data?.createTeam.name}`, message: "Team successfully created" })
-
+        data?.createTeam && notifications.show({ color: 'green', title: `Team: ${data?.createTeam.name}`, message: t('messages.create.success') })
+        if (error?.name) {
+            notifications.show({ color: 'red', title: t('messages.create.error'), message: error.message })
+            console.log('error message: ', error.message + '\nerror extraInfo: ', error.extraInfo)
+        }
     }, [data])
 
     return (
@@ -84,9 +91,19 @@ export const AddTeamWidget = ({ labels }: Props) => {
                 label={data.createTeam.name}
                 href={`/dashboard/team/${data.createTeam.id}`}
                 leftSection={<Avatar size='sm' src={data.createTeam.avatar} alt={data.createTeam.name || ''} />} />}
-            <NavLink onClick={open} variant='light' defaultOpened px={16} style={{ borderRadius: 99 }} label={labels.createTeam} leftSection={<IconPlus />} />
+            <Button
+                onClick={open}
+                fullWidth
+                color='default'
+                fw={400}
+                variant='subtle'
+                px={16}
+                style={{ borderRadius: 99 }}
+                leftSection={<IconPlus />}
+            >{labels.createTeam}</Button>
 
             <AddTeamForm
+                t={t}
                 ImageUpload={ImageUpload}
                 onSubmit={onSubmit}
                 open={opened}

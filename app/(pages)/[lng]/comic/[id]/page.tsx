@@ -1,18 +1,18 @@
 'use server'
-import { ActionIcon, AppShellMain, Avatar, Box, Button, Card, CardSection, Container, Flex, Group, Skeleton, Text, Title } from '@mantine/core';
-import { IconBookmark, IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
+import { AppShellMain, Box, Button, Card, CardSection, Container, Flex, Group, Stack, Text, Title, UnstyledButton } from '@mantine/core';
+import { IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { getComic, getComicMeta } from "@/app/entities/comic/queries";
 import { useTranslation } from "@/app/shared/lib/i18n";
-import { ListItemWithAvatar } from '@/app/shared/ui/ListItemWithAvatar';
 import { NotFoundError } from '@/app/widgets/not-found';
 
 import { ComicContent } from './comic-content';
 import classes from './styles.module.css'
 import { GetComicPageQuery } from '@/app/shared/api/graphql';
 import { AddBookmark } from '@/app/features/bookmark';
+import { Avatar } from '@/app/shared/ui/Avatar';
 
 type Props = {
     params: {
@@ -92,8 +92,8 @@ export default async function ComicDesktopPage({ params }: Props) {
                             <Image
                                 className={classes.posterImage}
                                 src={data.comic?.cover}
-                                width={230}
-                                height={230 * 1.5}
+                                width={270}
+                                height={270 * 1.5}
                                 alt=""
                             />
                         </CardSection>
@@ -136,29 +136,30 @@ export default async function ComicDesktopPage({ params }: Props) {
                     <ComicContent lng={params.lng} comic={data.comic} />
 
                 </Box>
-                <Box className={classes.creators}>
-                    <Title order={2} size="h5" style={{ marginBottom: 2 * 8 }}>
+                <Box className={classes.creators} ml='lg'>
+                    <Title order={2} size="h5" mb='md'>
                         {t('creators')}
                     </Title>
-                    <Group gap='sm'>
-                        {data.comic.team?.members?.map((m) => (
-                            <ListItemWithAvatar
-                                key={m?.user?.id}
+                    <Stack>
+                        {data.comic.team?.members?.map((member) => (
+                            <UnstyledButton
+                                className='mantine-active'
+                                key={member.id}
+                                component={Link}
                                 href={`/team/${data.comic?.team?.id}`}
-                                avatar={m?.user?.avatar
-                                    ? <Image
-                                        style={{ borderRadius: '4px', verticalAlign: 'top' }}
-                                        width={24}
-                                        height={24}
-                                        alt=""
-                                        src={m.user.avatar}
-                                    />
-                                    : <Avatar radius='sm' size={24} />}
                             >
-                                <Title order={2} size='h5' style={{ mb: 2 }}>{m?.user?.username}</Title>
-                            </ListItemWithAvatar>
+                                <Group align="center" gap='xs'>
+                                    <Avatar src={member?.user?.avatar} size='md' />
+                                    <div>
+                                        <Text size='md'>{member?.user?.username}</Text>
+                                        <Text c="dimmed" size="xs">
+                                            {member.role}
+                                        </Text>
+                                    </div>
+                                </Group>
+                            </UnstyledButton>
                         ))}
-                    </Group>
+                    </Stack>
                 </Box>
             </Container>
         </AppShellMain>

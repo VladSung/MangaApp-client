@@ -1,10 +1,10 @@
-import { Box, MantineSize } from "@mantine/core"
+import { Box } from "@mantine/core"
 import Image, { ImageProps } from "next/image"
 
 type Props = Omit<ImageProps, 'src' | 'alt' | 'height' | 'width'> & {
     src?: string | null
     alt?: string | null
-    size?: MantineSize | number
+    size?: keyof (typeof sizes) | number
 
     component?: 'span'
 }
@@ -14,10 +14,12 @@ const sizes = {
     sm: 26,
     md: 38,
     lg: 56,
-    xl: 84
+    "2lg": 56 * 2,
+    xl: 84,
+    "2xl": 84 * 2
 }
 
-const getSize = (size?: MantineSize | number) => {
+const getSize = (size?: keyof (typeof sizes) | number) => {
     if (!size) {
         return sizes.md
     }
@@ -38,6 +40,7 @@ export const Avatar = (props: Props) => {
     return <Box component={component} style={{ height: gettedSize, width: gettedSize, minWidth: gettedSize, borderRadius: '50%', overflow: "hidden" }}>
         <Image
             {...restProps}
+            style={{ objectFit: 'cover' }}
             loading='lazy'
             src={src || '/assets/avatar.png'}
             height={gettedSize}

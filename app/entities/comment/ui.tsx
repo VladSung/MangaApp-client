@@ -1,8 +1,9 @@
-import { ActionIcon, Avatar, Button, Collapse, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Button, Collapse, Group, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconCaretDownFilled, IconCaretUpFilled, IconHeart, IconMessageReply, IconPinFilled } from "@tabler/icons-react";
 
 import { dayjsRelativeTime } from "@/app/shared/api/dayjs";
+import { Avatar } from "@/app/shared/ui/Avatar";
 
 type CommentBase = { id?: string, createdAt?: Date, _count?: { replies?: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author?: { avatar?: string | null, username?: string | null } | null };
 

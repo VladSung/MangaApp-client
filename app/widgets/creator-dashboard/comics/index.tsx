@@ -70,7 +70,7 @@ export const Comics = () => {
                     </ActionIcon>
                 </Group>
 
-                <Group gap='md' align='flex-start'>
+                <Group gap='md' align='stretch'>
                     {comics.map((comic) => (
                         <ComicCard
                             key={comic.id}

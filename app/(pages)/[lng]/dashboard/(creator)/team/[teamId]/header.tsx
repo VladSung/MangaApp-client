@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { Team } from "@/app/entities/team"
+import { Team, TeamHeader } from "@/app/entities/team"
 import { graphql } from "@/app/shared/api/graphql"
 import { useTranslation } from "@/app/shared/lib/i18n/client"
 import { PageProps } from "@/app/shared/types"
@@ -68,7 +68,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
     }
 
     const clipboard = useClipboard({ timeout: 5000 });
-    const { t } = useTranslation(params.lng, "creator-dashboard/team");
+    const { t } = useTranslation(params.lng, "dashboard/creator/team/index");
     const [genInviteLink, { loading: LinkLoading }] = useMutation(genInviteLinkMutation)
     const [sendInviteToEmail, { data: sendInviteToEmailData }] = useMutation(sendInviteToEmailMutation)
     const [opened, { close: close, open: open }] = useDisclosure(false);
@@ -173,23 +173,19 @@ export const TeamPageHeader = ({ params, team }: Props) => {
         </Tabs >);
 
     return (
-        <Flex component='header' mb='lg' justify='space-between' align='center'>
-            <Flex gap={8} align='center'>
-                <Avatar size='lg' src={team?.avatar} alt={team?.name} />
-                <Title style={{ mb: 2 }} order={2} component='p'>
-                    {team?.name}
-                </Title>
-            </Flex>
-
-            <Flex gap={8}>
+        <TeamHeader
+            team={team}
+            rightSlot={<Flex gap={8}>
                 <Button size='xs' href={`/dashboard/comic/add?teamId=${team?.id}`} component={Link} variant='contain' leftSection={<IconPlus size={16} stroke={rem(2)} />}>{t('header.project')}</Button>
                 <Button size='xs' variant='outline' leftSection={<IconUser size={16} stroke={rem(2)} />} onClick={handleOpenModal} aria-label={t('manage team')}>
                     {team?.members?.length}
                 </Button>
-            </Flex>
+            </Flex>}
+        >
+            <Text>{team?.tagline}</Text>
             <Modal size='lg' lockScroll={false} opened={opened} onClose={close} title={t('team.header')}>
                 {ModalContent}
             </Modal>
-        </Flex>
+        </TeamHeader>
     )
 }

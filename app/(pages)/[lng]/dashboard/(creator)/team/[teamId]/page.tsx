@@ -1,4 +1,4 @@
-import { AppShellSection, Container, Group, Title } from '@mantine/core';
+import { AppShellSection, BackgroundImage, Box, Container, Group, Paper, Title } from '@mantine/core';
 
 import { ComicCard } from '@/app/entities/comic';
 import { graphql } from '@/app/shared/api/graphql';
@@ -55,25 +55,25 @@ const TeamList = async ({ params }: Props) => {
     }
 
     return (
-        <Container fluid p={24}>
-            <TeamPageHeader team={data.team} params={params} />
-            <AppShellSection component='section'>
-                <Group gap='md' w='100%' align='flex-start'>
-                    {data?.team?.comics?.map(c => (
-                        <ComicCard
-                            key={c.id}
-                            data={{
-                                id: c.id,
-                                title: c.title,
-                                // subtitle: c.alternativeTitles,
-                                // lastChange: dayjs(c.updatedAt as string).format('DD.MM.YYYY'),
-                                cover: c.cover
-                            }}
-                            href={`/dashboard/comic/${c.id}`} />
-                    ))}
-                </Group>
-                {(data?.team?.comics?.length || 0) < 1 && <Title order={4}>Nothing to show</Title>}
-            </AppShellSection>
+        <Container size='xl' p='md'>
+            <Paper >
+                <TeamPageHeader team={data.team} params={params} />
+                <AppShellSection component='section'>
+                    <Group gap='md' w='100%' align='stretch'>
+                        {data?.team?.comics?.map(c => (
+                            <ComicCard
+                                key={c.id}
+                                data={{
+                                    id: c.id,
+                                    title: c.title,
+                                    cover: c.cover
+                                }}
+                                href={`/dashboard/comic/${c.id}`} />
+                        ))}
+                    </Group>
+                    {(data?.team?.comics?.length || 0) < 1 && <Title order={4}>Nothing to show</Title>}
+                </AppShellSection>
+            </Paper>
         </Container >
     )
 }

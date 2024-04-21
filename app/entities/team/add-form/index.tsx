@@ -1,3 +1,4 @@
+'use client'
 import { Box, Button, Modal, Textarea, TextInput } from '@mantine/core';
 import { FileWithPath } from '@mantine/dropzone';
 import { createFormContext, UseFormReturnType } from '@mantine/form';
@@ -12,6 +13,7 @@ export interface FormInput {
 
 type UseFormContext = () => UseFormReturnType<{ cover: FileWithPath }, (values: { cover: FileWithPath }) => { cover: FileWithPath }>
 type AddProps = {
+    t: (str: string) => string;
     open: boolean;
     handleClose: () => void;
     onSubmit: (values: FormInput) => void,
@@ -22,7 +24,7 @@ type AddProps = {
 const [FormProvider, useFormContext, useForm] =
     createFormContext<FormInput>();
 
-export const Add = ({ open, onSubmit, ImageUpload, handleClose }: AddProps) => {
+export const Add = ({ open, t, onSubmit, ImageUpload, handleClose }: AddProps) => {
     const form = useForm({
         name: 'add-team-form', initialValues: {
             name: '',
@@ -36,7 +38,7 @@ export const Add = ({ open, onSubmit, ImageUpload, handleClose }: AddProps) => {
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-content"
-            title="Создать новую команду"
+            title={t('actions.create.title')}
         >
             <FormProvider form={form}>
                 <Box
@@ -64,18 +66,18 @@ export const Add = ({ open, onSubmit, ImageUpload, handleClose }: AddProps) => {
                     <TextInput
                         withAsterisk
                         {...form.getInputProps('name', { require: true })}
-                        label={'Название'}
+                        label={t('actions.create.inputs.name')}
                     />
                     <Textarea
                         {...form.getInputProps('tagline', { require: true })}
-                        label={'Cлоган команды'}
+                        label={t('actions.create.inputs.description')}
                         autosize
                         minRows={1}
                         mb={16}
                     />
                     <Box>
                         <Button variant="contained" type="submit">
-                            Добавить
+                            {t('actions.create.button')}
                         </Button>
                     </Box>
                 </Box>

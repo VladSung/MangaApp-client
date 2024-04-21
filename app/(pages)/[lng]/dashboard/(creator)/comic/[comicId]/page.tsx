@@ -1,57 +1,82 @@
-import { AppShellSection, Button, Flex, Group, Paper, rem, Stack, Text, Title } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import { Paper, Text, Title, SimpleGrid, Button, Group, Container, ActionIcon, Avatar, Modal, Fieldset } from '@mantine/core';
+import { IconTrendingUp, IconUser, IconBookmarks, IconEdit, IconExternalLink, IconSettings, IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
-
-import { ChapterListItem } from '@/app/entities/chapter';
-import { graphql } from '@/app/shared/api/graphql';
+import { PageProps } from '@/app/shared/types';
 import { getClient } from '@/app/shared/lib/apollo/client';
-import { UpdateComicWidget } from '@/app/widgets/comic';
+import { graphql } from '@/app/shared/api/graphql';
+import Image from 'next/image';
+import { useDisclosure } from '@mantine/hooks';
+import { SettingsModal } from './settings-modal';
 
-const getChaptersQuery = graphql(`
-    query ChaptersByComicId($id:ID!){
-        chapters(comicId:$id){
+type Props = PageProps & {
+    params: {
+        comicId: string
+    }
+}
+
+const getComicQuery = graphql(`
+    query getComicPageData($id: ID!) {
+        comic(id:$id){
             title
-            volume
-            number
-            id
-            publishDate
-            price
-        }    
+            cover
+        }
     }
 `)
 
-const AddComic = async ({ params: { comicId } }: { params: { comicId: string } }) => {
-    const chapters = await getClient().query({ query: getChaptersQuery, variables: { id: comicId } })
+const StatisticsPage = async ({ params }: Props) => {
+
+    const { data } = await getClient().query({
+        query: getComicQuery,
+        variables: { id: params.comicId }
+    })
+
+
+    const items = [
+        { icon: IconTrendingUp, title: 'Популярность', value: 0 },
+        { icon: IconUser, title: 'Читатели', value: 0 },
+        { icon: IconBookmarks, title: 'В закладках', value: 0 },
+        { icon: IconUser, title: 'Платные подписки', value: 0 },
+    ];
+
 
     return (
-        <Flex gap='lg'>
-            <AppShellSection grow><UpdateComicWidget comicId={comicId} /></AppShellSection>
-            <AppShellSection w={480} py={32} pr={24}>
-                <Paper h='100%' p={16}>
-                    <Group mb='xl' gap={8} align='center' justify='space-between'>
-                        <Title size="h4" order={2}>
-                            Comic Chapters
-                        </Title>
-                        <Button
-                            size='xs'
-                            href={`/dashboard/comic/${comicId}/ch-new`} component={Link} variant='contain'
-                            leftSection={<IconPlus size={16} stroke={rem(2)} />}
-                        >
-                            Chapter
-                        </Button>
-                    </Group>
-                    <Stack gap='sm' miw={420}>
-                        {chapters.data.chapters
-                            ? chapters.data.chapters?.map(
-                                ch => (<ChapterListItem key={ch.id} comicId={comicId} chapter={{ title: ch.title, createdAt: ch.publishDate as string, volume: ch.volume, number: ch.number, id: ch.id, price: ch.price }} />)
-                            )
-                            : <Text>Chapters not found</Text>
-                        }
-                    </Stack>
-                </Paper>
-            </AppShellSection>
-        </Flex>
+        <Container size='xl' pt='lg'>
+            <Group justify="space-between" mb='lg'>
+                <Group>
+                    <Avatar w={40} h={40 * 1.5} radius='md'>
+                        <Image src={data?.comic?.cover!} width={40} height={40 * 1.5} alt='' />
+                    </Avatar>
+                    <Title order={3}>{data?.comic?.title}</Title>
+                    <ActionIcon title='Перейти к комиксу' aria-label='Перейти к комиксу' size='sm' component={Link} href={`/comic/${params.comicId}`}>
+                        <IconExternalLink size={14} />
+                    </ActionIcon>
+                </Group>
+                <Group>
+                    <Button size='xs' component={Link} href={`/dashboard/comic/${params.comicId}/ch-new`} leftSection={<IconPlus size={16} />}>
+                        Главу
+                    </Button>
+                    <Button size='xs' variant='outline' component={Link} href={`/dashboard/comic/${params.comicId}/edit`} leftSection={<IconEdit size={16} />}>
+                        Редактировать
+                    </Button>
+                    <SettingsModal params={params} />
+                </Group>
+            </Group>
+            <Title order={4} mb="md">Статистика за последний месяц</Title>
+            <SimpleGrid cols={3} >
+                {items.map((item, index) => (
+                    <Paper key={index} withBorder p="md">
+                        <item.icon size={24} strokeWidth={2} color="gray" />
+                        <Text size="sm" c="dimmed" fw={500}>
+                            {item.title}
+                        </Text>
+                        <Text size="xl" fw={700}>
+                            {item.value}
+                        </Text>
+                    </Paper>
+                ))}
+            </SimpleGrid>
+        </Container>
     );
 };
 
-export default AddComic;
+export default StatisticsPage;

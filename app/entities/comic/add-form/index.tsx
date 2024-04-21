@@ -1,7 +1,6 @@
 'use client'
 import {
     ActionIcon,
-    Avatar,
     Button,
     Checkbox,
     Combobox,
@@ -31,6 +30,7 @@ import { ImageUpload, ImageUploadUseFormContext } from '../../image-upload';
 import { AddComicFormInput } from '..';
 import classes from './styles.module.css';
 import { Genres, Teams } from './types';
+import { Avatar } from '@/app/shared/ui/Avatar';
 
 
 const defaultFormValues = {

@@ -1,7 +1,6 @@
 'use client'
 import {
     ActionIcon,
-    Avatar,
     Button,
     Checkbox,
     Combobox,
@@ -32,6 +31,7 @@ import { ImageUpload } from '../../image-upload';
 import { AddComicFormInput } from '..';
 import classes from './styles.module.css';
 import { Genres, Teams } from './types';
+import { Avatar } from '@/app/shared/ui/Avatar';
 
 const defaultFormValues = {
     title: '',
@@ -88,7 +88,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
         return (
             <Flex gap={8} w='auto' align='center' component={Combobox.Option} active={form.getInputProps('teams')?.value === team.id} value={team.id!} key={team.id}>
                 <Avatar size='md' src={team.avatar} />
-                <Text>{team.name!}</Text>
+                <Text>{team.name}</Text>
             </Flex>
         )
     });

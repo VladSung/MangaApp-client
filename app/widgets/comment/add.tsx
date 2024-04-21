@@ -111,7 +111,6 @@ export const Add = ({ comicId, chapterId, parentCommentId }: { comicId: string, 
 
     return (
         <Group align='flex-start' >
-            <Avatar src={''} size='md' alt='' style={{ alignSelf: 'flex-start' }} />
             <Stack style={{ flexGrow: 1 }}>
                 <Textarea
                     minLength={2}

@@ -13,7 +13,7 @@ import { AddTeamWidget } from './team';
 import Wrapper from './wrapper';
 
 export const DashboardSidebar = ({ params }: BoxProps & PageProps) => {
-    const { t } = useTranslation(params.lng, 'creator-dashboard/common');
+    const { t } = useTranslation(params.lng, 'dashboard/creator/common');
     const teamData = useQuery(teamsQuery)
     const teamsList = teamData?.data?.me?.member?.map((member =>
     (
@@ -31,7 +31,7 @@ export const DashboardSidebar = ({ params }: BoxProps & PageProps) => {
             <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.projects')} href={'/dashboard/comic'} leftSection={<IconLayoutCollage />} />
             <NavLink decorative variant='light' defaultOpened style={{ borderRadius: 99 }} label={t('sidebar.teams')} leftSection={<IconUsers />} href={'/dashboard/team'}>
                 {teamsList}
-                <AddTeamWidget labels={{ createTeam: t('sidebar.create-team') }} />
+                <AddTeamWidget params={params} labels={{ createTeam: t('sidebar.create-team') }} />
             </NavLink>
             <NavLink variant='light' style={{ borderRadius: 99 }} label={t('sidebar.chats')} href={'/dashboard/chat'} leftSection={<IconMessageCircle />} />
         </Wrapper>
