@@ -1,13 +1,19 @@
 'use client'
 
+import { AppShell, Button, Title } from "@mantine/core";
+
 export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
     console.log(error);
 
     return (
         <html>
             <body>
-                <h2>Something went wrong!</h2>
-                <button onClick={() => reset()}>Try again</button>
+                <AppShell>
+                    <Title order={2}>Something went wrong!</Title>
+                    {JSON.stringify(error)}
+                    <Button onClick={() => reset()}>Try again</Button>
+
+                </AppShell>
             </body>
         </html>
     );

@@ -5,12 +5,13 @@ const config: CodegenConfig = {
     debug: true,
     documents: [
         'app/**/*.{ts,tsx}',
+        '_src/**/*.{ts,tsx}',
         // 'app/features/**/*.{ts,tsx}',
         // 'app/(pages)/**/*.{ts,tsx}',
     ],
     ignoreNoDocuments: true, // for better experience with the watcher
     generates: {
-        './app/shared/api/graphql/generated/': {
+        './_src/shared/api/graphql/generated/': {
             preset: 'client',
             config: {},
         },

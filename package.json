@@ -22,7 +22,7 @@
         "@mantine/hooks": "^7.6.1",
         "@mantine/notifications": "^7.6.1",
         "@mantine/nprogress": "^7.6.1",
-        "@tabler/icons-react": "^2.47.0",
+        "@tabler/icons-react": "^3.2.0",
         "accept-language": "^3.0.18",
         "apollo-remove-typename-mutation-link": "^3.3.9",
         "dayjs": "^1.11.10",

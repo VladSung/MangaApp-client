@@ -1,13 +1,15 @@
 import { NextResponse, NextRequest, NextFetchEvent } from 'next/server';
 import acceptLanguage from 'accept-language';
-import { fallbackLng, languages } from './app/shared/lib/i18n/settings';
+import { fallbackLng, languages } from '@src/shared/lib/i18n/settings';
 import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 
 acceptLanguage.languages(languages);
 
 export const config = {
     // matcher: '/:lng*',
-    matcher: ['/((?!api|_next/static|_error|_next/public|_next/image|assets|favicon.ico|sw.js).*)'],
+    matcher: [
+        '/((?!api|_next/static|_error|_next/public|robots.txt|manifest.json|_next/image|assets|favicon.ico|sw.js).*)',
+    ],
 };
 
 const cookieName = 'i18next';

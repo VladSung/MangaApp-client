@@ -9,6 +9,12 @@ const nextConfig = {
                 protocol: 'http',
                 pathname: '/alopex/**',
             },
+            {
+                hostname: 'rjqfpsoszpkdygjeykxf.supabase.co',
+
+                protocol: 'https',
+                pathname: '/storage/v1/**',
+            },
         ],
     },
 };

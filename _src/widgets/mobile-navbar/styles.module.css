@@ -1,0 +1,37 @@
+.navbarWrapper {
+    position: sticky;
+    margin-top: var(--mantine-spacing-sm);
+    --navbar-height: 56;
+    --navbar-z-index: 100+1;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.navbar {
+    padding-top: calc(var(--mantine-spacing-xs) / 2);
+    position:fixed;
+    height: var(--navbar-height);
+    z-index: var(--navbar-z-index) ;
+    width: auto;
+    bottom:0;
+    left:0;
+    right:0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.navbarButton{
+    gap:var(--mantine-spacing-xs);
+    flex-direction: column;
+    flex-grow: 1;
+
+    & :global(.mantine-ActionIcon-icon){
+        flex-direction: column;
+    }
+}
+
+.icon{
+    width: rem(20);
+    height: rem(20);
+}
