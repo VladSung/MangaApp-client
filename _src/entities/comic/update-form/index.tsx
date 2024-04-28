@@ -95,8 +95,8 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
 
     return (
         <FormProvider form={form}>
-            <form style={{ padding: '32px 24px', height: '100%' }} onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>
-                <Flex gap={24} mb={24}>
+            <form onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>
+                <Flex gap='md' mb='md' py='lg' px='md' h='100%' className={classes.formInner}>
                     <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as UseFormContext} />
                     <Stack gap={16} flex='1 0 auto'>
                         <TextInput
@@ -120,7 +120,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                         />
                     </Stack>
                 </Flex>
-                <Flex w='100%' gap={16} mb={16} justify='space-between'>
+                <Flex w='100%' gap={16} mb={16} justify='space-between' className={classes.formInner}>
                     <MultiSelect
                         classNames={{ input: classes.multiSelect }}
                         label='Genres (max:5)'
@@ -142,7 +142,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                         {...form.getInputProps('tags')}
                     />
                 </Flex>
-                <Flex w='100%' gap={16} mb={16}>
+                <Flex w='100%' gap={16} mb={16} className={classes.formInner}>
                     <Combobox
                         store={combobox} onOptionSubmit={(val) => {
                             form.setFieldValue('teams', val);
@@ -182,7 +182,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                     />
                     <Select label='Maturity rating' {...form.getInputProps('maturityRating')} data={mRatings} />
                 </Flex>
-                <Flex gap={16} mb={16}>
+                <Flex gap={16} mb={16} className={classes.formInner}>
                     <RadioGroup defaultValue="enable" name='comments' label='Comments'>
                         <Radio value='enable' label='Enable' />
                         <Radio value='disable' label='Disable' />
@@ -196,7 +196,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                         <Radio value='deny' label='Deny' />
                     </RadioGroup>
                 </Flex>
-                <Flex align='center' style={{ zIndex: 5 }} justify='center' pos='sticky' p='md' bottom={0}>
+                <Flex align='center' style={{ zIndex: 5 }} justify='center' pos='sticky' p='md' bottom={56}>
                     <Paper component={Group} radius='xl' withBorder align='center' justify='center' gap='xl' px='xl' py='md' w='max-content'>
                         <ActionIcon color='red' variant='default' size='lg' type='reset'><IconEraser /></ActionIcon>
                         <Tooltip position='top' offset={16} label="If the checkbox is checked, the comic will be visible to everyone and will appear in search." refProp='rootRef'>

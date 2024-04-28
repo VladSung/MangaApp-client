@@ -2,3 +2,10 @@
     min-height: rem(65.39px);
     height: 100%;
 }
+.formInner{
+    @mixin smaller-than $mantine-breakpoint-md {
+        flex-direction: column;
+        align-items: stretch;
+        width:100%;
+    }
+}

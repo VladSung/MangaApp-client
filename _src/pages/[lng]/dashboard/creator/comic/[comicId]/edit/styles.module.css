@@ -1,0 +1,16 @@
+.chapters{
+    --app-shell-aside-width: min(320px, 90dvw);
+    width: ;
+    @mixin smaller-than $mantine-breakpoint-lg {
+        &:not(.open){
+            right: calc(var(--app-shell-aside-width) * -1 + 10px);
+        }
+    }
+    & .button{
+        transform: rotate(90deg) translateY(-50%);
+        position: absolute;
+        left:0;
+        margin-left: -94px;
+        top:50%;
+    }
+}

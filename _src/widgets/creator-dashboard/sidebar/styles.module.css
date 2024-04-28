@@ -1,6 +1,30 @@
-.collapsed-links{
-    overflow: hidden;
-    &:global(.mantine-NavLink-root){
-        padding-inline: 0;
+.nav{
+    @mixin smaller-than $mantine-breakpoint-md {
+        padding-top: calc(var(--app-shell-header-offset) + var(--mantine-spacing-md))!Important;
+        position: static;
+        border: 0;
+        width:100%!Important;
+        height:auto;
+        & :global(.mantine-NavLink-root){
+            flex-direction: column;
+            width: auto;
+            flex-grow:1;
+        }
+        & :global(.mantine-NavLink-section){
+            margin-right:0;
+            & svg{
+                width:rem(18);
+                height: rem(18);
+            }
+        }
+    }
+}
+.navInner {
+    padding:0;
+    margin:0;
+    flex-direction: column;
+     @mixin smaller-than $mantine-breakpoint-md {
+       flex-direction: row;
+       flex-wrap: wrap;
     }
 }
