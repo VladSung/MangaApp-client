@@ -2,6 +2,7 @@ import { AppShellMain, Box, Button, Card, CardSection, Container, Flex, Group, S
 import { IconBookmarksFilled, IconEyeFilled, IconStarFilled } from '@tabler/icons-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { notFound } from 'next/navigation'
 
 import { useTranslation } from "@src/shared/lib/i18n";
 
@@ -12,7 +13,6 @@ import { AddBookmark } from '@src/features/bookmark';
 import { Avatar } from '@src/shared/ui/Avatar';
 import { getClient } from '@src/shared/lib/apollo/client';
 import { getComicQuery } from '@src/entities/comic/graphql';
-import NotFoundPage from '@src/shared/ui/not-found';
 
 type Props = {
     params: {
@@ -60,7 +60,7 @@ const ComicPage = async ({ params }: Props) => {
     const { t } = await useTranslation(params.lng, 'comic/id');
 
     if (!data.comic) {
-        return <NotFoundPage params={params} />
+        return notFound()
     }
 
     return (
@@ -129,30 +129,7 @@ const ComicPage = async ({ params }: Props) => {
                     <ComicContent lng={params.lng} comic={data.comic} />
 
                 </Box>
-                <Box className={classes.creators}>
-                    <Title order={2} size="h5" mb='md'>
-                        {t('creators')}
-                    </Title>
-                    <Stack>
-                        {data.comic.team?.members?.map((member) => (
-                            <UnstyledButton
-                                className='mantine-active'
-                                key={member.id}
-                                component={Link}
-                                href={`/team/${data.comic?.team?.id}`}
-                            >
-                                <Group align="center" gap='xs'>
-                                    <Avatar src={member?.user?.avatar} size='md' />
-                                    <div>
-                                        <Text size='md'>{member?.user?.username}</Text>
-                                        <Text c="dimmed" size="xs">
-                                            {member.role}
-                                        </Text>
-                                    </div>
-                                </Group>
-                            </UnstyledButton>
-                        ))}
-                    </Stack>
+                <Box component='article'>
                 </Box>
             </Container>
         </AppShellMain>

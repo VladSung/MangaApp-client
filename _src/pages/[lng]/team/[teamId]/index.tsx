@@ -5,8 +5,8 @@ import { getClient } from '@src/shared/lib/apollo/client';
 import { graphql } from '@src/shared/api/graphql';
 import { ComicCard } from '@src/entities/comic';
 import { Avatar } from '@src/shared/ui/Avatar';
-import { TeamHeader } from '@src/entities/team';
 import Link from 'next/link';
+import { ProfileHeader } from '@src/entities/profile';
 
 type Props = PageProps & {
     params: {
@@ -20,13 +20,13 @@ const teamQuery = graphql(`
             id
             avatar
             name
-            tagline
+            description
             members{
                 id
                 role
                     user{
                         id
-                        username
+                        name
                         avatar
                     }
             }
@@ -53,13 +53,10 @@ const TeamPage = async ({ params }: Props) => {
     return (
         <AppShellMain>
             <Container pt={40} size='lg'>
-                <TeamHeader
-                    rightSlot={<Button>{t('header.follow')}</Button>}
-                    team={data.team}
-                >
-                    <Text>{data.team?.tagline}</Text>
+                <ProfileHeader mb='xl' user={{ name: data?.team?.name!, description: data?.team?.description, avatar: data?.team?.avatar }}>
+                    <Button size='sm'>{t('header.follow')}</Button>
+                </ProfileHeader>
 
-                </TeamHeader>
                 <Tabs defaultValue='members'>
                     <TabsList mb='lg'>
                         <TabsTab value='members'>
@@ -95,7 +92,7 @@ const TeamPage = async ({ params }: Props) => {
                                         <Group align="center" gap='sm'>
                                             <Avatar src={member?.user?.avatar} size='lg' />
                                             <div>
-                                                <Text>{member?.user?.username}</Text>
+                                                <Text>{member?.user?.name}</Text>
                                                 <Text c="dimmed" size="sm">
                                                     {member.role}
                                                 </Text>

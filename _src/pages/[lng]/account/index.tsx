@@ -9,7 +9,7 @@ import { getClient } from '@src/shared/lib/apollo/client';
 const UserSettingQuery = graphql(`
     query UserSettingQuery {
         me{
-            username
+            name
             avatar
             subscriptions{
                 __typename
@@ -36,7 +36,7 @@ const AccountPage = async () => {
 
                     >
                         <Avatar src={userData?.data?.me?.avatar} size="lg" />
-                        <Text component='span' inline ml='sm' fw={500}>{userData?.data?.me?.username}</Text>
+                        <Text component='span' inline ml='sm' fw={500}>{userData?.data?.me?.name}</Text>
                     </Button>
                     <div>
                         <Group gap='md'>

@@ -1,11 +1,10 @@
 'use client'
 import { Flex, Box, Title } from "@mantine/core"
-
-import { Team } from "@src/entities/team"
+import { Team } from "@src/shared/api/graphql";
 import { Avatar } from "@src/shared/ui/Avatar"
 
 type Props = {
-    team?: Pick<Team, 'avatar' | 'name'> | null;
+    team?: Partial<Pick<Team, 'avatar' | 'name'>> | null;
     children?: React.ReactNode
     rightSlot?: React.ReactNode
 }

@@ -1,6 +1,6 @@
 'use client'
 import { gql, useMutation } from '@apollo/client';
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { graphql } from '@src/shared/api/graphql';
 import { getComicChapters } from '@src/shared/api/queries';
@@ -19,31 +19,33 @@ const addReadingHistoryMutation = graphql(`
 `)
 
 
-export const AddHistory = ({ params, chapterId, scroll }: { params: { id: string }, scroll?: { image?: { current: number }, all?: number }, chapterId?: string | null }) => {
+export const AddHistory = ({ params, chapterId }: { params: { id: string }, chapterId?: string | null }) => {
+    const scrollPosition = useWindowScroll()
 
-    useLayoutEffect(() => {
-        console.log(`${chapterId}: start`)
+    const [addReadingHistory] = useMutation(addReadingHistoryMutation, { errorPolicy: 'all' })
+
+    useEffect(() => {
+        console.log(`${chapterId}: ${scrollPosition[1]}`)
         return () => {
-            console.log(`${chapterId}: ${window.scrollY}, image: ${scroll?.image?.current}/${scroll?.all}`)
             if (chapterId) {
-                // addReadingHistory({
-                //     variables: { comicId: params.id, chapterId: chapterId },
-                //     update: (cache, { data: history }) => {
-                //         cache.writeFragment({
-                //             id: `Chapter:${history?.addReadingHistory?.chapter?.id}`,
-                //             fragment: gql`
-                //             fragment _ on Chapter {
-                //             usersReadHistory {
-                //                 id
-                //             }
-                //             }
-                //         `,
-                //             data: {
-                //                 usersReadHistory: history?.addReadingHistory
-                //             }
-                //         });
-                //     }
-                // });
+                addReadingHistory({
+                    variables: { comicId: params.id, chapterId: chapterId },
+                    update: (cache, { data: history }) => {
+                        cache.writeFragment({
+                            id: `Chapter:${history?.addReadingHistory?.chapter?.id}`,
+                            fragment: gql`
+                            fragment _ on Chapter {
+                            usersReadHistory {
+                                id
+                            }
+                            }
+                        `,
+                            data: {
+                                usersReadHistory: history?.addReadingHistory
+                            }
+                        });
+                    }
+                });
             }
         }
     }, [chapterId])

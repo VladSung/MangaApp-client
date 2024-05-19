@@ -1,8 +1,7 @@
 import { AppShell, AppShellMain } from '@mantine/core';
-import { PropsWithChildren } from 'react';
-
 import { PageProps } from '@src/shared/types';
 import { CreatorDashboardSidebar } from '@src/widgets/creator-dashboard';
+import { PropsWithChildren } from 'react';
 
 const CreatorDashboardLayout = async ({ children, params }: PropsWithChildren & PageProps) => {
     return (

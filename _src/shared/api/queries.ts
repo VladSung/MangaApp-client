@@ -9,15 +9,18 @@ export const comicQuery = graphql(`
 `);
 
 export const getComicChapters = graphql(`
-    query getChapters($comicId: ID!, $order: OrderBy, $paginate: PaginateInput) {
+    query getChapters($comicId: ID!, $order: OrderBy, $paginate: ChapterPaginateInput) {
         chapters(comicId: $comicId, orderBy: $order, paginate: $paginate) {
-            id
-            createdAt
-            number
-            volume
-            title
-            usersReadHistory {
+            count
+            chapters {
                 id
+                createdAt
+                number
+                volume
+                title
+                usersReadHistory {
+                    id
+                }
             }
         }
     }

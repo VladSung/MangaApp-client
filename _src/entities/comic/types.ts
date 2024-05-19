@@ -24,7 +24,7 @@ export type Comic = {
                 __typename?: 'User';
                 id: string;
                 avatar?: string | null;
-                username: string;
+                name: string;
             } | null;
         }> | null;
     } | null;

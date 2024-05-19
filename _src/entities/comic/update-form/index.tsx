@@ -97,7 +97,7 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
         <FormProvider form={form}>
             <form onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>
                 <Flex gap='md' mb='md' py='lg' px='md' h='100%' className={classes.formInner}>
-                    <ImageUpload initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as UseFormContext} />
+                    <ImageUpload className={classes.formImage} initialImage={selectedValues?.cover} useFormContext={useFormContext as unknown as UseFormContext} />
                     <Stack gap={16} flex='1 0 auto'>
                         <TextInput
                             required
@@ -196,8 +196,8 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: AddFor
                         <Radio value='deny' label='Deny' />
                     </RadioGroup>
                 </Flex>
-                <Flex align='center' style={{ zIndex: 5 }} justify='center' pos='sticky' p='md' bottom={56}>
-                    <Paper component={Group} radius='xl' withBorder align='center' justify='center' gap='xl' px='xl' py='md' w='max-content'>
+                <Flex className={classes.formActions}>
+                    <Paper className={classes.formActionsPaper} component={Group} withBorder>
                         <ActionIcon color='red' variant='default' size='lg' type='reset'><IconEraser /></ActionIcon>
                         <Tooltip position='top' offset={16} label="If the checkbox is checked, the comic will be visible to everyone and will appear in search." refProp='rootRef'>
                             <Checkbox type='checkbox' {...form.getInputProps('public')} label='Public access' />

@@ -8,7 +8,7 @@ import { useTranslation } from "@src/shared/lib/i18n"
 import { popularComicsQuery } from "./queries"
 
 const Popular = async ({ lng }: { lng: string }) => {
-    const comicsData = await getClient().query({ query: popularComicsQuery, variables: { paginate: { take: 20 } } })
+    const comicsData = await getClient().query({ query: popularComicsQuery, variables: { paginate: { take: 20 } }, errorPolicy: 'all' })
     const { t } = await useTranslation(lng, 'index')
 
     const Lists = comicsData?.data?.popularComics?.map(c => <ComicCard key={c?.id} data={c} />)

@@ -2,8 +2,43 @@
     min-height: rem(65.39px);
     height: 100%;
 }
-.form-container {
-    @media(max-width: $mantine-breakpoint-sm) {
-        flex-direction: column;
+.formImage{
+    @mixin smaller-than $mantine-breakpoint-md {
+        margin-inline: auto;
     }
+}
+.formInner{
+    @mixin smaller-than $mantine-breakpoint-md {
+        flex-direction: column;
+        align-items: stretch;
+        width:100%;
+    }
+}
+.formActions{
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    bottom:64px;
+    position: sticky;
+    
+    & .formActionsPaper{
+        border-radius: var(--mantine-spacing-xl);
+    align-items: center;
+    justify-content: center;
+    gap: var(--mantine-spacing-md);
+    padding: var(--mantine-spacing-md);
+    width: max-content;
+        /* radius='xl' withBorder align='center' justify='center' gap='xl' px='xl' py='md' w='max-content' */
+    }
+    
+    @mixin smaller-than $mantine-breakpoint-md {
+        flex-direction: column;
+        align-items: stretch;
+        width:100%;
+    }
+}
+
+.multiSelect{
+    min-height: rem(65.39px);
+    height: 100%;
 }

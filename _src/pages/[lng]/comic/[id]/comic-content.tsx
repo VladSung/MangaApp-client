@@ -1,32 +1,24 @@
-import { Box, Button, Divider, Spoiler, Tabs, TabsList, TabsPanel, TabsTab, Text } from '@mantine/core';
+import { Avatar, Box, Button, Divider, Group, Spoiler, Stack, Tabs, TabsList, TabsPanel, TabsTab, Text, Title, UnstyledButton } from '@mantine/core';
 import Link from 'next/link';
 
 import { useTranslation } from '@src/shared/lib/i18n';
 import { CommentList } from '@src/widgets/comment'
 import ChaptersList from './chapter-list'
+import classes from './styles.module.css'
+import { Comic, Team, Chapter } from '@src/shared/api/graphql';
 // const CommentList = dynamic(() => import('@src/widgets/comment/list'), { suspense: true })
 // const ChaptersList = dynamic(() => import('./chapter-list'), { suspense: true })
 
 type ComicContentProps = {
-    lng: string
-    comic: {
-        id: string;
-        description?: string | null;
-        genres?: { id: number; title: string }[] | null;
-        tags?: { id: number; title: string }[] | null;
-        chapters?:
-        | {
-            createdAt: string | null;
-            id: string | null;
-            number: number | null;
-            volume: number | null;
-            title?: string | null;
-            usersReadHistory?: {
-                id: string | null;
-            } | null,
-        }[]
-        | null;
-    };
+    lng: string;
+    comic: Partial<Pick<Comic, 'description' | 'genres' | 'tags'>>
+    & Partial<{
+        team: Pick<Team, 'id' | 'name' | 'avatar'> | null,
+        chapters: Pick<Chapter, 'createdAt' | 'id' | 'number' | 'volume' | 'title' | 'usersReadHistory'>
+    }> & {
+        id: string
+    }
+
 };
 
 export const ComicContent = async ({ comic, lng }: ComicContentProps) => {
@@ -64,6 +56,28 @@ export const ComicContent = async ({ comic, lng }: ComicContentProps) => {
                     >{g.title}</Button>
 
                 ))}
+            </Box>
+            <Box className={classes.creators} mb='md'>
+                <Title order={2} size="h5" mb='sm'>
+                    {t('creators')}
+                </Title>
+                <Stack>
+                    {(
+                        <UnstyledButton
+                            className='mantine-active'
+                            key={comic?.team?.id}
+                            component={Link}
+                            href={`/team/${comic?.team?.id}`}
+                        >
+                            <Group align="center" gap='xs'>
+                                <Avatar src={comic?.team?.avatar} size='md' />
+                                <div>
+                                    <Text size='md'>{comic?.team?.name}</Text>
+                                </div>
+                            </Group>
+                        </UnstyledButton>
+                    )}
+                </Stack>
             </Box>
 
             <TabsList defaultValue='chapters'>

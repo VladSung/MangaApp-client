@@ -6,7 +6,7 @@ import { IconSortAscending } from '@tabler/icons-react';
 import { ComicCard } from '@src/entities/comic';
 import { graphql } from '@src/shared/api/graphql';
 
-import { Filter } from './comic-filter';
+import { Filter } from '@src/entities/comic/ui/filter';
 
 const userComicsQuery = graphql(`
     query getUserComics {

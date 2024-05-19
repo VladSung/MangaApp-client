@@ -5,16 +5,20 @@ import Link from 'next/link';
 
 import { ChapterListItem } from '@src/entities/chapter';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import classes from './styles.module.css';
 import { Chapter } from '@src/shared/api/graphql';
 
-export const ChaptersInner = ({ comicId, chapters }: {
-    comicId: string, chapters?: Pick<Chapter, 'title'
-        | 'volume'
-        | 'number'
-        | 'id'
-        | 'publishDate'
-        | 'price'>[] | null
+import classes from './styles.module.css';
+
+export const ChaptersInner = ({ comicId, data }: {
+    comicId: string, data?: {
+        count?: number | null,
+        chapters?: Pick<Chapter, 'title'
+            | 'volume'
+            | 'number'
+            | 'id'
+            | 'publishDate'
+            | 'price'>[] | null
+    } | null
 }) => {
     const [opened, { toggle }] = useDisclosure()
     const smallerViewport = useMediaQuery('(max-width: 1200px)', true);
@@ -24,7 +28,7 @@ export const ChaptersInner = ({ comicId, chapters }: {
         <Paper h='100%' p={16}>
             <Group mb='xl' gap={8} align='center' justify='space-between'>
                 <Title size="h4" order={2}>
-                    Comic Chapters
+                    Comic Chapters ({data?.count})
                 </Title>
                 <Button
                     size='xs'
@@ -35,8 +39,8 @@ export const ChaptersInner = ({ comicId, chapters }: {
                 </Button>
             </Group>
             <Stack gap='sm' w={'100%'}>
-                {chapters?.length
-                    ? chapters?.map(
+                {data?.chapters?.length
+                    ? data?.chapters?.map(
                         ch => (<ChapterListItem key={ch.id} comicId={comicId} chapter={{ title: ch.title, createdAt: ch.publishDate as string, volume: ch.volume, number: ch.number, id: ch.id, price: ch.price }} />)
                     )
                     : <Text>Chapters not found</Text>

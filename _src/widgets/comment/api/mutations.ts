@@ -7,7 +7,7 @@ export const getCommentRepliesQuery = graphql(`
             createdAt
             id
             author {
-                username
+                name
                 avatar
             }
             _count {

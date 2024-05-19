@@ -66,7 +66,7 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
                         input: {
                             title: data.title,
                             alternativeTitles: data.alternativeTitles,
-                            cover: images ? images.data[0].path : undefined,
+                            cover: images?.data?.[0]?.path ?? undefined,
                             genres: data.genres,
                             description: data.description,
                             language: 'ru',
@@ -79,7 +79,7 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
                 }).catch((error) => {
 
                 })
-            }, { fileFolder: `comics/${data.title}`, files: [data.cover] })
+            }, { fileFolder: `/teams/${data.teams}/comics/${data.title}`, type: 'cover', files: [data.cover] })
         }
     };
 

@@ -1,17 +1,20 @@
 import { getUserToken } from '@src/shared/api/getUserToken';
 
-type uploadManyImagesResult = {
+type UploadManyImagesResult = {
     data: {
         path: string;
         aspectRatio: string;
     }[];
 };
 
+type UploadTypes = 'cover' | 'avatar' | 'background' | 'chapter';
+
 export const uploadImages: (
     files: File[],
     title: string,
+    type: UploadTypes,
     authToken?: string
-) => Promise<uploadManyImagesResult> = async (files, title, authToken) => {
+) => Promise<UploadManyImagesResult> = async (files, title, type, authToken) => {
     const formData = new FormData();
 
     for (const file of files) {
@@ -19,6 +22,7 @@ export const uploadImages: (
     }
 
     formData.append('title', title);
+    formData.append('type', type);
 
     const response = await fetch('http://localhost:5000/upload', {
         method: 'POST',
@@ -26,26 +30,27 @@ export const uploadImages: (
         headers: { authorization: `Bearer ${authToken}` },
     });
 
-    return (await response.json()) as uploadManyImagesResult;
+    return (await response.json()) as UploadManyImagesResult;
 };
 
 export async function mutationWithUploadImages<
-    TMutation extends (images?: uploadManyImagesResult) => void,
+    TMutation extends (images?: UploadManyImagesResult) => void,
 >(
     mutation: TMutation,
     filesOptions?: {
+        type: UploadTypes;
         fileFolder: string;
-        files: File[];
-    }
+        files?: File[];
+    },
+    setLoading?: (loading: boolean) => void
 ) {
-    return mutation();
-
-    // const session = await getUserToken();
-    // const images = await uploadImages(
-    //     filesOptions?.files,
-    //     filesOptions?.fileFolder,
-    //     session?.accessToken
-    // );
-
-    // mutation(images);
+    if (!filesOptions?.files?.length) return mutation();
+    setLoading && setLoading(true);
+    const images = await uploadImages(
+        filesOptions?.files,
+        filesOptions?.fileFolder,
+        filesOptions.type
+    );
+    setLoading && setLoading(false);
+    mutation(images);
 }

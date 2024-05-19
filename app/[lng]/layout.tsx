@@ -7,18 +7,18 @@ import '@src/pages/[lng]/global.css';
 import { getSession } from '@auth0/nextjs-auth0';
 import { AppShell, ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications'
+import { WithProviders } from '@src/app';
+import { checkIsOnline } from '@src/shared/lib/checkIsOnline';
+import { useTranslation } from '@src/shared/lib/i18n';
+import { PageProps } from '@src/shared/types';
+import Header from '@src/widgets/header';
+import { MobileNavbar } from '@src/widgets/mobile-navbar';
 import { dir } from 'i18next';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { redirect } from 'next/navigation';
 import { ScriptProps } from 'next/script';
 
-import { WithProviders } from '@src/app';
-import { useTranslation } from '@src/shared/lib/i18n';
-import { PageProps } from '@src/shared/types';
-import Header from '@src/widgets/header';
-
 import ErrorComponent from './error';
-import { MobileNavbar } from '@src/widgets/mobile-navbar';
 
 type Props = {
     token?: string;
@@ -57,7 +57,7 @@ export function generateStaticParams() {
 
 const theme = createTheme({
     defaultRadius: 'lg',
-    primaryColor: 'pink',
+    primaryColor: 'blue',
     cursorType: 'pointer'
 });
 
@@ -66,9 +66,17 @@ export default async function RootLayout({ children, params }: Props & ScriptPro
 
     const session = await getSession()
 
-
+    console.log(session)
     if (session?.accessToken && (new Date((session?.accessTokenExpiresAt || 0) * 1000)).getTime() < Date.now()) {
-        redirect('/api/auth/logout')
+        try {
+            const isOnline = await checkIsOnline();
+
+            if (isOnline) {
+                redirect('/api/auth/logout');
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -84,7 +92,9 @@ export default async function RootLayout({ children, params }: Props & ScriptPro
                             <WithProviders token={session?.accessToken}>
                                 <Notifications />
                                 <Header lng={params.lng} />
-                                {children}
+                                <ErrorBoundary errorComponent={ErrorComponent}>
+                                    {children}
+                                </ErrorBoundary>
                                 <MobileNavbar lng={params.lng} />
                             </WithProviders>
                         </ErrorBoundary>

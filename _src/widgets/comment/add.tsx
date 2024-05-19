@@ -7,7 +7,7 @@ import { KeyboardEvent, useState } from "react";
 import { graphql } from "@src/shared/api/graphql";
 
 import { getCommentRepliesQuery } from "./api/mutations";
-import { getCommentsQuery } from "./api/queries";
+import { getChapterCommentsQuery, getComicCommentsQuery } from "./api/queries";
 
 const addCommentMutation = graphql(`
     mutation AddCommentToComic($input:CommentInput!){
@@ -17,7 +17,7 @@ const addCommentMutation = graphql(`
             id
             author {
                 id
-                username
+                name
                 avatar
             }
             _count {
@@ -36,6 +36,8 @@ export const Add = ({ comicId, chapterId, parentCommentId }: { comicId: string, 
 
             variables: { input: { content: commentContent, comicId, chapterId, parentCommentId } },
             update: (cache, { data: addComment }) => {
+                setCommentContent('')
+
                 if (addComment?.addComment && parentCommentId) {
                     const data = cache.readQuery({
                         query: getCommentRepliesQuery, variables: {
@@ -77,13 +79,28 @@ export const Add = ({ comicId, chapterId, parentCommentId }: { comicId: string, 
                         })
                     })
 
-                    setCommentContent('')
                 } else {
-                    cache.updateQuery({
-                        query: getCommentsQuery,
-                        variables: { comicId },
+
+                    chapterId && cache.updateQuery({
+                        query: getChapterCommentsQuery,
+                        variables: { id: chapterId },
                     }, (data) => {
-                        if (data?.commentsByComic.comments && addComment?.addComment) {
+                        if (data?.commentsByChapter?.comments && addComment?.addComment) {
+                            return ({
+                                commentsByChapter: {
+                                    count: (data?.commentsByChapter?.count || 0) + 1,
+                                    comments: [...data.commentsByChapter.comments, addComment.addComment]
+                                }
+                            })
+                        }
+
+                        return data;
+                    })
+                    cache.updateQuery({
+                        query: getComicCommentsQuery,
+                        variables: { id: comicId },
+                    }, (data) => {
+                        if (data?.commentsByComic?.comments && addComment?.addComment) {
                             return ({
                                 commentsByComic: {
                                     count: (data?.commentsByComic?.count || 0) + 1,
@@ -119,7 +136,7 @@ export const Add = ({ comicId, chapterId, parentCommentId }: { comicId: string, 
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder='Введите комментарий'
                     onKeyDown={addCommentKeyboardHandler}
-                    rightSection={<ActionIcon mb={3} onClick={addCommentHandler} disabled={loading || commentContent.length < 2} style={{ alignSelf: 'flex-end' }}><IconSend2 size={16} /></ActionIcon>}
+                    rightSection={<ActionIcon mb={3} onClick={addCommentHandler} loading={loading} disabled={loading || commentContent.length < 2} style={{ alignSelf: 'flex-end' }}><IconSend2 size={16} /></ActionIcon>}
                 />
             </Stack>
         </Group >

@@ -8,14 +8,15 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { Team, TeamHeader } from "@src/entities/team"
-import { graphql } from "@src/shared/api/graphql"
+import { TeamHeader } from "@src/entities/team"
+import { graphql, Team, User } from "@src/shared/api/graphql"
 import { useTranslation } from "@src/shared/lib/i18n/client"
 import { PageProps } from "@src/shared/types"
 import { Avatar } from "@src/shared/ui/Avatar"
+import { ProfileHeader } from "@src/entities/profile"
 
 type Props = PageProps & {
-    team?: Pick<Team, 'avatar' | 'name' | 'id' | 'members' | 'tagline'> | null
+    team?: Partial<Pick<Team, 'avatar' | 'name' | 'id' | 'description'> & { members?: { role?: string, user?: Omit<User, 'createdAt' | 'updatedAt' | 'id'> | null }[] | null }> | null
 
     params: { teamId: string; }
 }
@@ -138,10 +139,10 @@ export const TeamPageHeader = ({ params, team }: Props) => {
                     </Table.Thead>
                     <Table.Tbody>
                         {team?.members?.map((m) => (
-                            <Table.Tr key={m?.user?.username}>
+                            <Table.Tr key={m?.user?.name}>
                                 <Group component={Table.Td} gap='sm' wrap='nowrap'>
-                                    <Avatar size='sm' src={m?.user?.avatar} alt={m?.user?.username} />
-                                    <Text lineClamp={1} size='sm'>{m?.user?.username}</Text>
+                                    <Avatar size='sm' src={m?.user?.avatar} alt={m?.user?.name} />
+                                    <Text lineClamp={1} size='sm'>{m?.user?.name}</Text>
                                 </Group>
                                 <Table.Td>{m?.user?.email}</Table.Td>
                                 <Table.Td>{m.role === 'Creator' ? m.role : <Select data={['Admin', 'Editor', 'Artist', 'Publisher']} defaultValue={m.role} />}</Table.Td>
@@ -159,7 +160,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
                         <Button variant='default' size='sm'>Изменить</Button>
                     </Group>
                     <Group>
-                        <Textarea flex={1} label='Description' minRows={1} defaultValue={team?.tagline || undefined} />
+                        <Textarea flex={1} label='Description' minRows={1} defaultValue={team?.description || undefined} />
                         <Button variant='default' size='sm'>Изменить</Button>
                     </Group>
                     <Fieldset color='red' legend="Danger Zone">
@@ -173,19 +174,16 @@ export const TeamPageHeader = ({ params, team }: Props) => {
         </Tabs >);
 
     return (
-        <TeamHeader
-            team={team}
-            rightSlot={<Flex gap={8}>
-                <Button size='xs' href={`/dashboard/comic/add?teamId=${team?.id}`} component={Link} variant='contain' leftSection={<IconPlus size={16} stroke={rem(2)} />}>{t('header.project')}</Button>
+        <ProfileHeader
+            user={{ ...team, name: team?.name, description: team?.description }}
+            mb='lg'
+        >
                 <Button size='xs' variant='outline' leftSection={<IconUser size={16} stroke={rem(2)} />} onClick={handleOpenModal} aria-label={t('manage team')}>
                     {team?.members?.length}
-                </Button>
-            </Flex>}
-        >
-            <Text>{team?.tagline}</Text>
+            </Button>
             <Modal size='lg' lockScroll={false} opened={opened} onClose={close} title={t('team.header')}>
                 {ModalContent}
             </Modal>
-        </TeamHeader>
+        </ProfileHeader>
     )
 }

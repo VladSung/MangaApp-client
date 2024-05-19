@@ -62,7 +62,7 @@ const ComicPage = async ({ params }: Props) => {
                 </Group>
             </Group>
             <Title order={4} mb="md">Статистика за последний месяц</Title>
-            <SimpleGrid cols={3} >
+            <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} >
                 {items.map((item, index) => (
                     <Paper key={index} withBorder p="md">
                         <item.icon size={24} strokeWidth={2} color="gray" />

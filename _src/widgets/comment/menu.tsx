@@ -5,7 +5,7 @@ import { IconDotsVertical } from "@tabler/icons-react";
 
 import { graphql } from "@src/shared/api/graphql";
 
-import { getCommentsQuery } from "./api/queries";
+import { getChapterCommentsQuery, getComicCommentsQuery } from "./api/queries";
 
 const deleteCommentMutation = graphql(`
     mutation DeleteComment($commentId:ID!){
@@ -29,12 +29,22 @@ const CommentMenu = ({ commentId }: { commentId: string }) => {
                 cache.gc();
 
                 cache.updateQuery({
-                    query: getCommentsQuery,
+                    query: getComicCommentsQuery,
                 }, data => {
                     return {
                         commentsByComic: {
                             count: (data?.commentsByComic?.count || 1) - 1,
                             ...data?.commentsByComic,
+                        }
+                    }
+                })
+                cache.updateQuery({
+                    query: getChapterCommentsQuery,
+                }, data => {
+                    return {
+                        commentsByChapter: {
+                            count: (data?.commentsByChapter?.count || 1) - 1,
+                            ...data?.commentsByChapter,
                         }
                     }
                 })

@@ -2,15 +2,15 @@
 import { useMutation } from '@apollo/client';
 import { useQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { Center, Loader } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
-import { redirect, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { AddComicForm, AddComicFormInput } from '@src/entities/comic';
 import { Team } from '@src/entities/comic/add-form/types';
-import { uploadImages } from '@src/features/upload-image';
+import { mutationWithUploadImages } from '@src/features/upload-image';
 import { ComicStatuses, graphql, MaturityRatings } from '@src/shared/api/graphql';
 
 import { getComicSelectionsQuery } from './queries';
+import { useState } from 'react';
 
 
 const addComicMutation = graphql(`
@@ -28,8 +28,8 @@ const addComicMutation = graphql(`
 const maturityRatings = [{ title: 'Everyone' }, { title: 'Teen' }, { title: 'Mature' }];
 
 export const AddComic = () => {
-    const [addComic, { data: comicData, error, reset }] = useMutation(addComicMutation);
-
+    const [addComic, { loading: MutateLoading }] = useMutation(addComicMutation);
+    const [imageLoading, setImageLoading] = useState(false);
     const router = useRouter();
 
     const teamId = useSearchParams().get('teamId');
@@ -40,41 +40,34 @@ export const AddComic = () => {
         }
     });
 
-    const [image, setImage] = useLocalStorage<string>({
-        key: 'add-comic-image-id',
-        defaultValue: JSON.stringify({ 'imageId': '', 'name': '' })
-    })
 
-    const onSubmit = async (data: AddComicFormInput) => {
+    const onSubmit = (data: AddComicFormInput) => {
+        if (data.cover) {
 
-        const storedImage = (JSON.parse(image) as { 'imageId': string, 'name': string })
+            mutationWithUploadImages((images) => {
+                if (images) {
+                    addComic({
+                        variables: {
+                            input: {
+                                title: data.title,
+                                alternativeTitles: data.alternativeTitles,
+                                cover: images.data[0].path,
+                                description: data.description,
+                                language: 'ru',
+                                status: ComicStatuses.Continues,
+                                teamId: data.teams,
+                                maturityRating: data.maturityRating as MaturityRatings,
+                                genres: data?.genres,
+                                tags: data?.tags
+                            },
+                        },
+                    }).then((newComic => {
+                        router.push(`/comic/${newComic.data?.addComic?.id}`)
+                    }))
 
-        if (storedImage?.name !== data?.cover?.name && data?.cover) {
-            const imageData = await uploadImages([data.cover], data.title)
-            storedImage.imageId = imageData.data[0].path;
-            setImage(JSON.stringify({ imageId: storedImage.imageId, name: data.cover.name }));
+                }
+            }, { type: 'cover', files: [data.cover], fileFolder: `/teams/${data.teams}/comics/${data.title}` }, setImageLoading)
         }
-
-        const newComic = await addComic({
-            variables: {
-                input: {
-                    title: data.title,
-                    alternativeTitles: data.alternativeTitles,
-                    cover: storedImage.imageId,
-                    description: data.description,
-                    language: 'ru',
-                    status: ComicStatuses.Continues,
-                    teamId: data.teams,
-                    maturityRating: data.maturityRating as MaturityRatings,
-                    genres: data?.genres,
-                    tags: data?.tags
-                },
-            },
-        });
-
-        setImage('{}');
-
-        router.push(`/comic/${newComic.data?.addComic?.id}`)
     };
 
     if (loading) {
@@ -91,6 +84,7 @@ export const AddComic = () => {
     return (
         <>
             <AddComicForm
+                loading={MutateLoading || imageLoading}
                 selectionValues={{
                     loading: false,
                     maturityRatings,

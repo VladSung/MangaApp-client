@@ -22,7 +22,7 @@ export const ManyUpload = ({ initialImages, height, width, resolution = '(800 x 
 
     return (
         <>
-            <Paper c='blue' withBorder h={height || 378} pos='relative' w={width || 253} radius='lg' style={{ borderColor: 'var(--mantine-color-blue-filled)', borderStyle: 'dashed', overflow: 'hidden' }}>
+            <Paper c='blue' withBorder h={height || 378} pos='relative' w={width || 253} radius='lg' style={{ zIndex: 0, borderColor: 'var(--mantine-color-blue-filled)', borderStyle: 'dashed', overflow: 'hidden' }}>
 
                 <Overlay backgroundOpacity={0.1} style={{ cursor: 'pointer' }}>
                     <Flex

@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
 import { ImageUpload } from '@src/entities/image-upload';
 import { AddTeamForm } from '@src/entities/team';
 import { FormInput } from '@src/entities/team/add-form';
-import { uploadImages } from "@src/features/upload-image";
 import { graphql } from '@src/shared/api/graphql';
 import { Avatar } from "@src/shared/ui/Avatar";
 import { useEffect } from "react";
 import { PageProps } from "@src/shared/types";
 import { useTranslation } from "@src/shared/lib/i18n/client";
+import { mutationWithUploadImages } from "@src/features/upload-image";
 
 const addTeamMutation = graphql(`
     mutation AddTeamMutation($input: AddTeamInput!) {
@@ -42,37 +42,39 @@ export const AddTeamWidget = ({ labels, params }: Props) => {
 
     const [addTeam, { data, error }] = useMutation(addTeamMutation)
 
-    const onSubmit = async (values: FormInput) => {
+    const onSubmit = (values: FormInput) => {
         if (values.cover && values.name) {
             const { cover, name } = values;
-            const imagePath = await uploadImages([cover], name)
 
-            const newTeam = await addTeam({
-                variables: {
-                    input: {
-                        name,
-                        avatar: imagePath.data[0].path
-                    }
-                },
-                update: (cache, { data: addTeam }) => {
-                    cache.writeFragment({
-                        id: `Team:${addTeam?.createTeam.id}`,
-                        fragment: gql`
+            mutationWithUploadImages(images => {
+                addTeam({
+                    variables: {
+                        input: {
+                            name,
+                            avatar: images?.data[0].path
+                        }
+                    },
+                    update: (cache, { data: addTeam }) => {
+                        cache.writeFragment({
+                            id: `Team:${addTeam?.createTeam.id}`,
+                            fragment: gql`
                             fragment _Team on Team {
                                 id
                                 avatar
                                 name
                             }
                         `,
-                        data: {
-                            team: addTeam?.createTeam
-                        }
-                    });
-                }
-            })
+                            data: {
+                                team: addTeam?.createTeam
+                            }
+                        });
+                    }
+                }).then((newTeam) => {
+                    close();
+                    router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
+                })
 
-            close();
-            router.push(`/dashboard/team/${newTeam.data?.createTeam.id}`)
+            }, { type: 'avatar', files: [values.cover], fileFolder: `teams/${name}` })
         }
     }
 

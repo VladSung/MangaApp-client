@@ -32,7 +32,6 @@
 }
 
 .posterWrapper {
-    
     @mixin larger-than $mantine-breakpoint-md {
         width: rem(270);
     }
@@ -41,7 +40,7 @@
         & .posterImage {
             height: auto;
             width: 230px;
-            
+
             aspect-ratio: 6 / 9;
         }
     }
@@ -58,7 +57,7 @@
         & .posterImage {
             height: auto;
             width: 180px;
-            
+
             aspect-ratio: 6 / 9;
         }
         aspect-ratio: 6 / 9;
@@ -73,15 +72,13 @@
 }
 
 .posterBackground {
-    @mixin larger-than $mantine-breakpoint-xs {
-        display: none;
-    }
     z-index: -1;
     position: absolute;
     margin-top: -40px;
     left: 0;
     width: 100%;
     & .overlay {
+        overflow: hidden;
         background: linear-gradient(
             0deg,
             var(--mantine-color-body) 20%,
@@ -96,6 +93,17 @@
     & img {
         height: auto;
         width: 100%;
+    }
+    @mixin larger-than $mantine-breakpoint-xs {
+        max-height: calc(100dvh - 80px);
+        overflow: hidden;
+        & .overlay {
+            background: linear-gradient(
+                0deg,
+                var(--mantine-color-body) 20%,
+                alpha(var(--mantine-color-body), 0.6)
+            );
+        }
     }
 }
 

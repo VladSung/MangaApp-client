@@ -7,7 +7,7 @@ const HomePage = async ({ params }: PageProps) => {
 
     return (
         <AppShellMain>
-            <Container>
+            <Container size='lg'>
                 <PopularComicsWidget lng={params.lng} />
             </Container>
         </AppShellMain>

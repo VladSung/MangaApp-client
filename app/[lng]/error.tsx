@@ -1,7 +1,7 @@
 'use client'
 
-import { Error as ErrorEntity } from "@src/entities/error";
 import { AppShellMain, Button } from "@mantine/core";
+import { Error as ErrorEntity } from "@src/entities/error";
 
 const ErrorComponent = ({ error, reset }: { error: Error, reset: () => void }) => {
 

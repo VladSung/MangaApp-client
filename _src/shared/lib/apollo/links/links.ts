@@ -5,7 +5,7 @@ import { removeTypenameFromMutationLink } from 'apollo-remove-typename-mutation-
 export const errorServerLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
         for (const error of graphQLErrors) {
-            throw error;
+            console.log(error);
         }
     } else if (networkError) {
         console.log(networkError);

@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/team/[teamId]'
+export { default } from '@src/pages/[lng]/dashboard/creator/team/[teamId]'

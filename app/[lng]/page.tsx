@@ -1,7 +1,6 @@
-import { Metadata } from 'next';
-
 import { useTranslation } from '@src/shared/lib/i18n';
 import { PageProps } from '@src/shared/types';
+import { Metadata } from 'next';
 
 
 

@@ -5,7 +5,7 @@ import { IconCaretDownFilled, IconCaretUpFilled, IconHeart, IconMessageReply, Ic
 import { dayjsRelativeTime } from "@src/shared/api/dayjs";
 import { Avatar } from "@src/shared/ui/Avatar";
 
-type CommentBase = { id?: string, createdAt?: Date, _count?: { replies?: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author?: { avatar?: string | null, username?: string | null } | null };
+type CommentBase = { id?: string, createdAt?: Date, _count?: { replies?: number | null } | null, pinned?: boolean, replies?: CommentBase[], content?: string, author?: { avatar?: string | null, name?: string | null } | null };
 
 type AddReplyWidget = ({ comicId, chapterId, parentCommentId }: { comicId: string, chapterId?: string, parentCommentId?: string }) => React.JSX.Element
 type Menu = ({ commentId }: { commentId: string }) => React.JSX.Element
@@ -13,6 +13,7 @@ type CommentProps = {
     comment: CommentBase
     depth: number
     comicId: string
+    chapterId?: string
     Menu: Menu
     AddReplyWidget: AddReplyWidget
     Replies?: ({ depth, Menu, AddReplyWidget, commentId }: { Menu: Menu, depth: number, AddReplyWidget: AddReplyWidget, comicId: string, commentId: string }) => undefined | React.JSX.Element | React.JSX.Element[]
@@ -36,7 +37,7 @@ export const Comment = ({ comment, comicId, AddReplyWidget, Menu, Replies, depth
                 <Avatar src={comment?.author?.avatar} />
                 <Stack gap={0} style={{ flexGrow: 1 }}>
                     <Group>
-                        <Text component='h3' fw='bold' size='xs'>{comment?.author?.username}</Text>
+                        <Text component='h3' fw='bold' size='xs'>{comment?.author?.name}</Text>
                         <Text size='xs'>{(dayjsRelativeTime(comment?.createdAt)).fromNow()}</Text>
                         {comment?.pinned && <IconPinFilled size={16} />}
                         {comment.id && <Menu commentId={comment?.id} />}

@@ -1,6 +1,6 @@
 'use client'
 import { useMutation } from "@apollo/client";
-import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
+import { useSuspenseQuery } from "@apollo/experimental-nextjs-app-support/ssr";
 import { ActionIcon, Anchor, AppShellSection, Breadcrumbs, Button, Center, Container, Group, InputError, Loader, NumberInput, Overlay, Radio, RadioGroup, Stack, Text, TextInput } from "@mantine/core";
 import { DatePickerInput } from '@mantine/dates';
 import { FileWithPath } from "@mantine/dropzone";
@@ -11,9 +11,9 @@ import Link from "next/link";
 
 import { ManyImagesUpload, ManyUploadUseFormContext } from "@src/entities/image-upload";
 import { DndFileList } from "@src/entities/image-upload/file-list";
-import { uploadImages } from "@src/features/upload-image";
+import { mutationWithUploadImages } from "@src/features/upload-image";
 import { graphql } from "@src/shared/api/graphql";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 const getComicAndChaptersData = graphql(`
     query getComicAndLastChapterData($id: ID!){
@@ -49,50 +49,49 @@ mutation addChapter($input: addChapterInput!){
 `)
 
 const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string } }) => {
-    const { data: comicData } = useQuery(getComicAndChaptersData, { variables: { id: params.comicId } })
+    const { data: comicData } = useSuspenseQuery(getComicAndChaptersData, { variables: { id: params.comicId } })
     const minComicVolume = comicData?.comic?.chapters?.[comicData?.comic.chapters.length - 1]?.volume || 1;
     const minComicNumber = comicData?.comic?.chapters?.[comicData?.comic.chapters.length - 1]?.number || 0;
     const [uploadChapter, { data, error, loading }] = useMutation(uploadChapterMutation)
 
     const onSubmit = (data: FormInput) => {
-        const upload = async () => {
-
-            const uploadedImages = await uploadImages(data.images, `${params.comicId}/${data.volume}/${data.number}`, 'token.accessToken');
-
-            await uploadChapter({
-                variables: {
-                    input: {
-                        comicId: params.comicId,
-                        volume: data?.volume,
-                        number: data.number,
-                        title: data.name,
-                        language: '',
-                        images: uploadedImages.data,
-                        publishDate: Date.now()
+        mutationWithUploadImages((images) => {
+            console.log(images)
+            if (images) {
+                uploadChapter({
+                    variables: {
+                        input: {
+                            comicId: params.comicId,
+                            volume: data?.volume,
+                            number: data.number,
+                            title: data.name,
+                            language: '',
+                            images: images.data,
+                            publishDate: Date.now()
+                        },
                     },
-                },
-                update: (cache, { data: newChapterData }) => {
-                    const data = cache.readQuery({ query: getComicAndChaptersData });
-                    const chapters = (data?.comic?.chapters && Array.isArray(data?.comic?.chapters)) ? [...data.comic.chapters] : [];
+                    update: (cache, { data: newChapterData }) => {
+                        const data = cache.readQuery({ query: getComicAndChaptersData });
+                        const chapters = (data?.comic?.chapters && Array.isArray(data?.comic?.chapters)) ? [...data.comic.chapters] : [];
 
-                    data?.comic && newChapterData?.addChapter && cache.writeQuery({
-                        query: getComicAndChaptersData, data:
-                        {
-                            ...data,
-                            comic: {
-                                ...data.comic,
-                                title: data.comic.title,
-                                chapters: [...chapters, newChapterData?.addChapter]
+                        data?.comic && newChapterData?.addChapter && cache.writeQuery({
+                            query: getComicAndChaptersData, data:
+                            {
+                                ...data,
+                                comic: {
+                                    ...data.comic,
+                                    title: data.comic.title,
+                                    chapters: [...chapters, newChapterData?.addChapter]
+                                }
                             }
-                        }
-                    })
-                }
-            })
+                        })
+                    }
+                })
+            }
+        }, { type: 'chapter', files: data.images, fileFolder: `${params.comicId}/${data.volume}/${data.number}` }).then(
+            () => form.reset()
+        )
 
-            form.reset()
-        }
-
-        upload()
     }
 
     useEffect(() => {
@@ -103,7 +102,7 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
 
         error && notifications.show({ message: 'Возникла ошибка', c: 'red' })
 
-    })
+    }, [data?.addChapter?.id])
 
 
     const form = useForm({
@@ -123,7 +122,7 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
     const images = form.getInputProps('images').value as FileWithPath[] | []
 
     return (
-        <AppShellSection component={Container} pt={40}>
+        <AppShellSection component={Container} pt={40} mb='md'>
             <Breadcrumbs mb={32}>
                 <Anchor href='/dashboard' component={Link}>Dashboard</Anchor>
                 <Anchor href='/dashboard/comic' component={Link}>Projects</Anchor>
@@ -175,4 +174,8 @@ const ChapterUploadPage = ({ params }: { params: { comicId: string, lng: string 
     )
 }
 
-export default ChapterUploadPage;
+export default ({ params }: { params: { comicId: string, lng: string } }) => {
+    return <Suspense>
+        <ChapterUploadPage params={params} />
+    </Suspense>
+};

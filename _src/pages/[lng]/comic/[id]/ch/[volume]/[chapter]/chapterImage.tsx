@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import classes from './styles.module.css'
-export const ChapterImage = ({ index, path }: { index: number, path?: string | null }) => {
+export const ChapterImage = ({ index, path, }: { index: number, path?: string | null }) => {
 
     return (
         <Image

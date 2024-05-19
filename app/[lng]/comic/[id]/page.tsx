@@ -1,6 +1,6 @@
+import { getComicMetaQuery } from '@src/entities/comic/graphql';
 import { getClient } from '@src/shared/lib/apollo/client';
 import { Metadata } from 'next';
-import { getComicMetaQuery } from '@src/entities/comic/graphql';
 
 type Props = {
     params: {
@@ -10,6 +10,7 @@ type Props = {
 };
 
 const client = getClient()
+
 export async function generateMetadata({ params: { id } }: Props) {
     const { data } = await client.query({ query: getComicMetaQuery, variables: { id } })
 

@@ -7,7 +7,7 @@ import { ImageUpload } from '../../image-upload';
 
 export interface FormInput {
     name: string;
-    tagline: string;
+    description: string;
     cover?: FileWithPath;
 }
 
@@ -28,7 +28,7 @@ export const Add = ({ open, t, onSubmit, ImageUpload, handleClose }: AddProps) =
     const form = useForm({
         name: 'add-team-form', initialValues: {
             name: '',
-            tagline: '',
+            description: '',
         }
     })
 
@@ -69,7 +69,7 @@ export const Add = ({ open, t, onSubmit, ImageUpload, handleClose }: AddProps) =
                         label={t('actions.create.inputs.name')}
                     />
                     <Textarea
-                        {...form.getInputProps('tagline', { require: true })}
+                        {...form.getInputProps('description', { require: true })}
                         label={t('actions.create.inputs.description')}
                         autosize
                         minRows={1}

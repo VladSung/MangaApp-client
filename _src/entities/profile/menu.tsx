@@ -12,7 +12,7 @@ export const ProfileMenu = ({ avatar }: { avatar?: string | null }) => {
     return (
         <Menu shadow="md" width={200} position='bottom-end'>
             <Menu.Target>
-                <ActionIcon style={{ flexGrow: 0 }} size='xl' variant='transparent'>
+                <ActionIcon style={{ flexGrow: 0 }} size='xl' variant='transparent' aria-label="user menu">
                     <Avatar component='span' size='md' src={avatar} alt='' />
                 </ActionIcon>
             </Menu.Target>

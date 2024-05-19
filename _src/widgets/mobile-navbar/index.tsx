@@ -26,20 +26,20 @@ export const MobileNavbar = ({ lng }: { lng: string }) => {
                 withBorder
             >
                 <Flex justify='space-between'>
-                    <ActionIcon component={Link} href='/' size='xl' variant='subtle' className={classes.navbarButton} aria-label={'Главная'}>
+                    {<ActionIcon component={Link} href='/' size='xl' color={currentPath('', true) ? theme.primaryColor : 'var(--mantine-color-text)'} variant='subtle' className={classes.navbarButton} aria-label={'Главная'}>
                         {currentPath('', true) ? <IconHomeFilled className={classes.icon} /> : <IconHome className={classes.icon} />}
                         <Text size='xs'>Главная</Text>
-                    </ActionIcon>
-                    <ActionIcon component={Link} href='/comic' size='xl' variant='subtle' className={classes.navbarButton} aria-label={'Поиск'}>
+                    </ActionIcon>}
+                    <ActionIcon color={currentPath('/comic') ? theme.primaryColor : 'var(--mantine-color-text)'} component={Link} href='/comic' size='xl' variant='subtle' className={classes.navbarButton} aria-label={'Поиск'}>
                         <IconSearch className={classes.icon} stroke={currentPath('/comic') ? 2 : undefined} />
                         <Text size='xs'>Каталог</Text>
                     </ActionIcon>
-                    <ActionIcon component={Link} href='/library' size='xl' variant='subtle' className={classes.navbarButton} aria-label='Библиотека'>
+                    <ActionIcon color={currentPath('/library') ? theme.primaryColor : 'var(--mantine-color-text)'} component={Link} href='/library' size='xl' variant='subtle' className={classes.navbarButton} aria-label='Библиотека'>
                         {currentPath('/library') ? <IconBookmarksFilled className={classes.icon} /> : <IconBookmarks className={classes.icon} />}
                         <Text size='xs'>Закладки</Text>
                     </ActionIcon>
-                    <ActionIcon component={Link} href='/account' size='xl' variant='subtle' className={classes.navbarButton} aria-label={'Больше'}>
-                        <Avatar className={classes.icon} style={{ background: currentPath('/account') ? theme.primaryColor : undefined, border: `2px solid ${currentPath('/account') ? theme.primaryColor : 'transparent'}` }} />
+                    <ActionIcon color={currentPath('/account') ? theme.primaryColor : 'var(--mantine-color-text)'} component={Link} href='/account' size='xl' variant='subtle' className={classes.navbarButton} aria-label={'Больше'}>
+                        <Avatar className={classes.icon} style={{ background: currentPath('/account') ? `var(--mantine-primary-color-filled)` : undefined, border: `2px solid ${currentPath('/account') ? `var(--mantine-primary-color-filled)` : 'transparent'}` }} />
                         <Text size='xs'>Больше</Text>
                     </ActionIcon>
                 </Flex>

@@ -1,8 +1,8 @@
 import { graphql } from '@src/shared/api/graphql';
 
-export const getCommentsQuery = graphql(`
-    query CommentsByComic($comicId: ID!) {
-        commentsByComic(comicId: $comicId) {
+export const getComicCommentsQuery = graphql(`
+    query CommentsByComic($id: ID!) {
+        commentsByComic(comicId: $id) {
             count
             comments {
                 createdAt
@@ -14,7 +14,28 @@ export const getCommentsQuery = graphql(`
                 author {
                     id
                     avatar
-                    username
+                    name
+                }
+            }
+        }
+    }
+`);
+
+export const getChapterCommentsQuery = graphql(`
+    query CommentsByChapter($id: ID!) {
+        commentsByChapter(chapterId: $id) {
+            count
+            comments {
+                createdAt
+                content
+                id
+                _count {
+                    replies
+                }
+                author {
+                    id
+                    avatar
+                    name
                 }
             }
         }

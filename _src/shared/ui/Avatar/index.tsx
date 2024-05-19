@@ -1,12 +1,14 @@
-import { Box } from "@mantine/core"
 import Image, { ImageProps } from "next/image"
-
+import { AvatarProps, Avatar as MantineAvatar } from "@mantine/core"
 type Props = Omit<ImageProps, 'src' | 'alt' | 'height' | 'width'> & {
     src?: string | null
     alt?: string | null
     size?: keyof (typeof sizes) | number
 
     component?: 'span'
+} & {
+    variant?: AvatarProps['variant'],
+    radius?: AvatarProps['radius']
 }
 
 const sizes = {
@@ -33,19 +35,19 @@ const getSize = (size?: keyof (typeof sizes) | number) => {
 
 
 export const Avatar = (props: Props) => {
-    const { src, alt, component, size, ...restProps } = props
+    const { src, alt, component, size, variant, radius, ...restProps } = props
 
     const gettedSize = getSize(size)
 
-    return <Box component={component} style={{ height: gettedSize, width: gettedSize, minWidth: gettedSize, borderRadius: '50%', overflow: "hidden" }}>
-        <Image
+    return <MantineAvatar variant={variant} radius={radius} alt={src ? undefined : alt ?? undefined} component={component} style={{ height: gettedSize, width: gettedSize, minWidth: gettedSize, borderRadius: '50%', overflow: "hidden" }}>
+        {src && <Image
             {...restProps}
             style={{ objectFit: 'cover' }}
             loading='lazy'
-            src={src || '/assets/avatar.png'}
+            src={src}
             height={gettedSize}
             width={gettedSize}
             alt={alt || ''}
-        />
-    </Box>
+        />}
+    </MantineAvatar>
 }

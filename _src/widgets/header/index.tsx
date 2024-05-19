@@ -10,6 +10,7 @@ import { getClient } from '@src/shared/lib/apollo/client';
 
 import classes from './header.module.css';
 import { Navigation } from './navigation';
+import { checkIsOnline } from '@src/shared/lib/checkIsOnline';
 
 
 const ProfileOrLoginMenu = dynamic(() => import('@src/features/auth'), { ssr: false })
@@ -37,10 +38,17 @@ async function Header({ lng }: { lng: string }) {
             },
         },
     }) : {};
+    const isOnline = await checkIsOnline()
 
     if (auth.errors?.find(err => (err.extensions.code === 'TOKEN_EXPIRED'))) {
-        redirect('/api/auth/authorize')
+        try {
+            if (isOnline) redirect('/api/auth/authorize');
+        } catch (err) {
+            console.log(err)
+        }
     }
+
+    console.log(auth)
 
     return (
         <AppShellHeader className={classes.header}>
