@@ -29,7 +29,7 @@ const ReadingProgress = ({ title, volume, chapter, progress }: ReadingProgressPr
                     <Group wrap='nowrap' gap='xs'>
                         <RingProgress
                             size={24}
-                            sections={[{ value: progress, color: 'blue' }]}
+                            sections={[{ value: progress, color: 'var(--mantine-color-primary-filled)' }]}
                         />
                         <Text size="xs" color="dimmed">
                             Глава: {progress}%

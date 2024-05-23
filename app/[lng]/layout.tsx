@@ -5,7 +5,7 @@ import '@mantine/nprogress/styles.css';
 import '@src/pages/[lng]/global.css';
 
 import { getSession } from '@auth0/nextjs-auth0';
-import { AppShell, ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
+import { AppShell, ColorSchemeScript, createTheme, MantineColorsTuple, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications'
 import { WithProviders } from '@src/app';
 import { checkIsOnline } from '@src/shared/lib/checkIsOnline';
@@ -55,9 +55,24 @@ export function generateStaticParams() {
     return languages.map((lng) => ({ lng }));
 }
 
+const primary: MantineColorsTuple = [
+    '#ffecee',
+    '#f7d7da',
+    '#edadb3',
+    '#e37f88',
+    '#da5965',
+    '#d7424e',
+    '#d43542',
+    '#bc2834',
+    '#a9212d',
+    '#941625'
+];
+
+
 const theme = createTheme({
+    colors: { primary },
     defaultRadius: 'lg',
-    primaryColor: 'blue',
+    primaryColor: 'primary',
     cursorType: 'pointer'
 });
 

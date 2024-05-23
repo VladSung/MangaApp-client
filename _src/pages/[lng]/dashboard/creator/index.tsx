@@ -40,7 +40,7 @@ const OverviewPage = () => {
                         <Group justify="space-between" mb="md">
                             <Avatar src={data?.avatar} alt={data?.name} size="xl" radius="md" />
                             <Group gap="xs">
-                                <Badge color="blue" variant="outline">
+                                <Badge color="primary" variant="outline">
                                     Команда
                                 </Badge>
                                 <Badge color="teal" variant="outline">

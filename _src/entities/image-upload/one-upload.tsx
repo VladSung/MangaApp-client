@@ -41,7 +41,7 @@ export const OneUpload = memo(({ initialImage, className, height = 378, width = 
                             <div>
                                 <Center mb={24}>
                                     <IconUpload
-                                        style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
+                                        style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-primary-filled-6)' }}
                                         stroke={1.5}
                                     />
                                 </Center>

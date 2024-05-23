@@ -17,6 +17,7 @@ const documents = {
     "\n    query getComicMeta($id: ID!) {\n        comic(id: $id) {\n            title\n            description\n            cover\n        }\n    }\n": types.GetComicMetaDocument,
     "\n    mutation setReadingHistory($comicId:ID!, $chapterId:ID!){\n        addReadingHistory(comicId:$comicId, chapterId:$chapterId){\n            id\n            chapter{\n                id\n            }\n        }\n    }\n": types.SetReadingHistoryDocument,
     "\n                            fragment _ on Chapter {\n                            usersReadHistory {\n                                id\n                            }\n                            }\n                        ": types._FragmentDoc,
+    "\n    query searchComicsBySearchText($search: String!) {\n        comics(where:{searchText:$search}){\n            id\n            title\n            alternativeTitles\n            cover\n    }\n    }\n": types.SearchComicsBySearchTextDocument,
     "\n    mutation AddTeam($input: AddTeamInput!) {\n        createTeam(input: $input) {\n            id\n            name\n        }\n    }\n": types.AddTeamDocument,
     "\n    query UserSettingQuery {\n        me{\n            name\n            avatar\n            subscriptions{\n                __typename\n            }\n        }\n    }\n": types.UserSettingQueryDocument,
     "\n    query getChapterImages($comicId:ID!, $paginate:ChapterPaginateInput){\n        chapters(comicId:$comicId, paginate:$paginate){\n          count  \n            chapters{\n              id\n              title\n              volume\n              number\n              images{\n                  path\n                  aspectRatio\n              }\n            }\n        }\n    }\n": types.GetChapterImagesDocument,
@@ -35,7 +36,7 @@ const documents = {
     "\n    query ComicName($id: ID!) {\n        comic(id: $id) {\n            title\n        }\n    }\n": types.ComicNameDocument,
     "\n    query getChapters($comicId: ID!, $order: OrderBy, $paginate: ChapterPaginateInput) {\n        chapters(comicId: $comicId, orderBy: $order, paginate: $paginate) {\n            count\n            chapters {\n                id\n                createdAt\n                number\n                volume\n                title\n                usersReadHistory {\n                    id\n                }\n            }\n        }\n    }\n": types.GetChaptersDocument,
     "\n    mutation AddComic($input: AddComicInput!) {\n        addComic(input: $input) {\n            __typename\n            ... on Comic {\n                id\n                title\n            }\n        }\n    }\n": types.AddComicDocument,
-    "\n    query Comics {\n        comics(paginate:{take: 50}) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n": types.ComicsDocument,
+    "\n    query Comics($paginate: PaginateInput, $where:ComicWhereInput) {\n        comics(paginate:$paginate, where:$where) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n": types.ComicsDocument,
     "\n    query getComics {\n        comics(paginate: { take: 50 }) {\n            cover\n            title\n            id\n        }\n    }\n": types.GetComicsDocument,
     "\n    query ComicSelections {\n        genres {\n            id\n            title\n        }\n        tags {\n            id\n            title\n        }\n        me {\n            member {\n                team {\n                    id\n                    avatar\n                    name\n                }\n            }\n        }\n    }\n": types.ComicSelectionsDocument,
     "\n    query GetPopularComics($paginate: PaginateInput!) {\n        popularComics(paginate: $paginate) {\n            title\n            cover\n            id\n        }\n    }\n": types.GetPopularComicsDocument,
@@ -85,6 +86,10 @@ export function graphql(source: "\n    mutation setReadingHistory($comicId:ID!, 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n                            fragment _ on Chapter {\n                            usersReadHistory {\n                                id\n                            }\n                            }\n                        "): (typeof documents)["\n                            fragment _ on Chapter {\n                            usersReadHistory {\n                                id\n                            }\n                            }\n                        "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n    query searchComicsBySearchText($search: String!) {\n        comics(where:{searchText:$search}){\n            id\n            title\n            alternativeTitles\n            cover\n    }\n    }\n"): (typeof documents)["\n    query searchComicsBySearchText($search: String!) {\n        comics(where:{searchText:$search}){\n            id\n            title\n            alternativeTitles\n            cover\n    }\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -160,7 +165,7 @@ export function graphql(source: "\n    mutation AddComic($input: AddComicInput!)
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n    query Comics {\n        comics(paginate:{take: 50}) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n"): (typeof documents)["\n    query Comics {\n        comics(paginate:{take: 50}) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n"];
+export function graphql(source: "\n    query Comics($paginate: PaginateInput, $where:ComicWhereInput) {\n        comics(paginate:$paginate, where:$where) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n"): (typeof documents)["\n    query Comics($paginate: PaginateInput, $where:ComicWhereInput) {\n        comics(paginate:$paginate, where:$where) {\n            id\n            cover\n            title\n            alternativeTitles\n            updatedAt\n        }\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

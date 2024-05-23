@@ -13,6 +13,7 @@ import { useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { useDisclosure } from "@mantine/hooks"
 import ChaptersList from "@src/pages/[lng]/comic/[id]/chapter-list"
+import { SearchComicByName } from "@src/features/search-comic-by-name"
 
 const parseComic: (path: string) => ({
     id: string | undefined
@@ -57,9 +58,10 @@ export const Navigation = ({ lng }: { lng: string }) => {
                 <Button c='initial' variant="subtle" component={Link} href="/comic">
                     {t('catalog')}
                 </Button>
-                <Button c='initial' leftSection={<IconSearch stroke={3} size={13} />} variant="subtle" component={Link} href="#">
+                <Button onClick={open} c='initial' leftSection={<IconSearch stroke={3} size={13} />} variant="subtle" component={Link} href="#">
                     {t('search')}
                 </Button>
+                <SearchComicByName opened={opened} onClose={close} />
             </Group>
         </>
         )

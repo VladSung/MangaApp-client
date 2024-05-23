@@ -32,7 +32,7 @@ export const Comment = ({ comment, comicId, AddReplyWidget, Menu, Replies, depth
     }
 
     return (
-        <Stack gap={depth ? 0 : 'md'} style={{ borderRadius: depth ? 0 : 16, borderLeft: `${comment?.pinned || depth > 0 ? 2 : 0}px solid var(--mantine-color-blue-6)` }} py={8} pl={4}>
+        <Stack gap={depth ? 0 : 'md'} style={{ borderRadius: depth ? 0 : 16, borderLeft: `${comment?.pinned || depth > 0 ? 2 : 0}px solid var(--mantine-color-primary-filled-6)` }} py={8} pl={4}>
             <Group wrap='nowrap' key={comment?.id} align='flex-start'>
                 <Avatar src={comment?.author?.avatar} />
                 <Stack gap={0} style={{ flexGrow: 1 }}>
@@ -56,7 +56,7 @@ export const Comment = ({ comment, comicId, AddReplyWidget, Menu, Replies, depth
                     </Group> : <></>}
                 </Stack>
             </Group>
-            {openedAddReplyWidget && <Stack pl={4} style={{ borderLeft: `${openedAddReplyWidget ? 2 : 0}px solid var(--mantine-color-blue-6)` }}>
+            {openedAddReplyWidget && <Stack pl={4} style={{ borderLeft: `${openedAddReplyWidget ? 2 : 0}px solid var(--mantine-color-primary-filled-6)` }}>
                 {AddReplyWidget ? <AddReplyWidget comicId={comicId} parentCommentId={comment.id} /> : null}
             </Stack>}
             <Collapse in={opened}>
