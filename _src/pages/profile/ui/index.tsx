@@ -45,7 +45,7 @@ export const ProfilePage = async ({}: PageProps) => {
                     </Paper>
                 )}
                 <ProfileHeader user={me} mb="xl">
-                    <Button size="sm">Edit profile</Button>
+                    <Button size="sm">Edit</Button>
                 </ProfileHeader>
                 <ProfileContent teams={teams} comics={comics} />
             </Container>

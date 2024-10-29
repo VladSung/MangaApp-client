@@ -18,9 +18,9 @@ import { PropsWithChildren } from 'react';
 import { MobileNavbar } from './mobile-navbar';
 import { PageProps } from '@src/shared/api';
 
-type Props = {
+type Props = PageProps<{
     token?: string;
-} & PageProps;
+}>;
 
 export const RootLayout = async ({ children, params }: Props & PropsWithChildren) => {
     const { lng } = await params;

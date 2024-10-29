@@ -7,17 +7,15 @@ import { Suspense } from 'react';
 import { ComicContent } from './comic-content';
 import { ComicPosterWithActions } from './comic-poster';
 import classes from './styles.module.css';
-
-type Props = {
-    params: Promise<{
-        id: string;
-        lng: string;
-    }>;
-};
+import { PageProps } from '@src/shared/api';
 
 const client = getClient();
 
-export const ComicPage = async ({ params }: Props) => {
+export const ComicPage = async ({
+    params,
+}: PageProps<{
+    id: string;
+}>) => {
     const { id, lng } = await params;
     const {
         data: {

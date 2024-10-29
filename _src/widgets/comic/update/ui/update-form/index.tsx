@@ -38,7 +38,7 @@ const defaultFormValues = {
     altTitle: '',
     tags: [],
     genres: [],
-    maturityRating: 'EVERYONE',
+    maturityRating: MaturityRatings.Everyone,
     teams: '',
     publishDate: undefined,
 };
@@ -63,8 +63,8 @@ export interface ComicUpdateFormProps {
     };
     onSubmit: (data: ComicUpdateFormInput) => void;
 }
-// !HARDCODED
-const mRatings = ['EVERYONE', 'TEEN', 'MATURE'];
+
+const mRatings = Object.values(MaturityRatings);
 
 const [FormProvider, useFormContext, useForm] = createFormContext<ComicUpdateFormInput>();
 
@@ -91,8 +91,6 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: ComicU
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
 
-    console.log(Object.assign(defaultFormValues, selectedValues, { cover: null }));
-
     const options = selectionValues.teams.map((team) => {
         return (
             team && (
@@ -112,7 +110,6 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: ComicU
         );
     });
 
-    console.log(selectionValues?.teams);
     return (
         <FormProvider form={form}>
             <form onReset={form.reset} onSubmit={form.onSubmit(onSubmit)}>

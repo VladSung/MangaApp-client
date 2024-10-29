@@ -9,17 +9,16 @@ import { notFound } from 'next/navigation';
 
 import { userProfileInfoQuery } from '../api';
 
-type Props = PageProps & {
-    params: {
-        userId: string;
-    };
-};
+type Props = PageProps<{
+    userId: string;
+}>;
 
 export const UserPage = async ({ params }: Props) => {
-    const { t } = await fetchTranslation(params.lng, 'team/profile');
+    const { lng, userId } = await params;
+    const { t } = await fetchTranslation(lng, 'team/profile');
     const { data } = await getClient().query({
         query: userProfileInfoQuery,
-        variables: { id: params.userId },
+        variables: { id: userId },
     });
 
     const user = data.user.one;

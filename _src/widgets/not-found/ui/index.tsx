@@ -4,10 +4,12 @@ import { ErrorComponent } from '@src/entities/error';
 import { PageProps } from '@src/shared/api/types';
 import { useTranslation } from '@src/shared/lib/i18n/client';
 import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
 export const NotFoundError = ({ params }: PageProps) => {
+    const { lng } = use(params);
     const router = useRouter();
-    const { t } = useTranslation(params?.lng, 'common');
+    const { t } = useTranslation(lng, 'common');
 
     const goBack = () => {
         router.back();

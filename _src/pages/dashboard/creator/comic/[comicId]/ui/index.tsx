@@ -31,21 +31,20 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import React from 'react';
+import React, { use } from 'react';
 
 import { comicBaseInfoQuery } from '../api';
 import { ChaptersTab } from './chapters-tab';
 import { SettingsTab } from './settings-tab';
 
-type Props = PageProps & {
-    params: {
-        comicId: string;
-    };
-};
+type Props = PageProps<{
+    comicId: string;
+}>;
 
 export const ComicPage = ({ params }: Props) => {
-    const { t } = useTranslation(params.lng, 'comic/id');
-    const { data } = useSuspenseQuery(comicBaseInfoQuery, { variables: { id: params.comicId } });
+    const { lng, comicId } = use(params);
+    const { t } = useTranslation(lng, 'comic/id');
+    const { data } = useSuspenseQuery(comicBaseInfoQuery, { variables: { id: comicId } });
     const comic = data.comic.one;
 
     const stats = [
@@ -112,7 +111,7 @@ export const ComicPage = ({ params }: Props) => {
                     <Title order={4}>Quick Actions</Title>
                     <Button
                         component={Link}
-                        href={`/comic/${params.comicId}`}
+                        href={`/comic/${comicId}`}
                         fullWidth
                         leftSection={<IconBook size={14} />}
                     >
@@ -120,7 +119,7 @@ export const ComicPage = ({ params }: Props) => {
                     </Button>
                     <Button
                         component={Link}
-                        href={`/dashboard/comic/${params.comicId}/edit`}
+                        href={`/dashboard/comic/${comicId}/edit`}
                         fullWidth
                         variant="light"
                         leftSection={<IconEdit size={14} />}
@@ -129,7 +128,7 @@ export const ComicPage = ({ params }: Props) => {
                     </Button>
                     <Button
                         component={Link}
-                        href={`/dashboard/comic/${params.comicId}/ch-new`}
+                        href={`/dashboard/comic/${comicId}/ch-new`}
                         fullWidth
                         variant="light"
                         leftSection={<IconPlus size={14} />}
@@ -138,7 +137,7 @@ export const ComicPage = ({ params }: Props) => {
                     </Button>
                     <Button
                         component={Link}
-                        href={`/dashboard/comic/${params.comicId}/chapter`}
+                        href={`/dashboard/comic/${comicId}/chapter`}
                         fullWidth
                         variant="light"
                         leftSection={<IconSettings size={14} />}
@@ -159,7 +158,7 @@ export const ComicPage = ({ params }: Props) => {
                 <Anchor component={Link} href="/dashboard/comic">
                     Projects
                 </Anchor>
-                <Anchor component={Link} href={`/dashboard/comic/${params.comicId}`}>
+                <Anchor component={Link} href={`/dashboard/comic/${comicId}`}>
                     {comic?.title}
                 </Anchor>
             </Breadcrumbs>
@@ -203,11 +202,11 @@ export const ComicPage = ({ params }: Props) => {
                             </Tabs.Panel>
 
                             <Tabs.Panel value="chapters" pt="xs">
-                                <ChaptersTab params={params} />
+                                <ChaptersTab lng={lng} comicId={comicId} />
                             </Tabs.Panel>
 
                             <Tabs.Panel value="settings" pt="xs">
-                                <SettingsTab params={params} />
+                                <SettingsTab lng={lng} comicId={comicId} />
                             </Tabs.Panel>
                         </Tabs>
                     </Paper>

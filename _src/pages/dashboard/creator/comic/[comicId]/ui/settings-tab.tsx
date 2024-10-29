@@ -7,17 +7,16 @@ import router from 'next/router';
 import { deleteComicMutation } from '../api';
 
 type Props = {
-    params: {
-        comicId: string;
-    };
+    comicId: string;
+    lng: string;
 };
 
-export const SettingsTab = ({ params }: Props) => {
+export const SettingsTab = ({ lng, comicId }: Props) => {
     const [deleteComic, { data }] = useMutation(deleteComicMutation);
 
     const deleteComicHandler = () => {
         deleteComic({
-            variables: { id: params.comicId },
+            variables: { id: comicId },
             update: (cache, { data }) => {
                 cache.evict({
                     id: `Comic:${data?.comic.delete.record?.id}`,

@@ -23,17 +23,17 @@ import { Avatar } from '@src/shared/ui';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-type Props = PageProps & {
-    params: {
-        teamId: string;
-    };
-};
+export const TeamPage = async ({
+    params,
+}: PageProps<{
+    teamId: string;
+}>) => {
+    const { teamId, lng } = await params;
 
-export const TeamPage = async ({ params }: Props) => {
-    const { t } = await fetchTranslation(params.lng, 'team/profile');
+    const { t } = await fetchTranslation(lng, 'team/profile');
     const { data } = await getClient().query({
         query: teamInfoQuery,
-        variables: { id: params.teamId },
+        variables: { id: teamId },
     });
 
     if (!data.team.one) {

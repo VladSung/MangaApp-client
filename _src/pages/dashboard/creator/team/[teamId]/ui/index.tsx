@@ -9,20 +9,19 @@ import { notFound } from 'next/navigation';
 
 import { TeamPageHeader } from './header';
 
-type Props = PageProps & {
-    params: {
-        teamId: string;
-    };
-};
+type Props = PageProps<{
+    teamId: string;
+}>;
 
 export const DashboardTeamPage = async ({ params }: Props) => {
+    const { teamId, lng } = await params;
     const {
         data: {
             team: { one: team },
         },
     } = await getClient().query({
         query: teamInfoQuery,
-        variables: { id: params.teamId },
+        variables: { id: teamId },
     });
 
     if (!team?.id) {
@@ -32,7 +31,7 @@ export const DashboardTeamPage = async ({ params }: Props) => {
     return (
         <Container size="xl" p="md">
             <Paper>
-                <TeamPageHeader team={team} params={params} />
+                <TeamPageHeader team={team} lng={lng} />
                 <AppShellSection component="section">
                     <Group mb="md">
                         <Title order={2} size="h3">

@@ -30,19 +30,17 @@ import { useRouter } from 'next/navigation';
 
 import { deleteTeamMutation } from '../api';
 
-type Props = PageProps & {
+type Props = Awaited<PageProps['params']> & {
     team: NonNullable<TeamInfoQuery['team']['one']>;
-
-    params: { teamId: string };
 };
 
-export const TeamPageHeader = ({ params, team }: Props) => {
+export const TeamPageHeader = ({ lng, team }: Props) => {
     const router = useRouter();
     const [deleteTeam, { data: deleteTeamData }] = useMutation(deleteTeamMutation);
 
     const deleteTeamHandler = () => {
         deleteTeam({
-            variables: { teamId: params.teamId },
+            variables: { teamId: team.id },
             update: (cache, { data }) => {
                 cache.evict({
                     id: `Team:${data?.team?.delete.record?.id}`,
@@ -55,7 +53,7 @@ export const TeamPageHeader = ({ params, team }: Props) => {
         router.push('/dashboard');
     };
 
-    const { t } = useTranslation(params.lng, 'dashboard/creator/team/index');
+    const { t } = useTranslation(lng, 'dashboard/creator/team/index');
 
     const [opened, { close: close, open: open }] = useDisclosure(false);
 
@@ -78,8 +76,8 @@ export const TeamPageHeader = ({ params, team }: Props) => {
                     Invite users
                 </Title>
                 <Box mb="lg">
-                    <SendInviteByEmail teamId={params.teamId} />
-                    <GetTeamInviteLinkButton teamId={params.teamId} />
+                    <SendInviteByEmail teamId={team.id} />
+                    <GetTeamInviteLinkButton teamId={team.id} />
                 </Box>
                 <Title order={4} mb="sm">
                     Members

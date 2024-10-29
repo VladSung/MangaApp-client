@@ -1,110 +1,12 @@
-'use client';
-import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
-import { AppShellMain, Container, Paper, Text } from '@mantine/core';
-import { startTransition, Suspense, useRef } from 'react';
+import { AppShellMain } from '@mantine/core';
+import { Suspense } from 'react';
 
-import { chapterImagesQuery } from '../api';
-import { Chapter, LoadMoreChapters } from './chapter';
+import { PageProps } from '@src/shared/api';
+import { ChapterPageInner } from './ChapterPageInner';
 
-const ChapterPageInner = ({
-    lng,
-    id,
-    chapter,
-    volume,
-}: {
-    lng: string;
-    id: string;
-    chapter: string;
-    volume: string;
-}) => {
-    const containerRef = useRef(null);
-
-    const isFetching = useRef(false);
-
-    const {
-        data: {
-            chapter: { all: data },
-        },
-        fetchMore,
-    } = useSuspenseQuery(chapterImagesQuery, {
-        variables: {
-            comicId: id,
-            paginate: {
-                after: {
-                    volume: Number(volume),
-                    number: Number(chapter),
-                },
-                first: 1,
-            },
-        },
-    });
-
-    const isLastChapter = !data.pageInfo.hasNextPage;
-
-    const handleIntersection = () => {
-        if (!isFetching.current && data.pageInfo.hasNextPage) {
-            startTransition(() => {
-                isFetching.current = true;
-
-                fetchMore({
-                    variables: {
-                        comicId: id,
-                        paginate: {
-                            after: {
-                                id: data.pageInfo.endCursor,
-                            },
-                            first: 1,
-                        },
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                        if (!fetchMoreResult) {
-                            return prev;
-                        }
-
-                        const prevChapters = prev.chapter.all?.edges || [];
-                        const newChapters = fetchMoreResult.chapter.all?.edges || [];
-
-                        fetchMoreResult.chapter.all.edges = [...prevChapters, ...newChapters];
-
-                        return fetchMoreResult;
-                    },
-                }).finally(() => (isFetching.current = false));
-            });
-        }
-    };
-
-    return (
-        <>
-            {data?.edges?.map(
-                (chapter, index) =>
-                    chapter?.node && (
-                        <Chapter
-                            lng={lng}
-                            chapter={chapter?.node}
-                            index={index}
-                            key={chapter?.node.id}
-                            id={id}
-                        />
-                    )
-            )}
-            {isLastChapter ? (
-                <Paper mb="lg" mx="md" withBorder p="md">
-                    <Text mb="lg" ta="center">
-                        Конец глав
-                    </Text>
-                </Paper>
-            ) : (
-                <LoadMoreChapters handleIntersection={handleIntersection} />
-            )}
-        </>
-    );
-};
-
-export const ChapterPage = ({
-    params: { lng, id, chapter, volume },
-}: {
-    params: { lng: string; id: string; chapter: string; volume: string };
-}) => {
+type Props = PageProps<{ id: string; chapter: string; volume: string }>;
+export const ChapterPage = async ({ params }: Props) => {
+    const { lng, id, chapter, volume } = await params;
     return (
         <AppShellMain>
             <Suspense>

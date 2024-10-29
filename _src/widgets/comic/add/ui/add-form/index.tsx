@@ -33,12 +33,12 @@ import { ComicAddFormInput, Genres, Teams } from './types';
 const defaultFormValues = {
     title: '',
     alternativeTitles: '',
-    cover: [],
+    cover: null,
     description: '',
     altTitle: '',
     tags: [],
     genres: [],
-    maturityRating: 'Everyone',
+    maturityRating: MaturityRatings.Everyone,
     teams: '',
     publishDate: undefined,
 };
@@ -77,10 +77,7 @@ export const AddForm = ({
     const form = useForm({
         name: 'add-comic-form',
         mode: 'uncontrolled',
-        initialValues: Object.assign(
-            defaultFormValues,
-            selectedValues
-        ) as unknown as ComicAddFormInput,
+        initialValues: Object.assign(defaultFormValues, selectedValues),
         validate: {
             title: hasLength({ min: 5, max: 270 }, 'Title must be between 5 and 270 characters'),
             alternativeTitles: hasLength(
@@ -94,6 +91,8 @@ export const AddForm = ({
             cover: isNotEmpty('Cover is required'),
         },
     });
+
+    console.log(Object.assign(defaultFormValues, selectedValues));
 
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
@@ -196,13 +195,11 @@ export const AddForm = ({
                             form.setFieldValue('teams', val);
                             combobox.closeDropdown();
                         }}
-                        key={form.key('teams')}
                     >
                         <Combobox.Target>
                             <InputBase
+                                key={form.key('teams')}
                                 miw={200}
-                                mb={5}
-                                error={form.errors?.teams?.toString()}
                                 label="Team"
                                 component="button"
                                 type="button"
@@ -213,9 +210,7 @@ export const AddForm = ({
                                             size="sm"
                                             src={
                                                 selectionValues.teams.find(
-                                                    (team) =>
-                                                        team?.id ===
-                                                        form.getInputProps('teams')?.value
+                                                    (team) => team?.id === form.getValues().teams
                                                 )?.avatar || ''
                                             }
                                         />
@@ -227,7 +222,7 @@ export const AddForm = ({
                                 onClick={() => combobox.toggleDropdown()}
                             >
                                 {selectionValues.teams.find(
-                                    (team) => team?.id === form.getInputProps('teams')?.value
+                                    (team) => team?.id === form.getValues().teams
                                 )?.name || <Input.Placeholder>Pick value</Input.Placeholder>}
                             </InputBase>
                         </Combobox.Target>

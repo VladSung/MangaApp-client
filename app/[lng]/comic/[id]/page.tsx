@@ -3,15 +3,21 @@ import { getClient } from '@src/shared/lib/apollo/client';
 import { Metadata } from 'next';
 
 type Props = {
-    params: {
+    params: Promise<{
         id: string;
         lng: string;
-    };
+    }>;
 };
 
 const client = getClient();
 
-export async function generateMetadata({ params: { id } }: Props) {
+export async function generateMetadata(props: Props) {
+    const params = await props.params;
+
+    const {
+        id
+    } = params;
+
     const { data } = await client.query({ query: comicMetaQuery, variables: { id } });
 
     const metadata = {
@@ -27,4 +33,5 @@ export async function generateMetadata({ params: { id } }: Props) {
     return metadata;
 }
 
-export { ComicPage as default } from '@src/pages/comic/[id]';
+export { /* @next-codemod-error `ComicPage` export is re-exported. Check if this component uses `params` or `searchParams`*/
+ComicPage as default } from '@src/pages/comic/[id]';

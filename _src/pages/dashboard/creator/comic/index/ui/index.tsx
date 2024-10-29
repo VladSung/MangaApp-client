@@ -6,7 +6,8 @@ import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 
 export const DashboardComicsPage = async ({ params }: PageProps) => {
-    const { t } = await fetchTranslation(params.lng, 'dashboard/creator/comic');
+    const { lng } = await params;
+    const { t } = await fetchTranslation(lng, 'dashboard/creator/comic');
 
     return (
         <Container size="xl" p="md">

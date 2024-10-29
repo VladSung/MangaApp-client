@@ -16,9 +16,11 @@ import {
 
 import { AddTeamWidget } from './team';
 import Wrapper from './wrapper';
+import { use } from 'react';
 
 export const DashboardSidebar = ({ params }: BoxProps & PageProps) => {
-    const { t } = useTranslation(params.lng, 'dashboard/creator/common');
+    const { lng } = use(params);
+    const { t } = useTranslation(lng, 'dashboard/creator/common');
     const teamData = useQuery(userTeamsQuery);
     const teamsList = teamData?.data?.user.me?.membersOf?.edges?.map(
         (member) =>
