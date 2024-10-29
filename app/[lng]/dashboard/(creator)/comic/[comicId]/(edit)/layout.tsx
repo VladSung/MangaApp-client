@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/dashboard/creator/comic/[comicId]/(edit)/layout'
+export { UpdateComicLayout as default } from '@src/pages/dashboard/creator/comic/edit';

@@ -1,5 +1,5 @@
 'use server';
-import { comicQuery } from '@src/shared/api/queries';
+import { comicMetaQuery } from '@src/entities/comic';
 import { getClient } from '@src/shared/lib/apollo/client';
 
 type Props = {
@@ -12,9 +12,9 @@ type Props = {
 };
 
 export async function generateMetadata({ params: { id, volume, chapter } }: Props) {
-    const c = await getClient().query({ query: comicQuery, variables: { id } });
+    const c = await getClient().query({ query: comicMetaQuery, variables: { id } });
 
     return {
-        title: `Ch. ${volume}-${chapter} ${c?.data?.comic?.title}`,
+        title: `Ch. ${volume}-${chapter} ${c?.data?.comic.one?.title}`,
     };
 }

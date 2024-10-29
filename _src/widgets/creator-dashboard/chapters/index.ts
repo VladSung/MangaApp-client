@@ -1,1 +1,1 @@
-export { Chapters } from './list';
+export { Chapters } from './ui/list';

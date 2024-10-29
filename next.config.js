@@ -4,16 +4,25 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
+                hostname: 'images.app.localhost',
+                protocol: 'https',
+                pathname: '**',
+            },
+            {
+                hostname: '*.images.app.localhost',
+                pathname: '**',
+            },
+            {
                 hostname: 'localhost',
                 port: '9000',
                 protocol: 'http',
-                pathname: '/alopex/**',
+                pathname: '/**',
             },
             {
                 hostname: '127.0.0.1',
                 port: '9000',
                 protocol: 'http',
-                pathname: '/alopex/**',
+                pathname: 'alopex/**',
             },
             {
                 hostname: 'rjqfpsoszpkdygjeykxf.supabase.co',
@@ -24,7 +33,7 @@ const nextConfig = {
         ],
     },
     experimental: {
-        // optimizePackageImports: ['@mantine/core', '@mantine/hooks', '@tabler/icons-react'],
+        optimizePackageImports: ['@mantine/core', '@tabler/icons-react'],
     },
 };
 

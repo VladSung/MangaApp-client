@@ -1,5 +1,5 @@
-import { Header } from './header';
-
-export { Add as AddTeamForm, type FormInput as AddTeamFormInput } from './add-form';
-export { Header as TeamHeader };
-export { Card as TeamCard } from './card';
+export * from './api';
+export type * as AddTeamFormTypes from './ui/add-form';
+export { AddFormModal as AddTeamFormModal } from './ui/add-form';
+export { Card as TeamCard } from './ui/card';
+export { Header as TeamHeader } from './ui/header';

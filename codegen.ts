@@ -6,14 +6,19 @@ const config: CodegenConfig = {
     documents: [
         'app/**/*.{ts,tsx}',
         '_src/**/*.{ts,tsx}',
-        // 'app/features/**/*.{ts,tsx}',
-        // 'app/(pages)/**/*.{ts,tsx}',
     ],
     ignoreNoDocuments: true, // for better experience with the watcher
     generates: {
         './_src/shared/api/graphql/generated/': {
             preset: 'client',
-            config: {},
+            config: {
+                // avoidOptionals: true,
+                skipTypename: true,
+                scalars: {
+                    Date: 'string',
+                    URL: 'string',
+                },
+            },
         },
     },
 };

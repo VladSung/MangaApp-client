@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/comic'
+export { ComicsPage as default } from '@src/pages/comic/index/ui';

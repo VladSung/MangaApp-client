@@ -1,12 +1,9 @@
-import { useTranslation } from '@src/shared/lib/i18n';
-import { PageProps } from '@src/shared/types';
+import { PageProps } from '@src/shared/api/types';
+import { fetchTranslation } from '@src/shared/lib/i18n';
 import { Metadata } from 'next';
 
-
-
 export async function generateMetadata({ params: { lng } }: PageProps) {
-    // const messages = (await import(`@src/shared/i18n/${lng}/home.json`)).default;
-    const { t } = await useTranslation(lng, 'index');
+    const { t } = await fetchTranslation(lng, 'index');
 
     return {
         title: t('title'),
@@ -15,4 +12,4 @@ export async function generateMetadata({ params: { lng } }: PageProps) {
     } as Metadata;
 }
 
-export { default } from "@src/pages/[lng]";
+export { HomePage as default } from '@src/pages/home';

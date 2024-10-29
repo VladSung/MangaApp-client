@@ -1,3 +1,7 @@
 import dynamic from 'next/dynamic';
 
-export default dynamic(() => import('@src/pages/[lng]/comic/[id]/ch/[volume]/[chapter]'), { ssr: false });
+const ChapterPage = dynamic(() => import('@src/pages/chapter').then((mod) => mod.ChapterPage), {
+    ssr: false,
+});
+
+export default ChapterPage;

@@ -1,1 +1,1 @@
-export { default } from "@src/pages/[lng]/team/[teamId]";
+export { TeamPage as default } from '@src/pages/team/[teamId]';

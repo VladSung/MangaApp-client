@@ -1,5 +1,6 @@
+import { Avatar as MantineAvatar,AvatarProps } from "@mantine/core"
 import Image, { ImageProps } from "next/image"
-import { AvatarProps, Avatar as MantineAvatar } from "@mantine/core"
+
 type Props = Omit<ImageProps, 'src' | 'alt' | 'height' | 'width'> & {
     src?: string | null
     alt?: string | null

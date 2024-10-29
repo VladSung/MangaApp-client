@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/dashboard/creator/team/[teamId]'
+export { DashboardTeamPage as default } from '@src/pages/dashboard/creator/team/[teamId]';

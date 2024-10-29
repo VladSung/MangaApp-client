@@ -14,8 +14,22 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  /** The `Date` scalar type represents a date in a numeric or sting format */
-  Date: { input: any; output: any; }
+  /**
+   * Статус закладки.
+   * Может быть одним из предопределенных значений:
+   * - IN_PLANS (В планах)
+   * - READ
+   * - READING (Читаю)
+   * - DROPPED (Брошено)
+   * Или любым пользовательским строковым значением.
+   *
+   *     use `enum PredefinedBookmarkTitle` for default titles
+   */
+  BookmarkTitle: { input: any; output: any; }
+  /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+  DateTime: { input: any; output: any; }
+  /** String */
+  URL: { input: string; output: string; }
 };
 
 export type AddComicInput = {
@@ -41,6 +55,7 @@ export type AddComicInput = {
   genres: Array<Scalars['String']['input']>;
   language: Scalars['String']['input'];
   maturityRating: MaturityRatings;
+  publishDate?: InputMaybe<Scalars['DateTime']['input']>;
   status?: InputMaybe<ComicStatuses>;
   /**
    * header
@@ -56,6 +71,11 @@ export type AddComicInput = {
    *
    */
   title: Scalars['String']['input'];
+};
+
+export type AddReadHistoryInput = {
+  chapterId: Scalars['ID']['input'];
+  comicId: Scalars['ID']['input'];
 };
 
 export type AddTeamInput = {
@@ -75,9 +95,8 @@ export type AddTeamInput = {
 };
 
 export type AggregatedRating = {
-  __typename?: 'AggregatedRating';
-  _avg: Scalars['Float']['output'];
-  _count: Scalars['Int']['output'];
+  rating: Scalars['Float']['output'];
+  totalCount: Scalars['Int']['output'];
 };
 
 export type AuthInput = {
@@ -97,46 +116,56 @@ export type AuthInput = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type AuthZDirectiveCompositeRulesInput = {
-  and?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
-  not?: InputMaybe<AuthZRules>;
-  or?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
+export type Bookmark = {
+  comics?: Maybe<Array<Comic>>;
+  count?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  title: Scalars['BookmarkTitle']['output'];
+  user?: Maybe<User>;
 };
 
-export type AuthZDirectiveDeepCompositeRulesInput = {
-  and?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
-  id?: InputMaybe<AuthZRules>;
-  not?: InputMaybe<AuthZDirectiveDeepCompositeRulesInput>;
-  or?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
+export type BookmarkConnection = {
+  edges?: Maybe<Array<BookmarkEdge>>;
+  pageInfo: ConnectionInfo;
 };
 
-export enum AuthZRules {
-  CanAddGenre = 'CanAddGenre',
-  CanAddTag = 'CanAddTag',
-  CanAddTeamMember = 'CanAddTeamMember',
-  CanCreateTeam = 'CanCreateTeam',
-  CanDeleteChapter = 'CanDeleteChapter',
-  CanDeleteComic = 'CanDeleteComic',
-  CanDeleteGenre = 'CanDeleteGenre',
-  CanDeleteTag = 'CanDeleteTag',
-  CanDeleteTeam = 'CanDeleteTeam',
-  CanDeleteTeamMember = 'CanDeleteTeamMember',
-  CanDeleteUser = 'CanDeleteUser',
-  CanPublishChapter = 'CanPublishChapter',
-  CanPublishComic = 'CanPublishComic',
-  CanPushNotification = 'CanPushNotification',
-  CanReadChapter = 'CanReadChapter',
-  CanReadComic = 'CanReadComic',
-  CanReadUser = 'CanReadUser',
-  CanUpdateChapter = 'CanUpdateChapter',
-  CanUpdateComic = 'CanUpdateComic',
-  CanUpdateGenre = 'CanUpdateGenre',
-  CanUpdateTag = 'CanUpdateTag',
-  CanUpdateTeam = 'CanUpdateTeam',
-  CanUpdateTeamMember = 'CanUpdateTeamMember',
-  CanUpdateUser = 'CanUpdateUser',
-  IsAuthenticated = 'IsAuthenticated'
-}
+export type BookmarkEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Bookmark;
+};
+
+export type BookmarkInput = {
+  comicId: Scalars['ID']['input'];
+  customTitle?: InputMaybe<Scalars['String']['input']>;
+  predefinedTitle?: InputMaybe<PredefinedBookmarkTitle>;
+};
+
+export type BookmarkMutations = {
+  add: BookmarkPayload;
+  delete: BookmarkPayload;
+  update: BookmarkPayload;
+};
+
+
+export type BookmarkMutationsAddArgs = {
+  input: BookmarkInput;
+};
+
+
+export type BookmarkMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type BookmarkMutationsUpdateArgs = {
+  id: Scalars['ID']['input'];
+  input: BookmarkInput;
+};
+
+export type BookmarkPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Bookmark>;
+};
 
 export enum CacheControlScope {
   Private = 'PRIVATE',
@@ -144,43 +173,45 @@ export enum CacheControlScope {
 }
 
 export type Chapter = {
-  __typename?: 'Chapter';
   comic?: Maybe<Comic>;
   comicId: Scalars['ID']['output'];
-  comments?: Maybe<Array<Comment>>;
-  createdAt: Scalars['Date']['output'];
+  comments?: Maybe<CommentConnection>;
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   images?: Maybe<Array<ChapterImage>>;
   language: Scalars['String']['output'];
-  lockedUntil?: Maybe<Scalars['Date']['output']>;
+  lockedUntil?: Maybe<Scalars['DateTime']['output']>;
   number: Scalars['Float']['output'];
   price?: Maybe<Scalars['Int']['output']>;
-  publishDate: Scalars['Date']['output'];
+  publishDate: Scalars['DateTime']['output'];
   publishStatus: PublishStatuses;
   title?: Maybe<Scalars['String']['output']>;
   translationId?: Maybe<Scalars['ID']['output']>;
-  unlockedForUser?: Maybe<Array<User>>;
-  updatedAt: Scalars['Date']['output'];
-  usersReadHistory?: Maybe<ReadingHistory>;
+  unlockedForUser?: Maybe<Array<Maybe<User>>>;
+  updatedAt: Scalars['DateTime']['output'];
+  usersReadHistory?: Maybe<ReadHistory>;
   viewed?: Maybe<Scalars['Boolean']['output']>;
   volume: Scalars['Int']['output'];
 };
 
-export type ChapterCursorInput = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  number?: InputMaybe<Scalars['Float']['input']>;
-  volume?: InputMaybe<Scalars['Int']['input']>;
+export type ChapterConnection = {
+  edges?: Maybe<Array<ChapterEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type ChapterEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Chapter;
 };
 
 export type ChapterImage = {
-  __typename?: 'ChapterImage';
   /**
    * header
    * * Changed Must match RegEx pattern: `^[0-9]+:[0-9]+$`
    *
    */
   aspectRatio?: Maybe<Scalars['String']['output']>;
-  path?: Maybe<Scalars['String']['output']>;
+  path?: Maybe<Scalars['URL']['output']>;
 };
 
 export type ChapterImageInput = {
@@ -188,50 +219,125 @@ export type ChapterImageInput = {
   path: Scalars['String']['input'];
 };
 
-export type ChapterPaginateInput = {
-  cursor?: InputMaybe<ChapterCursorInput>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
+export type ChapterInput = {
+  comicId?: InputMaybe<Scalars['ID']['input']>;
+  number?: InputMaybe<Scalars['ID']['input']>;
+  volume?: InputMaybe<Scalars['ID']['input']>;
 };
 
-export type ChapterResponse = {
-  __typename?: 'ChapterResponse';
-  chapters?: Maybe<Array<Chapter>>;
-  count?: Maybe<Scalars['Int']['output']>;
+export type ChapterMutations = {
+  add: ChapterPayload;
+  delete: ChapterPayload;
+  update: ChapterPayload;
+};
+
+
+export type ChapterMutationsAddArgs = {
+  input: AddChapterInput;
+};
+
+
+export type ChapterMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type ChapterMutationsUpdateArgs = {
+  input: UpdateChapterInput;
+};
+
+export type ChapterPaginateCursorInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  number?: InputMaybe<Scalars['Float']['input']>;
+  volume?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChapterPaginateInput = {
+  after?: InputMaybe<ChapterPaginateCursorInput>;
+  before?: InputMaybe<ChapterPaginateCursorInput>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChapterPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Chapter>;
+};
+
+export type ChapterQueries = {
+  all: ChapterConnection;
+  one?: Maybe<Chapter>;
+};
+
+
+export type ChapterQueriesAllArgs = {
+  comicId: Scalars['ID']['input'];
+  paginate: ChapterPaginateInput;
+  sort?: InputMaybe<OrderBy>;
+};
+
+
+export type ChapterQueriesOneArgs = {
+  input: ChapterInput;
 };
 
 export type Comic = {
-  __typename?: 'Comic';
   alternativeTitles?: Maybe<Scalars['String']['output']>;
-  chapters?: Maybe<Array<Chapter>>;
-  comments?: Maybe<Array<Comment>>;
+  bookmarks?: Maybe<BookmarkConnection>;
+  chapters?: Maybe<ChapterConnection>;
+  comments?: Maybe<CommentConnection>;
   count?: Maybe<Scalars['Int']['output']>;
-  cover: Scalars['String']['output'];
-  createdAt: Scalars['Date']['output'];
+  cover: Scalars['URL']['output'];
+  createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  genres?: Maybe<Array<Genre>>;
+  genres?: Maybe<Array<Maybe<Genre>>>;
   id: Scalars['ID']['output'];
   language: Scalars['String']['output'];
-  lastReadedChapter?: Maybe<Chapter>;
+  lastReadChapter?: Maybe<Chapter>;
   maturityRating: MaturityRatings;
   rating?: Maybe<AggregatedRating>;
   status: ComicStatuses;
-  subscriptions?: Maybe<Array<UserSubscription>>;
-  tags?: Maybe<Array<Tag>>;
+  subscriptions?: Maybe<UserSubscriptionConnection>;
+  tags?: Maybe<Array<Maybe<Tag>>>;
   team?: Maybe<Team>;
   title: Scalars['String']['output'];
-  updatedAt: Scalars['Date']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   uploader?: Maybe<TeamMember>;
-  usersReadHistory?: Maybe<Array<ReadingHistory>>;
+  usersReadHistory?: Maybe<ReadHistoryConnection>;
 };
 
-export enum ComicStatuses {
-  Completed = 'COMPLETED',
-  Continues = 'CONTINUES',
-  Frozen = 'FROZEN'
-}
 
-export type ComicWhereInput = {
+export type ComicBookmarksArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type ComicChaptersArgs = {
+  paginate: ChapterPaginateInput;
+  sort?: InputMaybe<OrderBy>;
+};
+
+
+export type ComicCommentsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type ComicUsersReadHistoryArgs = {
+  paginate: PaginateInput;
+  sort?: InputMaybe<OrderBy>;
+};
+
+export type ComicConnection = {
+  edges?: Maybe<Array<ComicEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type ComicEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Comic;
+};
+
+export type ComicFilterInput = {
   chaptersCount?: InputMaybe<Scalars['Int']['input']>;
   genres?: InputMaybe<Array<Scalars['String']['input']>>;
   language?: InputMaybe<Scalars['String']['input']>;
@@ -243,9 +349,69 @@ export type ComicWhereInput = {
   teamId?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type ComicMutations = {
+  add: ComicPayload;
+  delete: ComicPayload;
+  rate: RatingPayload;
+  update: ComicPayload;
+};
+
+
+export type ComicMutationsAddArgs = {
+  input: AddComicInput;
+};
+
+
+export type ComicMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type ComicMutationsRateArgs = {
+  input: RateInput;
+};
+
+
+export type ComicMutationsUpdateArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateComicInput;
+};
+
+export type ComicPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Comic>;
+};
+
+export type ComicQueries = {
+  all: ComicConnection;
+  one?: Maybe<Comic>;
+  popular: ComicConnection;
+};
+
+
+export type ComicQueriesAllArgs = {
+  filter?: InputMaybe<ComicFilterInput>;
+  paginate: PaginateInput;
+};
+
+
+export type ComicQueriesOneArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type ComicQueriesPopularArgs = {
+  filter?: InputMaybe<ComicFilterInput>;
+  paginate: PaginateInput;
+};
+
+export enum ComicStatuses {
+  Completed = 'COMPLETED',
+  Continues = 'CONTINUES',
+  Frozen = 'FROZEN'
+}
+
 export type Comment = {
-  __typename?: 'Comment';
-  _count?: Maybe<Count>;
   author?: Maybe<User>;
   authorId: Scalars['String']['output'];
   chapter?: Maybe<Chapter>;
@@ -253,18 +419,166 @@ export type Comment = {
   comic?: Maybe<Comic>;
   comicId?: Maybe<Scalars['String']['output']>;
   content: Scalars['String']['output'];
-  createdAt: Scalars['Date']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  likes: Scalars['Int']['output'];
+  isPinned: Scalars['Boolean']['output'];
+  isReply: Scalars['Boolean']['output'];
+  mentionedUser?: Maybe<User>;
+  mentionedUserPublicId?: Maybe<Scalars['String']['output']>;
   parentComment?: Maybe<Comment>;
-  parentId?: Maybe<Scalars['String']['output']>;
-  replies?: Maybe<Array<Maybe<Comment>>>;
-  updatedAt: Scalars['Date']['output'];
+  parentCommentId?: Maybe<Scalars['String']['output']>;
+  reactions?: Maybe<CommentReaction>;
+  replies?: Maybe<Array<Comment>>;
+  repliesCount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CommentConnection = {
+  edges?: Maybe<Array<CommentEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type CommentEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Comment;
 };
 
 export type CommentInput = {
   chapterId?: InputMaybe<Scalars['ID']['input']>;
+  comicId: Scalars['ID']['input'];
+  /**
+   * header
+   * * Changed Minimum length: `2`
+   * * Changed Maximum max length: `5000`
+   *
+   */
+  content: Scalars['String']['input'];
+  mentionedUserId?: InputMaybe<Scalars['ID']['input']>;
+  parentCommentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type CommentMutations = {
+  create: CommentPayload;
+  delete: CommentPayload;
+  pin: CommentPayload;
+  unpin: CommentPayload;
+  update: CommentPayload;
+  updateReaction: CommentPayload;
+};
+
+
+export type CommentMutationsCreateArgs = {
+  input: CommentInput;
+};
+
+
+export type CommentMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type CommentMutationsPinArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type CommentMutationsUnpinArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type CommentMutationsUpdateArgs = {
+  input: CommentUpdateInput;
+};
+
+
+export type CommentMutationsUpdateReactionArgs = {
+  input: UpdateCommentReactionInput;
+};
+
+export type CommentPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Comment>;
+};
+
+export type CommentPinInput = {
+  chapterId?: InputMaybe<Scalars['ID']['input']>;
   comicId?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+export type CommentQueries = {
+  allByChapter: CommentConnection;
+  allByComic: CommentConnection;
+  allByUser: CommentConnection;
+  one?: Maybe<Comment>;
+};
+
+
+export type CommentQueriesAllByChapterArgs = {
+  chapterId: Scalars['ID']['input'];
+  paginate?: InputMaybe<PaginateInput>;
+  sort: CommentSort;
+};
+
+
+export type CommentQueriesAllByComicArgs = {
+  comicId: Scalars['ID']['input'];
+  paginate?: InputMaybe<PaginateInput>;
+  sort: CommentSort;
+};
+
+
+export type CommentQueriesAllByUserArgs = {
+  paginate?: InputMaybe<PaginateInput>;
+  sort: CommentSort;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type CommentQueriesOneArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type CommentReaction = {
+  dislike: Scalars['Int']['output'];
+  like: Scalars['Int']['output'];
+  userReactType?: Maybe<ReactionType>;
+};
+
+export type CommentReply = {
+  author?: Maybe<User>;
+  authorId: Scalars['String']['output'];
+  chapter?: Maybe<Chapter>;
+  chapterId?: Maybe<Scalars['String']['output']>;
+  comic?: Maybe<Comic>;
+  comicId?: Maybe<Scalars['String']['output']>;
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isPinned: Scalars['Boolean']['output'];
+  isReply: Scalars['Boolean']['output'];
+  likes?: Maybe<Scalars['Int']['output']>;
+  mentionedUser?: Maybe<User>;
+  mentionedUserPublicId?: Maybe<Scalars['String']['output']>;
+  parentComment?: Maybe<Comment>;
+  parentCommentId?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CommentReplyConnection = {
+  edges?: Maybe<Array<CommentReplyEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type CommentReplyEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Comment;
+};
+
+export type CommentReplyInput = {
+  chapterId?: InputMaybe<Scalars['ID']['input']>;
+  comicId: Scalars['ID']['input'];
   /**
    * header
    * * Changed Minimum length: `2`
@@ -275,41 +589,188 @@ export type CommentInput = {
   parentCommentId?: InputMaybe<Scalars['ID']['input']>;
 };
 
-export type CommentReaction = {
-  __typename?: 'CommentReaction';
-  comment?: Maybe<Comment>;
-  type?: Maybe<ReactionType>;
-  user?: Maybe<User>;
+export type CommentReplyMutations = {
+  create: CommentReplyPayload;
+  delete: CommentReplyPayload;
+  update: CommentReplyPayload;
 };
 
-export type CommentResponse = {
-  __typename?: 'CommentResponse';
-  comments?: Maybe<Array<Comment>>;
-  count?: Maybe<Scalars['Int']['output']>;
+
+export type CommentReplyMutationsCreateArgs = {
+  input: CommentReplyInput;
 };
 
-export type Count = {
-  __typename?: 'Count';
-  replies?: Maybe<Scalars['Int']['output']>;
-};
 
-export type CursorInput = {
+export type CommentReplyMutationsDeleteArgs = {
   id: Scalars['ID']['input'];
 };
 
+
+export type CommentReplyMutationsUpdateArgs = {
+  id: Scalars['ID']['input'];
+  input: CommentReplyInput;
+};
+
+export type CommentReplyPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<CommentReply>;
+};
+
+export type CommentReplyQueries = {
+  allByCommentId: CommentReplyConnection;
+};
+
+
+export type CommentReplyQueriesAllByCommentIdArgs = {
+  commentId: Scalars['ID']['input'];
+  paginate?: InputMaybe<PaginateInput>;
+  sort: CommentSort;
+};
+
+export enum CommentSort {
+  New = 'NEW',
+  Popular = 'POPULAR'
+}
+
+export type CommentUpdateInput = {
+  /**
+   * header
+   * * Changed Minimum length: `2`
+   * * Changed Maximum max length: `5000`
+   *
+   */
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+};
+
+export type CommonIssue = IssueInterface & {
+  message?: Maybe<Scalars['String']['output']>;
+};
+
+export type ConnectionInfo = {
+  endCursor?: Maybe<Scalars['ID']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  startCursor?: Maybe<Scalars['ID']['output']>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+export type CreateTeamPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Team>;
+};
+
+export type CurrentUser = UserBase & {
+  age?: Maybe<Scalars['DateTime']['output']>;
+  avatar?: Maybe<Scalars['URL']['output']>;
+  background?: Maybe<Scalars['URL']['output']>;
+  bookmarks?: Maybe<BookmarkConnection>;
+  commentReactions?: Maybe<Array<CommentReaction>>;
+  comments?: Maybe<CommentConnection>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  membersOf?: Maybe<TeamMemberConnection>;
+  name: Scalars['String']['output'];
+  notifications?: Maybe<NotificationConnection>;
+  permissions?: Maybe<Array<Permission>>;
+  preferredLanguage?: Maybe<Scalars['String']['output']>;
+  publicId: Scalars['String']['output'];
+  readHistory?: Maybe<ReadHistoryConnection>;
+  socialLinks?: Maybe<Array<Scalars['URL']['output']>>;
+  subscribedComics?: Maybe<ComicConnection>;
+  subscriptions?: Maybe<UserSubscriptionConnection>;
+  updatedAt: Scalars['DateTime']['output'];
+  userRatings?: Maybe<Array<Rating>>;
+};
+
+
+export type CurrentUserBookmarksArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserCommentsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserMembersOfArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserNotificationsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserReadHistoryArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserSubscribedComicsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type CurrentUserSubscriptionsArgs = {
+  paginate: PaginateInput;
+};
+
+export type GenerateTeamInviteLinkPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Scalars['String']['output']>;
+};
+
 export type Genre = {
-  __typename?: 'Genre';
   id: Scalars['Int']['output'];
   title: Scalars['String']['output'];
 };
 
-export type GenreInput = {
-  id: Scalars['Int']['input'];
-  title: Scalars['String']['input'];
+export type GenreFilterInput = {
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type GenreWhereInput = {
-  title?: InputMaybe<Scalars['String']['input']>;
+export type GenreMutations = {
+  add: GenrePayload;
+  update: GenrePayload;
+};
+
+
+export type GenreMutationsAddArgs = {
+  genre: Scalars['String']['input'];
+};
+
+
+export type GenreMutationsUpdateArgs = {
+  input: UpdateGenreInput;
+};
+
+export type GenrePayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Genre>;
+};
+
+export type GenreQueries = {
+  all: Array<Genre>;
+  one?: Maybe<Genre>;
+};
+
+
+export type GenreQueriesAllArgs = {
+  filter?: InputMaybe<GenreFilterInput>;
+};
+
+
+export type GenreQueriesOneArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type IssueInterface = {
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export enum MaturityRatings {
@@ -319,180 +780,23 @@ export enum MaturityRatings {
 }
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  addChapter: Chapter;
-  addComic: Comic;
-  addComment: Comment;
-  addGenre: Genre;
-  addNotification: Notification;
-  addReadingHistory?: Maybe<ReadingHistory>;
-  addTag: Tag;
-  addTeamMember: TeamMember;
-  auth: User;
-  createTeam: Team;
-  deleteChapter: Scalars['ID']['output'];
-  deleteComic: Comic;
-  deleteComment?: Maybe<Comment>;
-  deleteTeam: Team;
-  deleteTeamMember: TeamMember;
-  generateTeamInviteLink: Scalars['String']['output'];
-  inviteUserToTeam?: Maybe<TeamMember>;
-  sendInviteToEmail: Scalars['String']['output'];
-  subscribe: UserSubscription;
-  unsubscribe: UserSubscription;
-  updateChapter: Chapter;
-  updateComic: Comic;
-  updateComment: Comment;
-  updateMe: User;
-  updateTeam: Team;
-  updateUser: User;
-};
-
-
-export type MutationAddChapterArgs = {
-  input: AddChapterInput;
-};
-
-
-export type MutationAddComicArgs = {
-  input: AddComicInput;
-};
-
-
-export type MutationAddCommentArgs = {
-  input: CommentInput;
-};
-
-
-export type MutationAddGenreArgs = {
-  genre: Scalars['String']['input'];
-};
-
-
-export type MutationAddNotificationArgs = {
-  input: NotificationInput;
-};
-
-
-export type MutationAddReadingHistoryArgs = {
-  chapterId: Scalars['ID']['input'];
-  comicId: Scalars['ID']['input'];
-};
-
-
-export type MutationAddTagArgs = {
-  tag: Scalars['String']['input'];
-};
-
-
-export type MutationAddTeamMemberArgs = {
-  memberId: Scalars['ID']['input'];
-  role: Scalars['String']['input'];
-  teamId: Scalars['ID']['input'];
-};
-
-
-export type MutationAuthArgs = {
-  input?: InputMaybe<AuthInput>;
-};
-
-
-export type MutationCreateTeamArgs = {
-  input: AddTeamInput;
-};
-
-
-export type MutationDeleteChapterArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteComicArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteCommentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteTeamArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteTeamMemberArgs = {
-  memberId: Scalars['ID']['input'];
-  role: Scalars['String']['input'];
-  teamId: Scalars['ID']['input'];
-};
-
-
-export type MutationGenerateTeamInviteLinkArgs = {
-  role: Scalars['String']['input'];
-  teamId: Scalars['ID']['input'];
-};
-
-
-export type MutationInviteUserToTeamArgs = {
-  inviteToken: Scalars['String']['input'];
-};
-
-
-export type MutationSendInviteToEmailArgs = {
-  email: Scalars['String']['input'];
-  role?: InputMaybe<Scalars['String']['input']>;
-  teamId: Scalars['ID']['input'];
-};
-
-
-export type MutationSubscribeArgs = {
-  input: UserSubscriptionInput;
-};
-
-
-export type MutationUnsubscribeArgs = {
-  input: UserSubscriptionInput;
-};
-
-
-export type MutationUpdateChapterArgs = {
-  input: UpdateChapterInput;
-};
-
-
-export type MutationUpdateComicArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateComicInput;
-};
-
-
-export type MutationUpdateCommentArgs = {
-  id: Scalars['ID']['input'];
-  input: CommentInput;
-};
-
-
-export type MutationUpdateMeArgs = {
-  input: UpdateUserInput;
-};
-
-
-export type MutationUpdateTeamArgs = {
-  id: Scalars['ID']['input'];
-  input: AddTeamInput;
-};
-
-
-export type MutationUpdateUserArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateUserInput;
+  bookmark?: Maybe<BookmarkMutations>;
+  chapter: ChapterMutations;
+  comic: ComicMutations;
+  comment: CommentMutations;
+  commentReply: CommentReplyMutations;
+  genre: GenreMutations;
+  notification: NotificationMutations;
+  readHistory: ReadHistoryMutations;
+  tag: TagMutations;
+  team: TeamMutations;
+  teamMember: TeamMemberMutations;
+  user: UserMutations;
+  userSubscription: UserSubscriptionMutations;
 };
 
 export type Notification = {
-  __typename?: 'Notification';
-  createdAt: Scalars['Date']['output'];
+  createdAt: Scalars['DateTime']['output'];
   /**
    * header
    * * Changed Maximum max length: `300`
@@ -500,8 +804,8 @@ export type Notification = {
    */
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  img: Scalars['String']['output'];
-  link: Scalars['String']['output'];
+  img: Scalars['URL']['output'];
+  link: Scalars['URL']['output'];
   read: Scalars['Boolean']['output'];
   recipient?: Maybe<User>;
   /**
@@ -513,6 +817,16 @@ export type Notification = {
   type: NotificationTypes;
 };
 
+export type NotificationConnection = {
+  edges?: Maybe<Array<NotificationEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type NotificationEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Notification;
+};
+
 export type NotificationInput = {
   description: Scalars['String']['input'];
   img: Scalars['String']['input'];
@@ -520,6 +834,35 @@ export type NotificationInput = {
   recipientId: Scalars['ID']['input'];
   title: Scalars['String']['input'];
   type: NotificationTypes;
+};
+
+export type NotificationMutations = {
+  add: NotificationPayload;
+  delete: NotificationPayload;
+};
+
+
+export type NotificationMutationsAddArgs = {
+  input: NotificationInput;
+};
+
+
+export type NotificationMutationsDeleteArgs = {
+  id: Array<Scalars['ID']['input']>;
+};
+
+export type NotificationPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Notification>;
+};
+
+export type NotificationQueries = {
+  all: NotificationConnection;
+};
+
+
+export type NotificationQueriesAllArgs = {
+  input: PaginateInput;
 };
 
 export enum NotificationTypes {
@@ -536,17 +879,28 @@ export enum OrderBy {
   Desc = 'desc'
 }
 
+/**
+ * "before" has higher priority.
+ * This means that if "before" and "after" are given at the same time, then "after" will be ignored
+ */
 export type PaginateInput = {
-  cursor?: InputMaybe<CursorInput>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['ID']['input']>;
+  before?: InputMaybe<Scalars['ID']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Permission = {
-  __typename?: 'Permission';
   description?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
 };
+
+export enum PredefinedBookmarkTitle {
+  Dropped = 'DROPPED',
+  InPlans = 'IN_PLANS',
+  Postponed = 'POSTPONED',
+  Read = 'READ',
+  Reading = 'READING'
+}
 
 export enum PublishStatuses {
   Draft = 'DRAFT',
@@ -554,160 +908,38 @@ export enum PublishStatuses {
 }
 
 export type Query = {
-  __typename?: 'Query';
-  allReadingHistory?: Maybe<Array<Maybe<ReadingHistory>>>;
-  chapter?: Maybe<Chapter>;
-  chapters?: Maybe<ChapterResponse>;
-  comic?: Maybe<Comic>;
-  comics?: Maybe<Array<Maybe<Comic>>>;
-  commentById?: Maybe<Comment>;
-  commentsByChapter: CommentResponse;
-  commentsByComic: CommentResponse;
-  commentsByUser?: Maybe<Array<Comment>>;
-  genre?: Maybe<Genre>;
-  genres?: Maybe<Array<Genre>>;
-  me?: Maybe<User>;
-  notifications?: Maybe<Array<Notification>>;
-  popularComics?: Maybe<Array<Maybe<Comic>>>;
-  readingHistory?: Maybe<ReadingHistory>;
-  repliesOnCommentByCommentId?: Maybe<Array<Comment>>;
-  subscriptions?: Maybe<Array<UserSubscription>>;
-  tag?: Maybe<Tag>;
-  tags?: Maybe<Array<Tag>>;
-  team?: Maybe<Team>;
-  teamMember?: Maybe<TeamMember>;
-  teamMembers?: Maybe<Array<TeamMember>>;
-  teams?: Maybe<Array<Maybe<Team>>>;
-  user?: Maybe<User>;
-  users?: Maybe<Array<User>>;
+  bookmark?: Maybe<Bookmark>;
+  bookmarks: BookmarkConnection;
+  chapter: ChapterQueries;
+  comic: ComicQueries;
+  comment: CommentQueries;
+  commentReply: CommentReplyQueries;
+  genre: GenreQueries;
+  notification: NotificationQueries;
+  readHistory: ReadHistoryQueries;
+  tag: TagQueries;
+  team: TeamQueries;
+  teamMember: TeamMemberQueries;
+  user: UserQueries;
+  userSubscription: UserSubscriptionQueries;
 };
 
 
-export type QueryChapterArgs = {
-  comicId?: InputMaybe<Scalars['ID']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  number?: InputMaybe<Scalars['ID']['input']>;
-  volume?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryChaptersArgs = {
-  comicId: Scalars['ID']['input'];
-  orderBy?: InputMaybe<OrderBy>;
-  paginate?: InputMaybe<ChapterPaginateInput>;
-};
-
-
-export type QueryComicArgs = {
+export type QueryBookmarkArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryComicsArgs = {
-  paginate?: InputMaybe<PaginateInput>;
-  where?: InputMaybe<ComicWhereInput>;
-};
-
-
-export type QueryCommentByIdArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryCommentsByChapterArgs = {
-  chapterId: Scalars['ID']['input'];
-  paginate?: InputMaybe<PaginateInput>;
-};
-
-
-export type QueryCommentsByComicArgs = {
-  comicId: Scalars['ID']['input'];
-  paginate?: InputMaybe<PaginateInput>;
-};
-
-
-export type QueryCommentsByUserArgs = {
-  paginate?: InputMaybe<PaginateInput>;
-  userId: Scalars['ID']['input'];
-};
-
-
-export type QueryGenreArgs = {
-  id: Scalars['Int']['input'];
-};
-
-
-export type QueryGenresArgs = {
-  paginate?: InputMaybe<PaginateInput>;
-  where?: InputMaybe<GenreWhereInput>;
-};
-
-
-export type QueryPopularComicsArgs = {
+export type QueryBookmarksArgs = {
   paginate: PaginateInput;
-  where?: InputMaybe<ComicWhereInput>;
 };
 
-
-export type QueryReadingHistoryArgs = {
-  comicId: Scalars['ID']['input'];
-};
-
-
-export type QueryRepliesOnCommentByCommentIdArgs = {
-  commentId: Scalars['ID']['input'];
-  paginate?: InputMaybe<PaginateInput>;
-};
-
-
-export type QuerySubscriptionsArgs = {
-  input: UserSubscriptionInput;
-  paginate?: InputMaybe<PaginateInput>;
-};
-
-
-export type QueryTagArgs = {
-  id: Scalars['Int']['input'];
-};
-
-
-export type QueryTagsArgs = {
-  paginate?: InputMaybe<PaginateInput>;
-  where?: InputMaybe<TagWhereInput>;
-};
-
-
-export type QueryTeamArgs = {
+export type RateInput = {
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryTeamMemberArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryTeamMembersArgs = {
-  teamId: Scalars['ID']['input'];
-};
-
-
-export type QueryTeamsArgs = {
-  paginate?: InputMaybe<PaginateInput>;
-};
-
-
-export type QueryUserArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryUsersArgs = {
-  paginate?: InputMaybe<PaginateInput>;
+  rating: Scalars['Int']['input'];
 };
 
 export type Rating = {
-  __typename?: 'Rating';
   comic: Comic;
   id: Scalars['ID']['output'];
   /**
@@ -720,58 +952,258 @@ export type Rating = {
   user: User;
 };
 
+export type RatingPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<AggregatedRating>;
+};
+
 export enum ReactionType {
   Dislike = 'DISLIKE',
   Like = 'LIKE'
 }
 
-export type ReadingHistory = {
-  __typename?: 'ReadingHistory';
+export type ReadHistory = {
   chapter?: Maybe<Chapter>;
   comic?: Maybe<Comic>;
-  createdAt: Scalars['Date']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   user?: Maybe<User>;
 };
 
+export type ReadHistoryConnection = {
+  edges?: Maybe<Array<ReadHistoryEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type ReadHistoryEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: ReadHistory;
+};
+
+export type ReadHistoryMutations = {
+  add: ReadHistoryPayload;
+  delete: ReadHistoryPayload;
+};
+
+
+export type ReadHistoryMutationsAddArgs = {
+  input: AddReadHistoryInput;
+};
+
+
+export type ReadHistoryMutationsDeleteArgs = {
+  id: Array<Scalars['ID']['input']>;
+};
+
+export type ReadHistoryPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<ReadHistory>;
+};
+
+export type ReadHistoryQueries = {
+  all: ReadHistoryConnection;
+  one?: Maybe<ReadHistory>;
+};
+
+
+export type ReadHistoryQueriesOneArgs = {
+  comicId: Scalars['ID']['input'];
+};
+
+export type SendInviteToEmailPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Scalars['String']['output']>;
+};
+
 export type Subscription = {
-  __typename?: 'Subscription';
   NotificationAdded?: Maybe<Notification>;
 };
 
 export type Tag = {
-  __typename?: 'Tag';
   id: Scalars['Int']['output'];
   title: Scalars['String']['output'];
 };
 
-export type TagInput = {
-  id: Scalars['Int']['input'];
-  title: Scalars['String']['input'];
-};
-
-export type TagWhereInput = {
+export type TagFilterInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type TagMutations = {
+  add: TagPayload;
+  update: TagPayload;
+};
+
+
+export type TagMutationsAddArgs = {
+  tag: Scalars['String']['input'];
+};
+
+
+export type TagMutationsUpdateArgs = {
+  input: UpdateTagInput;
+};
+
+export type TagPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Tag>;
+};
+
+export type TagQueries = {
+  all: Array<Tag>;
+  one?: Maybe<Tag>;
+};
+
+
+export type TagQueriesAllArgs = {
+  filter?: InputMaybe<TagFilterInput>;
+};
+
+
+export type TagQueriesOneArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type Team = {
-  __typename?: 'Team';
-  avatar?: Maybe<Scalars['String']['output']>;
-  comics?: Maybe<Array<Comic>>;
+  avatar?: Maybe<Scalars['URL']['output']>;
+  comics?: Maybe<ComicConnection>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  members?: Maybe<Array<TeamMember>>;
+  members?: Maybe<TeamMemberConnection>;
   name: Scalars['String']['output'];
-  subscribed?: Maybe<Array<UserSubscription>>;
+  publicId: Scalars['String']['output'];
+  socialLinks?: Maybe<Array<Scalars['URL']['output']>>;
+  subscribed?: Maybe<UserSubscriptionConnection>;
+};
+
+
+export type TeamMembersArgs = {
+  paginate: PaginateInput;
+};
+
+export type TeamConnection = {
+  edges?: Maybe<Array<TeamEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type TeamEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Team;
 };
 
 export type TeamMember = {
-  __typename?: 'TeamMember';
   comics?: Maybe<Array<Comic>>;
   id: Scalars['ID']['output'];
   role: Scalars['String']['output'];
   team?: Maybe<Team>;
   user?: Maybe<User>;
+};
+
+export type TeamMemberConnection = {
+  edges?: Maybe<Array<TeamMemberEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type TeamMemberEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: TeamMember;
+};
+
+export type TeamMemberMutations = {
+  add: TeamMemberPayload;
+  delete: TeamMemberPayload;
+};
+
+
+export type TeamMemberMutationsAddArgs = {
+  memberId: Scalars['ID']['input'];
+  role: Scalars['String']['input'];
+  teamId: Scalars['ID']['input'];
+};
+
+
+export type TeamMemberMutationsDeleteArgs = {
+  memberId: Scalars['ID']['input'];
+  role: Scalars['String']['input'];
+  teamId: Scalars['ID']['input'];
+};
+
+export type TeamMemberPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<TeamMember>;
+};
+
+export type TeamMemberQueries = {
+  all: TeamMemberConnection;
+  one?: Maybe<TeamMember>;
+};
+
+
+export type TeamMemberQueriesAllArgs = {
+  paginate: PaginateInput;
+  teamId: Scalars['ID']['input'];
+};
+
+
+export type TeamMemberQueriesOneArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type TeamMutations = {
+  create: CreateTeamPayload;
+  delete: UpdateTeamPayload;
+  generateTeamInviteLink: GenerateTeamInviteLinkPayload;
+  inviteMemberToTeam: TeamMemberPayload;
+  sendInviteToEmail: SendInviteToEmailPayload;
+  update: UpdateTeamPayload;
+};
+
+
+export type TeamMutationsCreateArgs = {
+  input: AddTeamInput;
+};
+
+
+export type TeamMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type TeamMutationsGenerateTeamInviteLinkArgs = {
+  role: Scalars['String']['input'];
+  teamId: Scalars['ID']['input'];
+};
+
+
+export type TeamMutationsInviteMemberToTeamArgs = {
+  inviteToken: Scalars['String']['input'];
+};
+
+
+export type TeamMutationsSendInviteToEmailArgs = {
+  email: Scalars['String']['input'];
+  role?: InputMaybe<Scalars['String']['input']>;
+  teamId: Scalars['ID']['input'];
+};
+
+
+export type TeamMutationsUpdateArgs = {
+  id: Scalars['ID']['input'];
+  input: AddTeamInput;
+};
+
+export type TeamQueries = {
+  all: TeamConnection;
+  one?: Maybe<Team>;
+};
+
+
+export type TeamQueriesAllArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type TeamQueriesOneArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type UpdateComicInput = {
@@ -796,6 +1228,7 @@ export type UpdateComicInput = {
   genres?: InputMaybe<Array<Scalars['String']['input']>>;
   language?: InputMaybe<Scalars['String']['input']>;
   maturityRating?: InputMaybe<MaturityRatings>;
+  publishDate?: InputMaybe<Scalars['DateTime']['input']>;
   status?: InputMaybe<ComicStatuses>;
   /**
    * header
@@ -812,14 +1245,22 @@ export type UpdateComicInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UpdateUserInput = {
+export type UpdateCommentReactionInput = {
+  id: Scalars['ID']['input'];
+  reaction: ReactionType;
+};
+
+export type UpdateCurrentUserInput = {
+  age?: InputMaybe<Scalars['DateTime']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
+  background?: InputMaybe<Scalars['String']['input']>;
   /**
    * header
    * * Changed Must match format: `email`
    *
    */
   email?: InputMaybe<Scalars['String']['input']>;
+  preferredLanguage?: InputMaybe<Scalars['String']['input']>;
   /**
    * header
    * * Changed Minimum length: `3`
@@ -829,39 +1270,209 @@ export type UpdateUserInput = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type User = {
-  __typename?: 'User';
-  age?: Maybe<Scalars['Date']['output']>;
-  avatar?: Maybe<Scalars['String']['output']>;
-  background?: Maybe<Scalars['String']['output']>;
+export type UpdateGenreInput = {
+  id: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type UpdateTagInput = {
+  id: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type UpdateTeamPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<Team>;
+};
+
+export type UpdateUserInput = {
+  age?: InputMaybe<Scalars['DateTime']['input']>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  background?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * header
+   * * Changed Must match format: `email`
+   *
+   */
+  email?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  preferredLanguage?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * header
+   * * Changed Minimum length: `3`
+   * * Changed Maximum max length: `20`
+   *
+   */
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type User = UserBase & {
+  age?: Maybe<Scalars['DateTime']['output']>;
+  avatar?: Maybe<Scalars['URL']['output']>;
+  background?: Maybe<Scalars['URL']['output']>;
+  bookmarks?: Maybe<BookmarkConnection>;
   commentReactions?: Maybe<Array<CommentReaction>>;
-  comments?: Maybe<Array<Comment>>;
-  createdAt: Scalars['Date']['output'];
+  comments?: Maybe<CommentConnection>;
+  createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  member?: Maybe<Array<TeamMember>>;
+  membersOf?: Maybe<TeamMemberConnection>;
   name: Scalars['String']['output'];
-  notifications?: Maybe<Array<Notification>>;
   permissions?: Maybe<Array<Permission>>;
   preferredLanguage?: Maybe<Scalars['String']['output']>;
-  publicId?: Maybe<Scalars['String']['output']>;
-  readingHistory?: Maybe<Array<ReadingHistory>>;
-  subscribedComics?: Maybe<Array<Comic>>;
-  subscriptions?: Maybe<Array<UserSubscription>>;
-  updatedAt: Scalars['Date']['output'];
+  publicId: Scalars['String']['output'];
+  readHistory?: Maybe<ReadHistoryConnection>;
+  socialLinks?: Maybe<Array<Scalars['URL']['output']>>;
+  subscribedComics?: Maybe<ComicConnection>;
+  subscriptions?: Maybe<UserSubscriptionConnection>;
+  updatedAt: Scalars['DateTime']['output'];
   userRatings?: Maybe<Array<Rating>>;
 };
 
 
+export type UserBookmarksArgs = {
+  paginate: PaginateInput;
+};
+
+
 export type UserCommentsArgs = {
-  cursor?: InputMaybe<Scalars['ID']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
+  paginate: PaginateInput;
+};
+
+
+export type UserMembersOfArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserReadHistoryArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserSubscribedComicsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserSubscriptionsArgs = {
+  paginate: PaginateInput;
+};
+
+export type UserAuthPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<User>;
+};
+
+export type UserBase = {
+  age?: Maybe<Scalars['DateTime']['output']>;
+  avatar?: Maybe<Scalars['URL']['output']>;
+  background?: Maybe<Scalars['URL']['output']>;
+  bookmarks?: Maybe<BookmarkConnection>;
+  commentReactions?: Maybe<Array<CommentReaction>>;
+  comments?: Maybe<CommentConnection>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  membersOf?: Maybe<TeamMemberConnection>;
+  name: Scalars['String']['output'];
+  permissions?: Maybe<Array<Permission>>;
+  preferredLanguage?: Maybe<Scalars['String']['output']>;
+  publicId: Scalars['String']['output'];
+  readHistory?: Maybe<ReadHistoryConnection>;
+  socialLinks?: Maybe<Array<Scalars['URL']['output']>>;
+  subscribedComics?: Maybe<ComicConnection>;
+  subscriptions?: Maybe<UserSubscriptionConnection>;
+  updatedAt: Scalars['DateTime']['output'];
+  userRatings?: Maybe<Array<Rating>>;
+};
+
+
+export type UserBaseBookmarksArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserBaseCommentsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserBaseMembersOfArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserBaseReadHistoryArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserBaseSubscribedComicsArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserBaseSubscriptionsArgs = {
+  paginate: PaginateInput;
+};
+
+export type UserConnection = {
+  edges?: Maybe<Array<UserEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type UserEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: User;
+};
+
+export type UserMutations = {
+  auth: UserAuthPayload;
+  delete: UserUpdatePayload;
+  update: UserUpdatePayload;
+  updateMe: UserUpdatePayload;
+};
+
+
+export type UserMutationsAuthArgs = {
+  input?: InputMaybe<AuthInput>;
+};
+
+
+export type UserMutationsDeleteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type UserMutationsUpdateArgs = {
+  input: UpdateUserInput;
+};
+
+
+export type UserMutationsUpdateMeArgs = {
+  input: UpdateCurrentUserInput;
+};
+
+export type UserQueries = {
+  all: UserConnection;
+  me?: Maybe<CurrentUser>;
+  one?: Maybe<User>;
+};
+
+
+export type UserQueriesAllArgs = {
+  paginate: PaginateInput;
+};
+
+
+export type UserQueriesOneArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type UserSubscription = {
-  __typename?: 'UserSubscription';
   comic?: Maybe<Comic>;
   comicId?: Maybe<Scalars['ID']['output']>;
   subscriber?: Maybe<User>;
@@ -872,10 +1483,61 @@ export type UserSubscription = {
   teamMemberId?: Maybe<Scalars['ID']['output']>;
 };
 
+export type UserSubscriptionConnection = {
+  edges?: Maybe<Array<UserSubscriptionEdge>>;
+  pageInfo: ConnectionInfo;
+};
+
+export type UserSubscriptionEdge = {
+  cursor?: Maybe<Scalars['ID']['output']>;
+  node: Comic;
+};
+
 export type UserSubscriptionInput = {
   comicId?: InputMaybe<Scalars['ID']['input']>;
   teamId?: InputMaybe<Scalars['ID']['input']>;
   teamMemberId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type UserSubscriptionMutations = {
+  subscribe: UserSubscriptionPayload;
+  unsubscribe: UserSubscriptionPayload;
+};
+
+
+export type UserSubscriptionMutationsSubscribeArgs = {
+  input: UserSubscriptionInput;
+};
+
+
+export type UserSubscriptionMutationsUnsubscribeArgs = {
+  input: UserSubscriptionInput;
+};
+
+export type UserSubscriptionPayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<UserSubscription>;
+};
+
+export type UserSubscriptionQueries = {
+  all: Array<Maybe<UserSubscription>>;
+  one?: Maybe<UserSubscription>;
+};
+
+
+export type UserSubscriptionQueriesAllArgs = {
+  input: UserSubscriptionInput;
+  paginate: PaginateInput;
+};
+
+
+export type UserSubscriptionQueriesOneArgs = {
+  input?: InputMaybe<UserSubscriptionInput>;
+};
+
+export type UserUpdatePayload = {
+  issue?: Maybe<IssueInterface>;
+  record?: Maybe<User>;
 };
 
 export type AddChapterInput = {
@@ -888,7 +1550,7 @@ export type AddChapterInput = {
    *
    */
   number: Scalars['Float']['input'];
-  publishDate?: InputMaybe<Scalars['Date']['input']>;
+  publishDate?: InputMaybe<Scalars['DateTime']['input']>;
   /**
    * header
    * * Changed Maximum max length: `270`
@@ -912,7 +1574,7 @@ export type UpdateChapterDataInput = {
    *
    */
   number?: InputMaybe<Scalars['Float']['input']>;
-  publishDate?: InputMaybe<Scalars['Date']['input']>;
+  publishDate?: InputMaybe<Scalars['DateTime']['input']>;
   /**
    * header
    * * Changed Maximum max length: `270`
@@ -932,180 +1594,278 @@ export type UpdateChapterInput = {
   fields: UpdateChapterDataInput;
 };
 
-export type GetComicPageQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type GetComicPageQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', id: string, title: string, alternativeTitles?: string | null, cover: string, description?: string | null, status: ComicStatuses, lastReadedChapter?: { __typename?: 'Chapter', id: string, volume: number, number: number } | null, genres?: Array<{ __typename?: 'Genre', id: number, title: string }> | null, tags?: Array<{ __typename?: 'Tag', id: number, title: string }> | null, team?: { __typename?: 'Team', id: string, name: string, avatar?: string | null } | null } | null };
-
-export type GetComicMetaQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type GetComicMetaQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', title: string, description?: string | null, cover: string } | null };
-
-export type SetReadingHistoryMutationVariables = Exact<{
-  comicId: Scalars['ID']['input'];
-  chapterId: Scalars['ID']['input'];
-}>;
-
-
-export type SetReadingHistoryMutation = { __typename?: 'Mutation', addReadingHistory?: { __typename?: 'ReadingHistory', id: string, chapter?: { __typename?: 'Chapter', id: string } | null } | null };
-
-export type _Fragment = { __typename?: 'Chapter', usersReadHistory?: { __typename?: 'ReadingHistory', id: string } | null } & { ' $fragmentName'?: '_Fragment' };
-
 export type SearchComicsBySearchTextQueryVariables = Exact<{
   search: Scalars['String']['input'];
 }>;
 
 
-export type SearchComicsBySearchTextQuery = { __typename?: 'Query', comics?: Array<{ __typename?: 'Comic', id: string, title: string, alternativeTitles?: string | null, cover: string } | null> | null };
+export type SearchComicsBySearchTextQuery = { comic: { all: { pageInfo: { totalCount?: number | null }, edges?: Array<{ node: { id: string, title: string, alternativeTitles?: string | null, cover: string } }> | null } } };
 
-export type AddTeamMutationVariables = Exact<{
+export type ChaptersByComicIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  sort: OrderBy;
+  paginate: ChapterPaginateInput;
+}>;
+
+
+export type ChaptersByComicIdQuery = { chapter: { all: { edges?: Array<{ node: { title?: string | null, volume: number, number: number, id: string, publishDate: any, price?: number | null, usersReadHistory?: { id: string } | null } }> | null, pageInfo: { totalCount?: number | null } } } };
+
+export type ComicInfoQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComicInfoQuery = { comic: { one?: { id: string, title: string, alternativeTitles?: string | null, cover: string, maturityRating: MaturityRatings, description?: string | null, status: ComicStatuses, createdAt: any, usersReadHistory?: { pageInfo: { totalCount?: number | null } } | null, rating?: { rating: number, totalCount: number } | null, bookmarks?: { pageInfo: { totalCount?: number | null } } | null, lastReadChapter?: { id: string, volume: number, number: number } | null, chapters?: { pageInfo: { totalCount?: number | null } } | null, genres?: Array<{ id: number, title: string } | null> | null, tags?: Array<{ id: number, title: string } | null> | null, team?: { id: string, name: string, avatar?: string | null } | null } | null } };
+
+export type ComicMetaQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComicMetaQuery = { comic: { one?: { id: string, title: string, description?: string | null, cover: string } | null } };
+
+export type ComicFormSelectionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ComicFormSelectionsQuery = { genre: { all: Array<{ id: number, title: string }> }, tag: { all: Array<{ id: number, title: string }> }, user: { me?: { membersOf?: { edges?: Array<{ node: { team?: { id: string, avatar?: string | null, name: string } | null } }> | null } | null } | null } };
+
+export type MyTeamsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyTeamsQuery = { user: { me?: { membersOf?: { edges?: Array<{ node: { team?: { id: string, name: string, avatar?: string | null } | null } }> | null } | null } | null } };
+
+export type AddTeamMutationMutationVariables = Exact<{
   input: AddTeamInput;
 }>;
 
 
-export type AddTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, name: string } };
-
-export type UserSettingQueryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type UserSettingQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', name: string, avatar?: string | null, subscriptions?: Array<{ __typename: 'UserSubscription' }> | null } | null };
-
-export type GetChapterImagesQueryVariables = Exact<{
-  comicId: Scalars['ID']['input'];
-  paginate?: InputMaybe<ChapterPaginateInput>;
-}>;
-
-
-export type GetChapterImagesQuery = { __typename?: 'Query', chapters?: { __typename?: 'ChapterResponse', count?: number | null, chapters?: Array<{ __typename?: 'Chapter', id: string, title?: string | null, volume: number, number: number, images?: Array<{ __typename?: 'ChapterImage', path?: string | null, aspectRatio?: string | null }> | null }> | null } | null };
-
-export type GetComicAndLastChapterDataQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type GetComicAndLastChapterDataQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', title: string, chapters?: Array<{ __typename?: 'Chapter', id: string, volume: number, number: number }> | null } | null };
-
-export type AddChapterMutationVariables = Exact<{
-  input: AddChapterInput;
-}>;
-
-
-export type AddChapterMutation = { __typename?: 'Mutation', addChapter: { __typename?: 'Chapter', id: string, volume: number, number: number } };
-
-export type GetComicPageDataQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type GetComicPageDataQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', title: string, cover: string } | null };
-
-export type DeleteComicMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteComicMutation = { __typename?: 'Mutation', deleteComic: { __typename?: 'Comic', id: string, title: string } };
-
-export type GenerateInviteLinkMutationVariables = Exact<{
-  teamId: Scalars['ID']['input'];
-}>;
-
-
-export type GenerateInviteLinkMutation = { __typename?: 'Mutation', generateTeamInviteLink: string };
-
-export type SendIviteEmailMutationVariables = Exact<{
-  teamId: Scalars['ID']['input'];
-  email: Scalars['String']['input'];
-}>;
-
-
-export type SendIviteEmailMutation = { __typename?: 'Mutation', sendInviteToEmail: string };
-
-export type DeleteUserTeamMutationVariables = Exact<{
-  teamId: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteUserTeamMutation = { __typename?: 'Mutation', deleteTeam: { __typename?: 'Team', id: string } };
-
-export type MyTeamInfoQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type MyTeamInfoQuery = { __typename?: 'Query', team?: { __typename?: 'Team', id: string, name: string, description?: string | null, avatar?: string | null, members?: Array<{ __typename?: 'TeamMember', id: string, role: string, user?: { __typename?: 'User', name: string, avatar?: string | null, email: string } | null }> | null, comics?: Array<{ __typename?: 'Comic', id: string, title: string, alternativeTitles?: string | null, cover: string, updatedAt: any }> | null } | null };
-
-export type ProfileQueryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ProfileQueryQuery = { __typename?: 'Query', me?: { __typename?: 'User', name: string, avatar?: string | null, description?: string | null, background?: string | null, member?: Array<{ __typename?: 'TeamMember', role: string, id: string, team?: { __typename?: 'Team', id: string, name: string, avatar?: string | null, description?: string | null, comics?: Array<{ __typename?: 'Comic', id: string, title: string, cover: string }> | null } | null }> | null } | null };
+export type AddTeamMutationMutation = { team: { create: { record?: { id: string, name: string, avatar?: string | null } | null, issue?: { message?: string | null } | null } } };
 
 export type TeamInfoQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type TeamInfoQuery = { __typename?: 'Query', team?: { __typename?: 'Team', id: string, avatar?: string | null, name: string, description?: string | null, members?: Array<{ __typename?: 'TeamMember', id: string, role: string, user?: { __typename?: 'User', id: string, name: string, avatar?: string | null } | null }> | null, comics?: Array<{ __typename?: 'Comic', id: string, cover: string, title: string }> | null } | null };
+export type TeamInfoQuery = { team: { one?: { id: string, avatar?: string | null, publicId: string, name: string, description?: string | null, socialLinks?: Array<string> | null, members?: { pageInfo: { totalCount?: number | null }, edges?: Array<{ node: { id: string, role: string, user?: { publicId: string, email: string, name: string, avatar?: string | null } | null } }> | null } | null, comics?: { pageInfo: { totalCount?: number | null }, edges?: Array<{ node: { id: string, title: string, alternativeTitles?: string | null, cover: string, updatedAt: any } }> | null } | null } | null } };
+
+export type UserAvatarQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserAvatarQuery = { user: { me?: { publicId: string, avatar?: string | null } | null } };
+
+export type AddBookmarkMutationVariables = Exact<{
+  input: BookmarkInput;
+}>;
+
+
+export type AddBookmarkMutation = { bookmark?: { add: { record?: { title: any, id: string } | null, issue?: { message?: string | null } | null } } | null };
+
+export type DeleteBookmarkMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteBookmarkMutation = { bookmark?: { delete: { record?: { title: any, id: string } | null, issue?: { message?: string | null } | null } } | null };
+
+export type RateComicMutationVariables = Exact<{
+  input: RateInput;
+}>;
+
+
+export type RateComicMutation = { comic: { rate: { record?: { totalCount: number, rating: number } | null, issue?: { message?: string | null } | null } } };
+
+export type ComicFragmentFragment = { id: string, rating?: { rating: number, totalCount: number } | null } & { ' $fragmentName'?: 'ComicFragmentFragment' };
+
+export type AddCommentToComicMutationVariables = Exact<{
+  input: CommentInput;
+}>;
+
+
+export type AddCommentToComicMutation = { comment: { create: { issue?: { message?: string | null } | null, record?: { repliesCount: number, isReply: boolean, content: string, createdAt: any, updatedAt: any, isPinned: boolean, id: string, reactions?: { like: number, dislike: number, userReactType?: ReactionType | null } | null, author?: { id: string, publicId: string, name: string, avatar?: string | null } | null } | null } } };
+
+export type CommentsByComicQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  paginate: PaginateInput;
+  sort: CommentSort;
+}>;
+
+
+export type CommentsByComicQuery = { comment: { allByComic: { pageInfo: { totalCount?: number | null, hasNextPage: boolean, endCursor?: string | null }, edges?: Array<{ node: { createdAt: any, content: string, id: string, isReply: boolean, updatedAt: any, isPinned: boolean, repliesCount: number, reactions?: { userReactType?: ReactionType | null, like: number, dislike: number } | null, author?: { id: string, publicId: string, avatar?: string | null, name: string } | null } }> | null } } };
+
+export type CommentRepliesQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  sort: CommentSort;
+}>;
+
+
+export type CommentRepliesQuery = { commentReply: { allByCommentId: { pageInfo: { totalCount?: number | null }, edges?: Array<{ node: { createdAt: any, content: string, isReply: boolean, id: string, updatedAt: any, mentionedUserPublicId?: string | null, isPinned: boolean, reactions?: { like: number, dislike: number, userReactType?: ReactionType | null } | null, author?: { id: string, publicId: string, avatar?: string | null, name: string } | null } }> | null } } };
+
+export type CommentsByChapterQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  paginate: PaginateInput;
+  sort: CommentSort;
+}>;
+
+
+export type CommentsByChapterQuery = { comment: { allByChapter: { pageInfo: { totalCount?: number | null, hasNextPage: boolean, endCursor?: string | null }, edges?: Array<{ node: { createdAt: any, content: string, isPinned: boolean, updatedAt: any, isReply: boolean, repliesCount: number, id: string, reactions?: { like: number, dislike: number } | null, author?: { id: string, publicId: string, avatar?: string | null, name: string } | null } }> | null } } };
+
+export type CommentFragmentFragment = { createdAt: any, content: string, isPinned: boolean, isReply: boolean, updatedAt: any, repliesCount: number, id: string, reactions?: { like: number, dislike: number, userReactType?: ReactionType | null } | null, author?: { id: string, publicId: string, avatar?: string | null, name: string } | null } & { ' $fragmentName'?: 'CommentFragmentFragment' };
+
+export type UpdateCommentMutationVariables = Exact<{
+  input: CommentUpdateInput;
+}>;
+
+
+export type UpdateCommentMutation = { comment: { update: { record?: { id: string, content: string } | null } } };
+
+export type DeleteCommentMutationVariables = Exact<{
+  commentId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteCommentMutation = { comment: { delete: { record?: { id: string } | null, issue?: { message?: string | null } | null } } };
+
+export type PinCommentMutationVariables = Exact<{
+  commentId: Scalars['ID']['input'];
+}>;
+
+
+export type PinCommentMutation = { comment: { pin: { record?: { id: string } | null, issue?: { message?: string | null } | null } } };
+
+export type UnpinCommentMutationVariables = Exact<{
+  commentId: Scalars['ID']['input'];
+}>;
+
+
+export type UnpinCommentMutation = { comment: { unpin: { record?: { id: string } | null, issue?: { message?: string | null } | null } } };
+
+export type _Fragment = { usersReadHistory?: { id: string } | null } & { ' $fragmentName'?: '_Fragment' };
+
+export type AddReadHistoryMutationVariables = Exact<{
+  input: AddReadHistoryInput;
+}>;
+
+
+export type AddReadHistoryMutation = { readHistory: { add: { record?: { id: string, chapter?: { id: string } | null } | null, issue?: { message?: string | null } | null } } };
+
+export type GenerateInviteLinkMutationVariables = Exact<{
+  teamId: Scalars['ID']['input'];
+}>;
+
+
+export type GenerateInviteLinkMutation = { team: { generateTeamInviteLink: { record?: string | null, issue?: { message?: string | null } | null } } };
+
+export type SendInviteEmailMutationVariables = Exact<{
+  teamId: Scalars['ID']['input'];
+  email: Scalars['String']['input'];
+}>;
+
+
+export type SendInviteEmailMutation = { team: { sendInviteToEmail: { record?: string | null } } };
+
+export type UserSettingQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserSettingQueryQuery = { user: { me?: { name: string, avatar?: string | null } | null } };
+
+export type ChapterImagesQueryVariables = Exact<{
+  comicId: Scalars['ID']['input'];
+  paginate: ChapterPaginateInput;
+}>;
+
+
+export type ChapterImagesQuery = { chapter: { all: { edges?: Array<{ node: { id: string, title?: string | null, volume: number, number: number, images?: Array<{ path?: string | null, aspectRatio?: string | null }> | null } }> | null, pageInfo: { hasNextPage: boolean, totalCount?: number | null, endCursor?: string | null } } } };
+
+export type LastChapterOfComicQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type LastChapterOfComicQuery = { comic: { one?: { title: string, chapters?: { edges?: Array<{ node: { id: string, volume: number, number: number } }> | null, pageInfo: { totalCount?: number | null } } | null } | null } };
+
+export type AddChapterMutationVariables = Exact<{
+  input: AddChapterInput;
+}>;
+
+
+export type AddChapterMutation = { chapter: { add: { record?: { id: string, volume: number, number: number } | null, issue?: { message?: string | null } | null } } };
+
+export type ComicBaseInfoQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ComicBaseInfoQuery = { comic: { one?: { id: string, title: string, cover: string, description?: string | null, status: ComicStatuses, maturityRating: MaturityRatings, language: string, createdAt: any, updatedAt: any, count?: number | null, rating?: { totalCount: number, rating: number } | null, genres?: Array<{ title: string } | null> | null, tags?: Array<{ title: string } | null> | null } | null } };
+
+export type DeleteComicMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteComicMutation = { comic: { delete: { record?: { id: string, title: string } | null } } };
+
+export type DashboardOverviewQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DashboardOverviewQuery = { user: { me?: { name: string, membersOf?: { edges?: Array<{ node: { role: string, team?: { id: string, name: string, avatar?: string | null, comics?: { edges?: Array<{ node: { id: string, title: string, cover: string, status: ComicStatuses, count?: number | null, updatedAt: any } }> | null } | null } | null } }> | null } | null, notifications?: { edges?: Array<{ node: { id: string, title: string, description: string, createdAt: any, type: NotificationTypes } }> | null } | null } | null } };
+
+export type DashboardStatisticsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DashboardStatisticsQuery = { user: { me?: { membersOf?: { edges?: Array<{ node: { team?: { id: string, name: string, comics?: { edges?: Array<{ node: { id: string, title: string, rating?: { rating: number, totalCount: number } | null, usersReadHistory?: { pageInfo: { totalCount?: number | null } } | null, comments?: { pageInfo: { totalCount?: number | null } } | null, subscriptions?: { pageInfo: { totalCount?: number | null } } | null } }> | null } | null } | null } }> | null } | null } | null } };
+
+export type DeleteUserTeamMutationVariables = Exact<{
+  teamId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteUserTeamMutation = { team: { delete: { record?: { id: string } | null } } };
+
+export type MeBookmarksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeBookmarksQuery = { user: { me?: { bookmarks?: { edges?: Array<{ node: { id: string, title: any, comics?: Array<{ id: string, title: string, cover: string, lastReadChapter?: { volume: number, id: string, number: number } | null }> | null } }> | null } | null } | null } };
+
+export type MeProfileInfoQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeProfileInfoQuery = { user: { me?: { name: string, publicId: string, avatar?: string | null, description?: string | null, background?: string | null, socialLinks?: Array<string> | null, membersOf?: { edges?: Array<{ node: { role: string, id: string, team?: { id: string, name: string, avatar?: string | null, description?: string | null, comics?: { edges?: Array<{ node: { id: string, title: string, cover: string } }> | null } | null } | null } }> | null } | null } | null } };
 
 export type UserInfoQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type UserInfoQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, avatar?: string | null, name: string, description?: string | null, background?: string | null, member?: Array<{ __typename?: 'TeamMember', id: string, role: string, comics?: Array<{ __typename?: 'Comic', id: string, cover: string, title: string }> | null, team?: { __typename?: 'Team', id: string, name: string, avatar?: string | null } | null }> | null } | null };
-
-export type ComicNameQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type ComicNameQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', title: string } | null };
-
-export type GetChaptersQueryVariables = Exact<{
-  comicId: Scalars['ID']['input'];
-  order?: InputMaybe<OrderBy>;
-  paginate?: InputMaybe<ChapterPaginateInput>;
-}>;
-
-
-export type GetChaptersQuery = { __typename?: 'Query', chapters?: { __typename?: 'ChapterResponse', count?: number | null, chapters?: Array<{ __typename?: 'Chapter', id: string, createdAt: any, number: number, volume: number, title?: string | null, usersReadHistory?: { __typename?: 'ReadingHistory', id: string } | null }> | null } | null };
+export type UserInfoQuery = { user: { one?: { id: string, avatar?: string | null, name: string, publicId: string, description?: string | null, background?: string | null, membersOf?: { edges?: Array<{ node: { id: string, role: string, comics?: Array<{ id: string, cover: string, title: string }> | null, team?: { id: string, description?: string | null, name: string, avatar?: string | null } | null } }> | null } | null } | null } };
 
 export type AddComicMutationVariables = Exact<{
   input: AddComicInput;
 }>;
 
 
-export type AddComicMutation = { __typename?: 'Mutation', addComic: { __typename: 'Comic', id: string, title: string } };
+export type AddComicMutation = { comic: { add: { issue?: { message?: string | null } | null, record?: { id: string, title: string } | null } } };
 
-export type ComicsQueryVariables = Exact<{
-  paginate?: InputMaybe<PaginateInput>;
-  where?: InputMaybe<ComicWhereInput>;
+export type ComicsWithFiltersQueryVariables = Exact<{
+  paginate: PaginateInput;
+  filter?: InputMaybe<ComicFilterInput>;
 }>;
 
 
-export type ComicsQuery = { __typename?: 'Query', comics?: Array<{ __typename?: 'Comic', id: string, cover: string, title: string, alternativeTitles?: string | null, updatedAt: any } | null> | null };
+export type ComicsWithFiltersQuery = { comic: { all: { pageInfo: { endCursor?: string | null, totalCount?: number | null, hasNextPage: boolean }, edges?: Array<{ node: { id: string, cover: string, title: string, alternativeTitles?: string | null, updatedAt: any } }> | null } } };
 
-export type GetComicsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetComicsQuery = { __typename?: 'Query', comics?: Array<{ __typename?: 'Comic', cover: string, title: string, id: string } | null> | null };
-
-export type ComicSelectionsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ComicSelectionsQuery = { __typename?: 'Query', genres?: Array<{ __typename?: 'Genre', id: number, title: string }> | null, tags?: Array<{ __typename?: 'Tag', id: number, title: string }> | null, me?: { __typename?: 'User', member?: Array<{ __typename?: 'TeamMember', team?: { __typename?: 'Team', id: string, avatar?: string | null, name: string } | null }> | null } | null };
-
-export type GetPopularComicsQueryVariables = Exact<{
+export type PopularComicsQueryVariables = Exact<{
   paginate: PaginateInput;
 }>;
 
 
-export type GetPopularComicsQuery = { __typename?: 'Query', popularComics?: Array<{ __typename?: 'Comic', title: string, cover: string, id: string } | null> | null };
+export type PopularComicsQuery = { comic: { popular: { edges?: Array<{ node: { title: string, cover: string, id: string } }> | null } } };
+
+export type UserComicForUpdateQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type UserComicForUpdateQuery = { comic: { one?: { title: string, alternativeTitles?: string | null, cover: string, description?: string | null, language: string, status: ComicStatuses, maturityRating: MaturityRatings, genres?: Array<{ id: number, title: string } | null> | null, tags?: Array<{ id: number, title: string } | null> | null, team?: { id: string, avatar?: string | null, name: string } | null } | null } };
 
 export type UpdateComicMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1113,122 +1873,73 @@ export type UpdateComicMutationVariables = Exact<{
 }>;
 
 
-export type UpdateComicMutation = { __typename?: 'Mutation', updateComic: { __typename: 'Comic' } };
+export type UpdateComicMutation = { comic: { update: { record?: { id: string } | null } } };
 
-export type GetUserComicQueryVariables = Exact<{
+export type UpdateCommentReactionMutationVariables = Exact<{
+  input: UpdateCommentReactionInput;
+}>;
+
+
+export type UpdateCommentReactionMutation = { comment: { updateReaction: { issue?: { message?: string | null } | null, record?: { reactions?: { like: number, dislike: number, userReactType?: ReactionType | null } | null } | null } } };
+
+export type DeleteChapterMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetUserComicQuery = { __typename?: 'Query', comic?: { __typename?: 'Comic', title: string, alternativeTitles?: string | null, cover: string, description?: string | null, language: string, status: ComicStatuses, maturityRating: MaturityRatings, genres?: Array<{ __typename?: 'Genre', id: number, title: string }> | null, tags?: Array<{ __typename?: 'Tag', id: number, title: string }> | null, team?: { __typename?: 'Team', id: string, avatar?: string | null, name: string } | null } | null };
+export type DeleteChapterMutation = { chapter: { delete: { record?: { id: string } | null, issue?: { message?: string | null } | null } } };
 
-export type AddCommentToComicMutationVariables = Exact<{
-  input: CommentInput;
-}>;
+export type UserComicsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AddCommentToComicMutation = { __typename?: 'Mutation', addComment: { __typename?: 'Comment', content: string, createdAt: any, id: string, author?: { __typename?: 'User', id: string, name: string, avatar?: string | null } | null, _count?: { __typename?: 'Count', replies?: number | null } | null } };
+export type UserComicsQuery = { user: { me?: { id: string, membersOf?: { edges?: Array<{ node: { id: string, team?: { id: string, name: string, comics?: { edges?: Array<{ node: { id: string, cover: string, title: string, alternativeTitles?: string | null, updatedAt: any } }> | null } | null } | null } }> | null } | null } | null } };
 
-export type _CommentFragment = { __typename?: 'Comment', _count?: { __typename?: 'Count', replies?: number | null } | null } & { ' $fragmentName'?: '_CommentFragment' };
+export type _TeamFragment = { id: string, avatar?: string | null, name: string } & { ' $fragmentName'?: '_TeamFragment' };
 
-export type GetCommentRepliesQueryVariables = Exact<{
-  commentId: Scalars['ID']['input'];
-}>;
-
-
-export type GetCommentRepliesQuery = { __typename?: 'Query', repliesOnCommentByCommentId?: Array<{ __typename?: 'Comment', content: string, createdAt: any, id: string, author?: { __typename?: 'User', name: string, avatar?: string | null } | null, _count?: { __typename?: 'Count', replies?: number | null } | null }> | null };
-
-export type CommentsByComicQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type CommentsByComicQuery = { __typename?: 'Query', commentsByComic: { __typename?: 'CommentResponse', count?: number | null, comments?: Array<{ __typename?: 'Comment', createdAt: any, content: string, id: string, _count?: { __typename?: 'Count', replies?: number | null } | null, author?: { __typename?: 'User', id: string, avatar?: string | null, name: string } | null }> | null } };
-
-export type CommentsByChapterQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type CommentsByChapterQuery = { __typename?: 'Query', commentsByChapter: { __typename?: 'CommentResponse', count?: number | null, comments?: Array<{ __typename?: 'Comment', createdAt: any, content: string, id: string, _count?: { __typename?: 'Count', replies?: number | null } | null, author?: { __typename?: 'User', id: string, avatar?: string | null, name: string } | null }> | null } };
-
-export type DeleteCommentMutationVariables = Exact<{
-  commentId: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteCommentMutation = { __typename?: 'Mutation', deleteComment?: { __typename?: 'Comment', id: string } | null };
-
-export type ChaptersByComicIdQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type ChaptersByComicIdQuery = { __typename?: 'Query', chapters?: { __typename?: 'ChapterResponse', count?: number | null, chapters?: Array<{ __typename?: 'Chapter', title?: string | null, volume: number, number: number, id: string, publishDate: any, price?: number | null }> | null } | null };
-
-export type GetUserComicsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetUserComicsQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, member?: Array<{ __typename?: 'TeamMember', id: string, team?: { __typename?: 'Team', id: string, name: string, comics?: Array<{ __typename?: 'Comic', id: string, cover: string, title: string, alternativeTitles?: string | null, updatedAt: any }> | null } | null }> | null } | null };
-
-export type MyTeamsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MyTeamsQuery = { __typename?: 'Query', me?: { __typename?: 'User', member?: Array<{ __typename?: 'TeamMember', team?: { __typename?: 'Team', id: string, name: string, avatar?: string | null } | null }> | null } | null };
-
-export type AddTeamMutationMutationVariables = Exact<{
-  input: AddTeamInput;
-}>;
-
-
-export type AddTeamMutationMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, name: string, avatar?: string | null } };
-
-export type _TeamFragment = { __typename?: 'Team', id: string, avatar?: string | null, name: string } & { ' $fragmentName'?: '_TeamFragment' };
-
-export type GetAuthMutationVariables = Exact<{
-  input?: InputMaybe<AuthInput>;
-}>;
-
-
-export type GetAuthMutation = { __typename?: 'Mutation', auth: { __typename?: 'User', id: string, avatar?: string | null } };
-
+export const ComicFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"comicFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comic"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rating"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<ComicFragmentFragment, unknown>;
+export const CommentFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"commentFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}},{"kind":"Field","name":{"kind":"Name","value":"userReactType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"isReply"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"repliesCount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CommentFragmentFragment, unknown>;
 export const _FragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"_"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Chapter"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"usersReadHistory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<_Fragment, unknown>;
-export const _CommentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"_Comment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"}}]}}]}}]} as unknown as DocumentNode<_CommentFragment, unknown>;
 export const _TeamFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"_Team"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Team"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]} as unknown as DocumentNode<_TeamFragment, unknown>;
-export const GetComicPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComicPage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReadedChapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}},{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<GetComicPageQuery, GetComicPageQueryVariables>;
-export const GetComicMetaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComicMeta"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]} as unknown as DocumentNode<GetComicMetaQuery, GetComicMetaQueryVariables>;
-export const SetReadingHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"setReadingHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chapterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addReadingHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}}},{"kind":"Argument","name":{"kind":"Name","value":"chapterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chapterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<SetReadingHistoryMutation, SetReadingHistoryMutationVariables>;
-export const SearchComicsBySearchTextDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"searchComicsBySearchText"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"searchText"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]} as unknown as DocumentNode<SearchComicsBySearchTextQuery, SearchComicsBySearchTextQueryVariables>;
-export const AddTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<AddTeamMutation, AddTeamMutationVariables>;
-export const UserSettingQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserSettingQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}}]}}]}}]}}]} as unknown as DocumentNode<UserSettingQueryQuery, UserSettingQueryQueryVariables>;
-export const GetChapterImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChapterImages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ChapterPaginateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"images"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}},{"kind":"Field","name":{"kind":"Name","value":"aspectRatio"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetChapterImagesQuery, GetChapterImagesQueryVariables>;
-export const GetComicAndLastChapterDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComicAndLastChapterData"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}}]}}]}}]} as unknown as DocumentNode<GetComicAndLastChapterDataQuery, GetComicAndLastChapterDataQueryVariables>;
-export const AddChapterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addChapter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"addChapterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addChapter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}}]}}]} as unknown as DocumentNode<AddChapterMutation, AddChapterMutationVariables>;
-export const GetComicPageDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComicPageData"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]} as unknown as DocumentNode<GetComicPageDataQuery, GetComicPageDataQueryVariables>;
-export const DeleteComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteComic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]} as unknown as DocumentNode<DeleteComicMutation, DeleteComicMutationVariables>;
-export const GenerateInviteLinkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"generateInviteLink"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"generateTeamInviteLink"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}},{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"StringValue","value":"Viewer","block":false}}]}]}}]} as unknown as DocumentNode<GenerateInviteLinkMutation, GenerateInviteLinkMutationVariables>;
-export const SendIviteEmailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendIviteEmail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendInviteToEmail"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}},{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"StringValue","value":"Viewer","block":false}}]}]}}]} as unknown as DocumentNode<SendIviteEmailMutation, SendIviteEmailMutationVariables>;
-export const DeleteUserTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteUserTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteUserTeamMutation, DeleteUserTeamMutationVariables>;
-export const MyTeamInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyTeamInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<MyTeamInfoQuery, MyTeamInfoQueryVariables>;
-export const ProfileQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ProfileQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"background"}},{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ProfileQueryQuery, ProfileQueryQueryVariables>;
-export const TeamInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TeamInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<TeamInfoQuery, TeamInfoQueryVariables>;
-export const UserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"background"}},{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UserInfoQuery, UserInfoQueryVariables>;
-export const ComicNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]} as unknown as DocumentNode<ComicNameQuery, ComicNameQueryVariables>;
-export const GetChaptersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChapters"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderBy"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ChapterPaginateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"usersReadHistory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetChaptersQuery, GetChaptersQueryVariables>;
-export const AddComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddComicInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addComic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comic"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<AddComicMutation, AddComicMutationVariables>;
-export const ComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Comics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ComicWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<ComicsQuery, ComicsQueryVariables>;
-export const GetComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"50"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetComicsQuery, GetComicsQueryVariables>;
-export const ComicSelectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicSelections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComicSelectionsQuery, ComicSelectionsQueryVariables>;
-export const GetPopularComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPopularComics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"popularComics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetPopularComicsQuery, GetPopularComicsQueryVariables>;
-export const UpdateComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComicInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}}]}}]}}]} as unknown as DocumentNode<UpdateComicMutation, UpdateComicMutationVariables>;
-export const GetUserComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"maturityRating"}}]}}]}}]} as unknown as DocumentNode<GetUserComicQuery, GetUserComicQueryVariables>;
-export const AddCommentToComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddCommentToComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"}}]}}]}}]}}]} as unknown as DocumentNode<AddCommentToComicMutation, AddCommentToComicMutationVariables>;
-export const GetCommentRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentReplies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"repliesOnCommentByCommentId"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"}}]}}]}}]}}]} as unknown as DocumentNode<GetCommentRepliesQuery, GetCommentRepliesQueryVariables>;
-export const CommentsByComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommentsByComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commentsByComic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"comments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"_count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"}}]}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommentsByComicQuery, CommentsByComicQueryVariables>;
-export const CommentsByChapterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommentsByChapter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commentsByChapter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chapterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"comments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"_count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"}}]}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommentsByChapterQuery, CommentsByChapterQueryVariables>;
-export const DeleteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteCommentMutation, DeleteCommentMutationVariables>;
-export const ChaptersByComicIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ChaptersByComicId"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publishDate"}},{"kind":"Field","name":{"kind":"Name","value":"price"}}]}}]}}]}}]} as unknown as DocumentNode<ChaptersByComicIdQuery, ChaptersByComicIdQueryVariables>;
-export const GetUserComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserComics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserComicsQuery, GetUserComicsQueryVariables>;
-export const MyTeamsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyTeams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"member"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyTeamsQuery, MyTeamsQueryVariables>;
-export const AddTeamMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddTeamMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]} as unknown as DocumentNode<AddTeamMutationMutation, AddTeamMutationMutationVariables>;
-export const GetAuthDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"getAuth"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AuthInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auth"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]} as unknown as DocumentNode<GetAuthMutation, GetAuthMutationVariables>;
+export const SearchComicsBySearchTextDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"searchComicsBySearchText"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"searchText"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SearchComicsBySearchTextQuery, SearchComicsBySearchTextQueryVariables>;
+export const ChaptersByComicIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ChaptersByComicId"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderBy"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChapterPaginateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publishDate"}},{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"usersReadHistory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ChaptersByComicIdQuery, ChaptersByComicIdQueryVariables>;
+export const ComicInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"maturityRating"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"usersReadHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"0"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"rating"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"bookmarks"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"0"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastReadChapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComicInfoQuery, ComicInfoQueryVariables>;
+export const ComicMetaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicMeta"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]}}]} as unknown as DocumentNode<ComicMetaQuery, ComicMetaQueryVariables>;
+export const ComicFormSelectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicFormSelections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genre"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"tag"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComicFormSelectionsQuery, ComicFormSelectionsQueryVariables>;
+export const MyTeamsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyTeams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyTeamsQuery, MyTeamsQueryVariables>;
+export const AddTeamMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddTeamMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddTeamInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"create"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddTeamMutationMutation, AddTeamMutationMutationVariables>;
+export const TeamInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TeamInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"socialLinks"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<TeamInfoQuery, TeamInfoQueryVariables>;
+export const UserAvatarDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserAvatar"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<UserAvatarQuery, UserAvatarQueryVariables>;
+export const AddBookmarkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addBookmark"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BookmarkInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bookmark"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"add"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddBookmarkMutation, AddBookmarkMutationVariables>;
+export const DeleteBookmarkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteBookmark"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bookmark"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteBookmarkMutation, DeleteBookmarkMutationVariables>;
+export const RateComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RateComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RateComicMutation, RateComicMutationVariables>;
+export const AddCommentToComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddCommentToComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"create"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"repliesCount"}},{"kind":"Field","name":{"kind":"Name","value":"isReply"}},{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}},{"kind":"Field","name":{"kind":"Name","value":"userReactType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddCommentToComicMutation, AddCommentToComicMutationVariables>;
+export const CommentsByComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommentsByComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentSort"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allByComic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isReply"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userReactType"}},{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}}]}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"repliesCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommentsByComicQuery, CommentsByComicQueryVariables>;
+export const CommentRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommentReplies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentSort"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commentReply"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allByCommentId"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"isReply"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}},{"kind":"Field","name":{"kind":"Name","value":"userReactType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mentionedUserPublicId"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommentRepliesQuery, CommentRepliesQueryVariables>;
+export const CommentsByChapterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommentsByChapter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentSort"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allByChapter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chapterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}}]}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"isReply"}},{"kind":"Field","name":{"kind":"Name","value":"repliesCount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommentsByChapterQuery, CommentsByChapterQueryVariables>;
+export const UpdateCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpdateCommentMutation, UpdateCommentMutationVariables>;
+export const DeleteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteCommentMutation, DeleteCommentMutationVariables>;
+export const PinCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PinComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pin"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<PinCommentMutation, PinCommentMutationVariables>;
+export const UnpinCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnpinComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unpin"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UnpinCommentMutation, UnpinCommentMutationVariables>;
+export const AddReadHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addReadHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddReadHistoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"readHistory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"add"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddReadHistoryMutation, AddReadHistoryMutationVariables>;
+export const GenerateInviteLinkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"generateInviteLink"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"generateTeamInviteLink"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}},{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"StringValue","value":"Viewer","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GenerateInviteLinkMutation, GenerateInviteLinkMutationVariables>;
+export const SendInviteEmailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendInviteEmail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendInviteToEmail"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}},{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"StringValue","value":"Viewer","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"}}]}}]}}]}}]} as unknown as DocumentNode<SendInviteEmailMutation, SendInviteEmailMutationVariables>;
+export const UserSettingQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserSettingQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<UserSettingQueryQuery, UserSettingQueryQueryVariables>;
+export const ChapterImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"chapterImages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChapterPaginateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"comicId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"comicId"}}},{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"EnumValue","value":"asc"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}},{"kind":"Field","name":{"kind":"Name","value":"images"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}},{"kind":"Field","name":{"kind":"Name","value":"aspectRatio"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ChapterImagesQuery, ChapterImagesQueryVariables>;
+export const LastChapterOfComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"LastChapterOfComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"chapters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}},{"kind":"ObjectField","name":{"kind":"Name","value":"before"},"value":{"kind":"NullValue"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"EnumValue","value":"desc"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<LastChapterOfComicQuery, LastChapterOfComicQueryVariables>;
+export const AddChapterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddChapter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"addChapterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"add"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddChapterMutation, AddChapterMutationVariables>;
+export const ComicBaseInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicBaseInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"maturityRating"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"rating"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}}]}},{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComicBaseInfoQuery, ComicBaseInfoQueryVariables>;
+export const DeleteComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteComicMutation, DeleteComicMutationVariables>;
+export const DashboardOverviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DashboardOverview"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"notifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<DashboardOverviewQuery, DashboardOverviewQueryVariables>;
+export const DashboardStatisticsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DashboardStatistics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"after"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"rating"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"usersReadHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"comments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"after"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"subscriptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<DashboardStatisticsQuery, DashboardStatisticsQueryVariables>;
+export const DeleteUserTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteUserTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteUserTeamMutation, DeleteUserTeamMutationVariables>;
+export const MeBookmarksDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MeBookmarks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bookmarks"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"after"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"lastReadChapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"volume"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MeBookmarksQuery, MeBookmarksQueryVariables>;
+export const MeProfileInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MeProfileInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"background"}},{"kind":"Field","name":{"kind":"Name","value":"socialLinks"}},{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MeProfileInfoQuery, MeProfileInfoQueryVariables>;
+export const UserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"publicId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"background"}},{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<UserInfoQuery, UserInfoQueryVariables>;
+export const AddComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddComicInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"add"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddComicMutation, AddComicMutationVariables>;
+export const ComicsWithFiltersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ComicsWithFilters"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ComicFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"all"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}},{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<ComicsWithFiltersQuery, ComicsWithFiltersQueryVariables>;
+export const PopularComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PopularComics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"popular"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paginate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<PopularComicsQuery, PopularComicsQueryVariables>;
+export const UserComicForUpdateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserComicForUpdate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genres"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"maturityRating"}}]}}]}}]}}]} as unknown as DocumentNode<UserComicForUpdateQuery, UserComicForUpdateQueryVariables>;
+export const UpdateComicDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateComic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateComicInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comic"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpdateComicMutation, UpdateComicMutationVariables>;
+export const UpdateCommentReactionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCommentReaction"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCommentReactionInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateReaction"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reactions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"like"}},{"kind":"Field","name":{"kind":"Name","value":"dislike"}},{"kind":"Field","name":{"kind":"Name","value":"userReactType"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpdateCommentReactionMutation, UpdateCommentReactionMutationVariables>;
+export const DeleteChapterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteChapter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chapter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"delete"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"record"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteChapterMutation, DeleteChapterMutationVariables>;
+export const UserComicsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userComics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"membersOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paginate"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"first"},"value":{"kind":"NullValue"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"cover"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"alternativeTitles"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<UserComicsQuery, UserComicsQueryVariables>;

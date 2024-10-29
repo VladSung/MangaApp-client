@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/draft/chapter'
+export { default } from '@src/pages/draft/chapter';

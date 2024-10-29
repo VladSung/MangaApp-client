@@ -10,7 +10,7 @@ import {
     UseTranslationOptions,
 } from 'react-i18next';
 
-import { getOptions, languages } from './settings';
+import { getOptions, languages } from './config';
 
 const runsOnServerSide = typeof window === 'undefined';
 

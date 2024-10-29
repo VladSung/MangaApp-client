@@ -6,10 +6,21 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "publish-not-started": "Publication has not yet started",
+    "description": "Description",
+    "genres-and-tags": "Genres and tags",
+    "publish-not-started": "Публикация еще не началась",
     "start-reading": "Start reading",
     "continue": "Continue",
     "add-bookmark": "Add to bookmarks",
-    "edit": "Edit",
-    "creators": "Creators"
+    "manage": "Manage",
+    "creators": "Creators",
+    "notification.on": "Уведомления включены",
+    "notification.off": "Включить уведомления",
+    "notification.enabled": "Уведомления включены",
+    "notification.disabled": "Уведомления отключены",
+    "notification.enabled.message": "Мы уведомим вас, когда начнется публикация глав",
+    "notification.disabled.message": "Вы больше не будете получать уведомления о новых главах",
+    "expected-start-date": "Ожидаемая дата начала публикации",
+    "publication-not-started": "Публикация еще не началась",
+    "enable-notifications": "Включить уведомления"
 }

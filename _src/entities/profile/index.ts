@@ -1,3 +1,3 @@
-export { ProfileMenu } from './menu';
-export { ProfileHeader } from './header';
-export {Content as ProfileContent } from './content'
+export * from './ui/content';
+export * from './ui/header';
+export * from './ui/menu';

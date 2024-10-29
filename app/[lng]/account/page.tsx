@@ -4,4 +4,4 @@ export const metadata: Metadata = {
     title: 'Account'
 }
 
-export { default } from '@src/pages/[lng]/account'
+export { AccountPage as default } from '@src/pages/account';

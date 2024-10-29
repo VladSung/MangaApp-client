@@ -1,3 +1,4 @@
-export { AddComic as AddComicWidget } from './add';
-export { default as PopularComicsWidget } from './popular';
-export { UpdateComic as UpdateComicWidget } from './update';
+export * from './add';
+export * from './list-with-filters';
+export * from './popular';
+export * from './update';

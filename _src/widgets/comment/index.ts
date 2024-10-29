@@ -1,1 +1,1 @@
-export { default as CommentList } from './list';
+export { CommentsList } from './ui/list';

@@ -1,54 +1,45 @@
 'use client'
 import { gql, useMutation } from '@apollo/client';
+import { useWindowScroll } from '@mantine/hooks';
 import { useEffect } from 'react';
 
-import { graphql } from '@src/shared/api/graphql';
-import { getComicChapters } from '@src/shared/api/queries';
-import { useScrollIntoView, useWindowScroll } from '@mantine/hooks';
+import { addReadHistoryMutation } from './api';
 
+export const AddHistory = ({
+    params,
+    chapterId,
+}: {
+    params: { id: string };
+    chapterId?: string | null;
+}) => {
+    const scrollPosition = useWindowScroll();
 
-const addReadingHistoryMutation = graphql(`
-    mutation setReadingHistory($comicId:ID!, $chapterId:ID!){
-        addReadingHistory(comicId:$comicId, chapterId:$chapterId){
-            id
-            chapter{
-                id
-            }
-        }
-    }
-`)
-
-
-export const AddHistory = ({ params, chapterId }: { params: { id: string }, chapterId?: string | null }) => {
-    const scrollPosition = useWindowScroll()
-
-    const [addReadingHistory] = useMutation(addReadingHistoryMutation, { errorPolicy: 'all' })
+    const [addReadHistory] = useMutation(addReadHistoryMutation, { errorPolicy: 'all' });
 
     useEffect(() => {
-        console.log(`${chapterId}: ${scrollPosition[1]}`)
         return () => {
             if (chapterId) {
-                addReadingHistory({
-                    variables: { comicId: params.id, chapterId: chapterId },
+                addReadHistory({
+                    variables: { input: { comicId: params.id, chapterId: chapterId } },
                     update: (cache, { data: history }) => {
                         cache.writeFragment({
-                            id: `Chapter:${history?.addReadingHistory?.chapter?.id}`,
+                            id: `Chapter:${history?.readHistory?.add?.record?.chapter?.id}`,
                             fragment: gql`
-                            fragment _ on Chapter {
-                            usersReadHistory {
-                                id
-                            }
-                            }
-                        `,
+                                fragment _ on Chapter {
+                                    usersReadHistory {
+                                        id
+                                    }
+                                }
+                            `,
                             data: {
-                                usersReadHistory: history?.addReadingHistory
-                            }
+                                usersReadHistory: history?.readHistory?.add?.record,
+                            },
                         });
-                    }
+                    },
                 });
             }
-        }
-    }, [chapterId])
+        };
+    }, [chapterId]);
 
-    return <div></div>
-}
+    return <div></div>;
+};

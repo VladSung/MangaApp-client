@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/dashboard/creator/comic/add'
+export { AddComic as default } from '@src/pages/dashboard/creator/comic/add';

@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/library';
+export { LibraryPage as default } from '@src/pages/library';

@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/dashboard/creator';
+export { DashboardOverviewPage as default } from '@src/pages/dashboard/creator/overview';

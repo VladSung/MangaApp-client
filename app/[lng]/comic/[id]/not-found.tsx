@@ -1,1 +1,1 @@
-export { default } from '@src/shared/ui/not-found'
+export { NotFoundPage as default } from '@src/shared/ui';

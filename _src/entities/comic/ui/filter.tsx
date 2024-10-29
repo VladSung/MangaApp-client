@@ -1,23 +1,39 @@
-import { Button, Flex, InputLabel, Loader, MultiSelect, NumberInput, Paper, Select, Slider, TextInput, Title } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { ComicStatuses, MaturityRatings } from "@src/shared/api/graphql"
-import { createContext, memo, useContext } from "react"
+'use client';
+import {
+    Button,
+    Chip,
+    ChipGroup,
+    Flex,
+    Group,
+    InputLabel,
+    Loader,
+    MultiSelect,
+    NumberInput,
+    Paper,
+    Select,
+    TextInput,
+    Title,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { ComicStatuses, MaturityRatings } from '@src/shared/api';
+import { createContext, useContext } from 'react';
 
 export type FilterInputs = {
-    searchText?: string
-    status?: ComicStatuses | null
-    maturityRating?: MaturityRatings | null
+    chaptersCount?: string;
+    searchText?: string;
+    status?: ComicStatuses | null;
+    maturityRating?: MaturityRatings | null;
     year: {
-        min: number | null
-        max: number | null
-    }
+        min: number | null;
+        max: number | null;
+    };
     rating: {
-        min: number | null
-        max: number | null
-    }
-    genres: string[]
-    tags: string[]
-}
+        min: number | null;
+        max: number | null;
+    };
+    genres: string[];
+    tags: string[];
+};
 
 const initialValues = {
     searchText: '',
@@ -25,88 +41,166 @@ const initialValues = {
     maturityRating: null,
     year: {
         min: null,
-        max: null
+        max: null,
     },
     rating: {
         min: null,
-        max: null
+        max: null,
     },
     genres: [],
     tags: [],
-
-}
+};
 
 type Props = {
     genres: string[];
     tags: string[];
     loading: boolean;
-}
+};
 
-export const FilterContext = createContext<{ filter: FilterInputs, setFilter: (data: FilterInputs) => void }>({
+export const FilterContext = createContext<{
+    filter: FilterInputs;
+    setFilter: (data: FilterInputs) => void;
+}>({
     filter: initialValues,
-    setFilter: () => { }
-})
+    setFilter: () => {},
+});
 
 export const Filter = ({ genres, loading, tags }: Props) => {
-    const { setFilter } = useContext(FilterContext)
+    const { setFilter } = useContext(FilterContext);
+
     const form = useForm<FilterInputs>({
         mode: 'uncontrolled',
-        onValuesChange: setFilter,
-        initialValues
-    })
-
+        // onValuesChange: setFilter,
+        initialValues,
+    });
 
     return (
-        <form onReset={() => form.resetDirty()}>
-            <Paper maw={320} miw={320} withBorder radius='md' p='lg'>
-                <Flex justify='space-between'>
-                    <Title order={4} mb='lg'>Filters</Title>
-                    <Button onClick={() => { form.reset(); form.setValues(initialValues) }} size="compact-sm" variant="subtle">Сбросить фильтры</Button>
+        <form
+            onReset={() => form.resetDirty()}
+            onSubmit={form.onSubmit((values) => {
+                setFilter(values);
+            })}
+        >
+            <Paper maw={320} miw={320} withBorder radius="md" p="lg">
+                <Flex justify="space-between">
+                    <Title order={4} mb="lg">
+                        Filters
+                    </Title>
+                    <Button
+                        onClick={() => {
+                            form.reset();
+                            form.setValues(initialValues);
+                        }}
+                        size="compact-sm"
+                        variant="subtle"
+                    >
+                        Сбросить фильтры
+                    </Button>
                 </Flex>
-                <TextInput key={form.key('searchText')} {...form.getInputProps('searchText')} mb='md' placeholder="Filter by title" />
+                <TextInput
+                    key={form.key('searchText')}
+                    {...form.getInputProps('searchText')}
+                    mb="md"
+                    placeholder="Filter by title"
+                />
+                <InputLabel mb="sm">Chapters count</InputLabel>
+                <ChipGroup
+                    multiple
+                    key={form.key('chaptersCount')}
+                    {...form.getInputProps('chaptersCount')}
+                >
+                    <Group gap="xs" mb="md">
+                        <Chip variant="filled" value="0" size="sm">
+                            0-50
+                        </Chip>
+                        <Chip variant="filled" value="50" size="sm">
+                            50-100
+                        </Chip>
+                        <Chip variant="filled" value="100" size="sm">
+                            100+
+                        </Chip>
+                    </Group>
+                </ChipGroup>
 
-                <Select key={form.key('status')} clearable mb='md' placeholder="All" {...form.getInputProps('status')} label="Status" data={Object.values(ComicStatuses)} />
-                <Select key={form.key('maturityRating')} clearable mb='md' placeholder="All" {...form.getInputProps('maturityRating')} label="Maturity rating" data={Object.values(MaturityRatings)} />
-                <InputLabel mb='sm'>Publish year</InputLabel>
-                <Flex gap='sm' mb='md'>
-                    <NumberInput key={form.key('year.min')}  {...form.getInputProps('year.min')} min={0} max={new Date().getFullYear()}
-                        placeholder="From" />
-                    <NumberInput key={form.key('year.max')}  {...form.getInputProps('year.max')} min={0} max={new Date().getFullYear()}
-                        placeholder="To" />
+                <Select
+                    key={form.key('status')}
+                    clearable
+                    mb="md"
+                    placeholder="All"
+                    {...form.getInputProps('status')}
+                    label="Status"
+                    data={Object.values(ComicStatuses)}
+                />
+                <Select
+                    key={form.key('maturityRating')}
+                    clearable
+                    mb="md"
+                    placeholder="All"
+                    {...form.getInputProps('maturityRating')}
+                    label="Maturity rating"
+                    data={Object.values(MaturityRatings)}
+                />
+                <InputLabel mb="sm">Publish year</InputLabel>
+                <Flex gap="sm" mb="md">
+                    <NumberInput
+                        key={form.key('year.min')}
+                        {...form.getInputProps('year.min')}
+                        min={0}
+                        max={new Date().getFullYear()}
+                        placeholder="From"
+                    />
+                    <NumberInput
+                        key={form.key('year.max')}
+                        {...form.getInputProps('year.max')}
+                        min={0}
+                        max={new Date().getFullYear()}
+                        placeholder="To"
+                    />
                 </Flex>
 
-                <InputLabel mb='sm'>Rating</InputLabel>
-                <Flex gap='sm' mb='md'>
-                    <NumberInput key={form.key('rating.max')} {...form.getInputProps('rating.max')} min={0} max={10}
-                        placeholder="From" />
-                    <NumberInput key={form.key('rating.min')} {...form.getInputProps('rating.min')} min={0} max={10}
-                        placeholder="To" />
+                <InputLabel mb="sm">Rating</InputLabel>
+                <Flex gap="sm" mb="md">
+                    <NumberInput
+                        key={form.key('rating.max')}
+                        {...form.getInputProps('rating.max')}
+                        min={0}
+                        max={10}
+                        placeholder="From"
+                    />
+                    <NumberInput
+                        key={form.key('rating.min')}
+                        {...form.getInputProps('rating.min')}
+                        min={0}
+                        max={10}
+                        placeholder="To"
+                    />
                 </Flex>
                 <MultiSelect
-                    mb='md'
-                    label='Genres'
+                    mb="md"
+                    label="Genres"
                     placeholder="Select genres"
                     data={genres}
-                    rightSection={loading && <Loader size='xs' />}
+                    rightSection={loading && <Loader size="xs" />}
                     key={form.key('genres')}
                     {...form.getInputProps('genres')}
                     maxValues={7}
-                    w='100%'
+                    w="100%"
                     searchable
                 />
                 <MultiSelect
-                    mb='md'
-                    label='Tags'
+                    mb="md"
+                    label="Tags"
                     placeholder="Select tags"
                     data={tags}
-                    rightSection={loading && <Loader size='xs' />}
+                    rightSection={loading && <Loader size="xs" />}
                     key={form.key('tags')}
                     {...form.getInputProps('tags')}
                     maxValues={15}
-                    w='100%'
+                    w="100%"
                     searchable
                 />
+                <Button type="submit">Apply</Button>
             </Paper>
         </form>
-    )
-}
+    );
+};

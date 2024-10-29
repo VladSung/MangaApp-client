@@ -6,7 +6,6 @@ import {
     NextSSRInMemoryCache,
 } from '@apollo/experimental-nextjs-app-support/ssr';
 import { getAccessToken } from '@auth0/nextjs-auth0';
-
 import { config } from '@src/shared/config';
 
 import { apolloLinks } from './links/links';

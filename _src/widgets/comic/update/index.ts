@@ -1,0 +1,1 @@
+export { UpdateComic } from './ui';

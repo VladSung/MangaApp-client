@@ -1,1 +1,1 @@
-export { default } from '@src/pages/[lng]/user/[userId]';
+export { UserPage as default } from '@src/pages/user/[userId]';

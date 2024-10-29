@@ -1,1 +1,2 @@
-export { Comment } from './ui';
+export { Comment } from './ui/comment';
+export type * from './ui/types';
