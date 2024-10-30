@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: '/[lng]/dashboard/',
         },
-        sitemap: 'https://acme.com/sitemap.xml',
+        // sitemap: 'https://acme.com/sitemap.xml',
     }
 }
