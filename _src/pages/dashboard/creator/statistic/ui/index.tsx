@@ -173,7 +173,7 @@ export const DashboardStatisticsPage = () => {
                             <Title order={4} mb="md">
                                 Views and Likes Over Time
                             </Title>
-                            <ResponsiveContainer width="100%" height={300}>
+                            {/* <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={lineChartData}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="name" />
@@ -193,7 +193,7 @@ export const DashboardStatisticsPage = () => {
                                         stroke="#82ca9d"
                                     />
                                 </LineChart>
-                            </ResponsiveContainer>
+                            </ResponsiveContainer> */}
                         </Card>
                     </Grid.Col>
                     <Grid.Col span={4}>
@@ -201,7 +201,7 @@ export const DashboardStatisticsPage = () => {
                             <Title order={4} mb="md">
                                 Views Distribution
                             </Title>
-                            <ResponsiveContainer width="100%" height={300}>
+                            {/* <ResponsiveContainer width="100%" height={300}>
                                 <PieChart>
                                     <Pie
                                         data={pieChartData}
@@ -221,7 +221,7 @@ export const DashboardStatisticsPage = () => {
                                     </Pie>
                                     <Tooltip />
                                 </PieChart>
-                            </ResponsiveContainer>
+                            </ResponsiveContainer> */}
                         </Card>
                     </Grid.Col>
                 </Grid>

@@ -32,15 +32,14 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
     });
 
     const onSubmit = async (data: ComicUpdateFormInput) => {
-        if (data.cover) {
-            const image = await uploadImage(data.cover, false);
+            const image = data.cover ? await uploadImage(data.cover, false) : undefined;
             updateComic({
                 variables: {
                     id: comicId,
                     input: {
                         title: data.title,
                         alternativeTitles: data.alternativeTitles,
-                        cover: image.data?.key ?? undefined,
+                        cover: image?.data?.key,
                         genres: data.genres,
                         description: data.description,
                         language: 'ru',
@@ -69,7 +68,6 @@ export const UpdateComic = ({ comicId }: { comicId: string }) => {
                     });
                     console.log(error);
                 });
-        }
     };
 
     if (comicLoading || selectionsLoading) {

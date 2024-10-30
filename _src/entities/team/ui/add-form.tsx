@@ -7,7 +7,7 @@ import { OneImageUpload } from '@src/entities/image-upload';
 export interface FormInput {
     name: string;
     description: string;
-    cover?: FileWithPath;
+    cover: FileWithPath | null;
 }
 
 type UseFormContext = () => UseFormReturnType<
@@ -30,6 +30,7 @@ export const AddFormModal = ({ open, t, onSubmit, ImageUpload, handleClose }: Ad
         initialValues: {
             name: '',
             description: '',
+            cover: null
         },
     });
 
@@ -63,6 +64,7 @@ export const AddFormModal = ({ open, t, onSubmit, ImageUpload, handleClose }: Ad
                         }}
                     >
                         <ImageUpload
+                            imageFile={form.getValues().cover}
                             height={200}
                             width={200}
                             resolution="(256 x 256 px)"

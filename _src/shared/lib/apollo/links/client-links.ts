@@ -6,7 +6,7 @@ export const errorClientLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
         for (const error of graphQLErrors) {
             notifications.show({
-                title: String(error.extensions.code),
+                title: String(error.extensions?.code),
                 message: error.message,
                 color: 'red',
                 autoClose: 5000,

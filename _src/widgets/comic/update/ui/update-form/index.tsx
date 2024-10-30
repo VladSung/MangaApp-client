@@ -83,7 +83,6 @@ export const UpdateForm = ({ selectedValues, onSubmit, selectionValues }: ComicU
             genres: hasLength({ min: 1, max: 5 }, 'Genres must be between 1 and 5'),
             tags: hasLength({ min: 1, max: 15 }, 'Tags must be between 1 and 15'),
             teams: isNotEmpty('Team is required'),
-            cover: isNotEmpty('Cover is required'),
         },
     });
 

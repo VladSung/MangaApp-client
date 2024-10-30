@@ -62,9 +62,8 @@ export const DashboardTeamPage = async ({ params }: Props) => {
                                 )
                         )}
                     </ComicGrid>
-                    {(team?.comics?.pageInfo.totalCount || 0) < 1 && (
-                        <Title order={4}>Nothing to show</Title>
-                    )}
+                    {(team?.comics?.pageInfo.totalCount || team?.comics?.edges?.length || 0) <
+                        1 && <Title order={4}>Nothing to show</Title>}
                 </AppShellSection>
             </Paper>
         </Container>

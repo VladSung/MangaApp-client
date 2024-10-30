@@ -2,7 +2,7 @@ import { useLoadableQuery } from '@apollo/client';
 import { Input, Loader, Modal, ScrollAreaAutosize, Stack } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
 import { SearchComicsBySearchTextQuery } from '@src/shared/api';
-import { Suspense, useEffect } from 'react';
+import { ChangeEvent, Suspense, useEffect } from 'react';
 
 import { searchComicsBySearchTextQuery } from './api';
 import { SearchComicList } from './list';
@@ -39,7 +39,9 @@ export const SearchComicByName = ({
             <Input
                 mb="lg"
                 placeholder="Please enter more than 2 characters to search"
-                onChange={(e) => setSearchText(e.target.value.trim())}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setSearchText(e.target.value.trim())
+                }
             />
 
             <Suspense

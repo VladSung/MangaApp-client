@@ -8,10 +8,13 @@ import Link from 'next/link';
 
 import { addChapterMutation, lastChapterOfComicQuery } from '../api';
 import { ChapterUploadForm, OnSubmitHandler } from './form';
+import { PageProps } from '@src/shared/api';
+import { use } from 'react';
 
-export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: string } }) => {
+export const ChapterUploadPage = ({ params }: PageProps<{ comicId: string }>) => {
+    const { comicId, lng } = use(params);
     const { data: comicData, loading } = useQuery(lastChapterOfComicQuery, {
-        variables: { id: params.comicId },
+        variables: { id: comicId },
         fetchPolicy: 'network-only',
     });
 
@@ -21,7 +24,7 @@ export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: 
             refetchQueries: [
                 {
                     query: lastChapterOfComicQuery,
-                    variables: { id: params.comicId },
+                    variables: { id: comicId },
                 },
                 chaptersByComicIdQuery,
             ],
@@ -30,7 +33,7 @@ export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: 
 
     const onSubmit: OnSubmitHandler = async (data, form) => {
         const uploadFormData = new FormData();
-        uploadFormData.append('id', params.comicId);
+        uploadFormData.append('id', comicId);
         uploadFormData.append('type', 'chapter');
 
         if (data) {
@@ -55,7 +58,7 @@ export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: 
             uploadChapter({
                 variables: {
                     input: {
-                        comicId: params.comicId,
+                        comicId: comicId,
                         volume: data?.volume,
                         number: data.number,
                         title: data.name,
@@ -106,7 +109,7 @@ export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: 
                 <Anchor href="/dashboard/comic" component={Link}>
                     Projects
                 </Anchor>
-                <Anchor href={`/dashboard/comic/${params.comicId}`} component={Link}>
+                <Anchor href={`/dashboard/comic/${comicId}`} component={Link}>
                     {comicData?.comic.one?.title}
                 </Anchor>
                 <Anchor>New chapter</Anchor>
@@ -119,7 +122,8 @@ export const ChapterUploadPage = ({ params }: { params: { comicId: string; lng: 
                     submitLoading={uploadChapterLoading}
                     number={(comicData?.comic.one?.chapters?.edges?.[0].node.number || 0) + 1}
                     volume={comicData?.comic.one?.chapters?.edges?.[0].node.volume || 1}
-                    params={params}
+                    comicId={comicId}
+                    lng={lng}
                 />
             )}
         </AppShellSection>

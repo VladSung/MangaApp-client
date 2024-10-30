@@ -34,7 +34,8 @@ export type OnSubmitHandler = (
 ) => void;
 
 export const ChapterUploadForm = ({
-    params,
+    comicId,
+    lng,
     volume,
     number,
     onSubmitHandler,
@@ -44,7 +45,8 @@ export const ChapterUploadForm = ({
     number?: number;
     submitLoading: boolean;
     onSubmitHandler: OnSubmitHandler;
-    params: { comicId: string; lng: string };
+    comicId: string;
+    lng: string;
 }) => {
     const minComicVolume = volume || 1;
     const minComicNumber = number || 1;

@@ -11,6 +11,7 @@ import { useTranslation } from '@src/shared/lib/i18n/client';
 import { Avatar } from '@src/shared/ui';
 import { IconPlus } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
 type Props = PageProps & {
     labels: {
@@ -19,7 +20,8 @@ type Props = PageProps & {
 };
 
 export const AddTeamWidget = ({ labels, params }: Props) => {
-    const { t } = useTranslation(params.lng, 'dashboard/creator/team/index');
+    const { lng } = use(params);
+    const { t } = useTranslation(lng, 'dashboard/creator/team/index');
 
     const router = useRouter();
     const [opened, { close, open }] = useDisclosure();
